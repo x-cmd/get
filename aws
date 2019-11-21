@@ -1,0 +1,142 @@
+#! /usr/bin/env bash
+
+aws.setup(){ 
+    aws configure set aws_access_key_id $1
+    aws configure set aws_secret_access_key $2
+    aws configure set region ap-northeast-1 
+}
+
+
+aws.ecr.setup.tag(){
+    export aws.ecr.tag=$1
+}
+
+# gojq = x jq
+aws.ecr.list(){
+    aws ecr describe-repositories | \
+        jq '.repositories[] | { name: .repositoryName, uri: .repositoryUri, tagmute: .imageTagMutability, create: .createdAt | strftime("%Y/%m/%d %H:%M")  }'
+}
+
+aws.ecr.urls(){
+    local A=$(aws ecr describe-repositories | \
+        jq -r '.repositories[].repositoryUri' | \
+        cut -d '/' -f 1 | \
+        uniq)
+    if [ -z "$1" ]; then
+        echo "${A[@]}"
+    else
+        echo ${A[$1]}
+    fi
+}
+
+aws.ecr.login(){
+    local _region=$(aws configure get region)
+    local region=${1:-$_region}
+    eval $(aws ecr get-login --no-include-email --region $region) 
+}
+
+aws_gen_t3=t3
+aws_gen_t3a=t3a
+
+aws_2c1g=micro
+aws_2c2g=small
+aws_2c4g=medium
+aws_2c8g=large
+aws_4c16g=xlarge
+aws_8c32g=2xlarge
+
+aws.ec2.security_group.create(){
+    local name=${1:?group-name} # groupname
+
+    aws ec2 describe-security-groups --group-names "$name" >> /dev/null
+    [ $? -eq 0 ] && return
+
+    aws ec2 create-security-group \
+        --group-name "$name" \
+        --description "${2:-"no info for this security group"}"
+}
+
+aws.ec2.security_group.add(){
+    local name=${1:?group-name} # groupname
+    local protocol=${2:?protocol} # tcp
+    local port=${3:?port} # 22
+    local cidr=${4:?cidr} #0.0.0.0/0
+    aws ec2 authorize-security-group-ingress \
+        --group-name $name \
+        --protocol $protocol --port $port --cidr $cidr
+}
+
+aws.ec2.security_group.describe(){
+    local name=${1:?group-name} # groupname
+    aws ec2 describe-security-groups --group-names $name
+}
+
+aws.ec2.key_pair.create(){
+    local name="${1:?key-pair-name}" # groupname
+    aws ec2 describe-key-pairs --key-names "$name" >> /dev/null
+    [ $? -eq 0 ] && return
+    aws ec2 create-key-pair $name
+}
+
+export AWS_EC2_ZONE_TOKYO=ap-northeast-1a
+
+aws.ec2.ip.allocate(){
+    aws ec2 create-tags --tag key=Name,value=dev11 --resources "eipalloc-02c7c8c98d1f1cc13"
+}
+
+aws.ec2.create(){
+    echo "$@"
+
+    local IMAGE_ID="${1:?ImageId}"
+
+    local AVA_ZONE="${2:?Provice zone}"
+
+    local name="${3:?name}"
+    local INSTANCE_TYPE="${4:?Intance type}"
+    local KEY_PAIR="${5:?keypair name}"
+
+    aws.ec2.security_group.create "$name"
+
+    aws.ec2.key_pair.create "$name"
+
+    echo "$INSTANCE_TYPE"
+
+    # local IMAGE_ID=ami-00379ec40a3e30f87 #ubuntu 18.04 # ami-5ec1673e
+    # local AVA_ZONE=ap-northeast-1a
+    aws ec2 run-instances \
+        --image-id "$IMAGE_ID" \
+        --key-name "$KEY_PAIR" --security-groups "$name" \
+        --instance-type "$INSTANCE_TYPE" \
+        --placement AvailabilityZone="$AVA_ZONE" \
+        --block-device-mappings DeviceName=/dev/sdh,Ebs={VolumeSize=100} \
+        --count 1
+}
+
+# aws.ec2.create.amazon(){ aws.ec2.create ami-0d097db2fb6e0f05e "$@"; }
+# aws.ec2.create.amazon-dev(){ aws.ec2.create ami-0e1e385b0a934254a "$@"; }
+# aws.ec2.create.amazon-dev-nvidia(){ aws.ec2.create ami-09d81be6f51fdf36e "$@"; }
+# aws.ec2.create.ubuntu18(){ aws.ec2.create ami-00379ec40a3e30f87 "$@"; }
+# aws.ec2.create.ubuntu18-dev-nvidia(){ aws.ec2.create ami-067f6aed863481eca "$@"; }
+# aws.ec2.create.windows2019(){ aws.ec2.create ami-076906b16e013789e "$@"; }
+
+aws.ec2.create.INIT(){
+    local REGION=${1:?region}
+    local CODE=${2:?region code name}
+    eval "
+aws.ec2.create.$REGION.amazon(){ aws.ec2.create ami-0064e711cbc7a825e $CODE "\$@"; }
+aws.ec2.create.$REGION.amazon-dev(){ aws.ec2.create ami-0ab3e16f9c414dee7 $CODE "\$@"; }
+aws.ec2.create.$REGION.amazon-dev-nvidia(){ aws.ec2.create ami-0fb38d659bdb97eba $CODE "\$@"; }
+
+aws.ec2.create.$REGION.ubuntu18(){ aws.ec2.create ami-056ec0a934b29c239 $CODE "\$@"; }
+aws.ec2.create.$REGION.ubuntu18-dev-nvidia(){ aws.ec2.create ami-0b6888712816cfdb8 $CODE "\$@"; }
+
+aws.ec2.create.$REGION.windows2019(){ aws.ec2.create ami-0d3b127e673885e80 $CODE "\$@"; }
+"
+}
+
+aws.ec2.create.INIT tokyo "ap-northeast-1a"
+
+# One key pair, one machine. Normally, it is not that important.
+
+# Auto Generation
+

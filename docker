@@ -1,0 +1,15 @@
+#! /usr/bin/env bash
+
+docker.rmi.unused(){
+
+}
+
+docker.rmc.stopped(){
+
+}
+
+# eval "${x @bash/std}"
+# eval "${x @bash/std/str}"
+# eval "${x @bash/std/regex}"
+
+# eval "${x @bash/docker}"

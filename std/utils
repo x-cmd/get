@@ -1,0 +1,100 @@
+#! /usr/bin/env bash
+
+str.trim(){
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   
+    echo -n "$var"
+}
+
+
+# str.lower(){ echo -n $1 | tr [:upper:] [:lower:]; }
+
+yesno(){
+    while true; do
+        read -p "$1 (Input 'y' for yes or 'n' for no): " p
+        p="$(str.trim $p)"
+        if [ "$p" == "y" ]; then
+            return 0
+        fi
+
+        if [ "$p" == "n" ]; then
+            return 1
+        fi
+    done
+}
+
+
+# Protected folders
+
+rmrf(){
+    for i in "$@"; do
+        local tgt="$(str.trim $i)"
+        [ "$tgt" == "" ] && continue
+
+        # TODO: add other patterns
+        if [ "$tgt" == "/" ]; then
+            yesno "WARNING: Sure of removing '$tgt': " || continue
+        fi
+
+        rm -rf $i
+    done
+}
+
+COLP(){
+  tput setaf "$1"
+  shift
+  echo -ne "$@"
+  tput sgr0
+}
+
+COLBP(){
+  tput setaf "$1"
+  tput bold
+  shift
+  echo -ne "$@"
+  tput sgr0
+}
+
+COLP(){
+  tput setaf "$1"
+  shift
+  echo -ne "$@"
+  tput sgr0
+}
+
+COLBP(){
+  tput setaf "$1"
+  tput bold
+#   tput smul
+  shift
+  echo -ne "$@"
+  tput sgr0
+}
+
+# with find arguments -x md,sh
+# ls shallow wrapper to improve the readability
+lsx(){
+    # Directory using blue
+    # Not the current user files using yellow
+    # Time Using More files
+    # files more than 1MB using bold
+
+    # while read -r l 
+    # do
+    #     echo $l;
+    # done <<< $(ls -alh)
+
+    ls -alh | while read -r l 
+    do
+        if [ "${l:0:1}" == "d" ]; then
+            # tput smul
+            COLBP 4 "$l\n";
+        else
+            COLP 7 "$l\n";
+        fi
+    done
+    
+}
