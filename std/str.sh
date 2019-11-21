@@ -37,3 +37,19 @@ str.upper(){ echo -n $1 | tr [:lower:] [:upper:]; }
 str.lower(){ echo -n $1 | tr [:upper:] [:lower:]; }
 
 # other format using library
+
+## Regular Expression design
+
+OR="\|"
+
+R.wrap(){
+    echo -n "\($1\)"
+}
+
+R.or(){
+    R.wrap $(str.join "\|" "$@")
+}
+
+# IP_0_255="[0-9]${OR}\([1-9][0-9]\)${OR}\(1[0-9][0-9]\)${OR}\(2[0-4][0-9]\)${OR}\(25[0-5]\)"
+IP_0_255=$( R.or `R.wrap [0-9]` `R.wrap [1-9][0-9]` `R.wrap 1[0-9][0-9]` `R.wrap 2[0-4][0-9]` `R.wrap 25[0-5]` )
+IP="\\b${IP_0_255}\.${IP_0_255}\.${IP_0_255}\.${IP_0_255}\\b"
