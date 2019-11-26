@@ -38,6 +38,22 @@ str.lower(){ echo -n $1 | tr [:upper:] [:lower:]; }
 
 # other format using library
 
+str.starts_with(){
+    :
+}
+
+str.ends_with(){
+    :
+}
+
+str.slice(){
+    :
+}
+
+str.index_of(){
+    :
+}
+
 ## text
 
 str.dos2unix(){

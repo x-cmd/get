@@ -216,6 +216,21 @@ map.get(){
     done
 }
 
+arr.indexof(){
+    local target="$1"
+    shift
+    local a=0
+    for i in "$@"; do
+        a=$((a + 1))
+        if [ "$i" == "$target" ]; then
+            echo $a
+            return 0
+        fi
+    done
+    echo -1
+    return 1
+}
+
 # Cookbook 1.15
 repeat(){ while :; do "$@"; sleep ${INTERVAL:-3}; done }
 repeat.until.success(){ while :; do "$@" && return; sleep ${INTERVAL:-3}; done }
