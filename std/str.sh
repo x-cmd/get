@@ -20,17 +20,17 @@ str.trim(){
     echo -n "$var"
 }
 
-str.trimLeft(){
+str.trim_left(){
     :
 }
 
-str.trimRight(){
+str.trim_right(){
     :
 }
 
 # According to 
 str.split(){
-    :
+    echo ${1:?source string} | tr ${2:?split char} '\n'
 }
 
 str.upper(){ echo -n $1 | tr [:lower:] [:upper:]; }
