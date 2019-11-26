@@ -50,7 +50,7 @@ str.slice(){
     :
 }
 
-str.index_of(){
+str.indexof(){
     :
 }
 

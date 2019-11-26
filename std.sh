@@ -99,10 +99,14 @@ echon(){
 # @valid.float()
 # @valid.int()
 valid.float(){
-    echo $0
+    [[ "$a" =~ ^[\ \t]+[0-9]+(.[0-9]+)?[\ \t]+$ ]]
+    return $?
 }
 
-# valid.int(){}
+valid.int(){
+    [[ "$a" =~ ^[\ \t]+[0-9]+[\ \t]+$ ]]
+    return $?
+}
 
 # rand
 
