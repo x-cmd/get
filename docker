@@ -1,12 +1,17 @@
 #! /usr/bin/env bash
 
-docker.rmi.unused(){
-
+docker.rm.unused_images(){
+    docker system prune "$@"
 }
 
-docker.rmc.stopped(){
-
+docker.ls.container(){
+    docker container ls -a "$@"
 }
+
+docker.rm.stopped_containers(){
+    docker container prune "$@"
+}
+
 
 # eval "${x @bash/std}"
 # eval "${x @bash/std/str}"

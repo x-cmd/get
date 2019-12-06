@@ -28,13 +28,30 @@ str.trim_right(){
     :
 }
 
-# According to 
+# According to str.split
 str.split(){
-    echo ${1:?source string} | tr ${2:?split char} '\n'
+    if [ $# -eq 1 ]; then
+        tr ${1:?split char} '\n'
+    else
+        echo ${2:?source string} | tr ${1:?split char} '\n'
+    fi
 }
 
-str.upper(){ echo -n $1 | tr [:lower:] [:upper:]; }
-str.lower(){ echo -n $1 | tr [:upper:] [:lower:]; }
+str.upper(){
+    if [ "$#" -eq 0 ]; then
+        tr [:lower:] [:upper:]
+    else
+        echo -n $1 | tr [:lower:] [:upper:]
+    fi
+}
+
+str.lower(){ 
+    if [ "$#" -eq 0 ]; then
+        tr [:upper:] [:lower:]
+    else
+        echo -n $1 | tr [:upper:] [:lower:]
+    fi
+}
 
 # other format using library
 
