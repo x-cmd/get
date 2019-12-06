@@ -53,21 +53,6 @@ COLP(){
 COLBP(){
   tput setaf "$1"
   tput bold
-  shift
-  echo -ne "$@"
-  tput sgr0
-}
-
-COLP(){
-  tput setaf "$1"
-  shift
-  echo -ne "$@"
-  tput sgr0
-}
-
-COLBP(){
-  tput setaf "$1"
-  tput bold
 #   tput smul
   shift
   echo -ne "$@"
@@ -96,5 +81,4 @@ lsx(){
             COLP 7 "$l\n";
         fi
     done
-    
 }

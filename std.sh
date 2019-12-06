@@ -51,7 +51,7 @@ X_CMD_COM_RETURN=""
 }
 
 @res(){
-    echo $X_CMD_COM_RETURN
+    echo "$X_CMD_COM_RETURN"
 }
 
 
