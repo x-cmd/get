@@ -20,29 +20,25 @@ init.curl(){
     return 1
 }
 
-# import docker
-# import aws
-# import std/aws
-
-# eval "$(x bash/std)"
-# eval "$(curl https://x-cmder.github.io/bash)"
-
-import-bash(){
+@use(){ 
     init.curl
-    eval "$($CURL https://x-cmder.github.io/bash/$1)"
+    mkdir -p "$HOME/.x-cmd.com/x-bash/std"
+    mkdir -p "$HOME/.x-cmd.com/x-bash/cloud"
+    [ ! -e "$HOME/.x-cmd.com/x-bash/$1" ] && \
+        $CURL https://x-bash.github.io/$1 > "$HOME/.x-cmd.com/x-bash/$1" 2>/dev/null && \
+    
+    [ $? -eq 0 ] && source "$HOME/.x-cmd.com/x-bash/$1"
+    # eval "$($CURL https://x-bash.github.io/$1)"
 }
-@use(){ import-bash "$@"; }
 
-import-std(){ import-bash "std/$1"; }
-@std(){ import-std "$@"; }
-
-import-all(){
-    import-std color
-    import-std regex
-    import-std str
-    import-std text
+@std(){ 
+    @use "std/$1" 
 }
-@stdall(){ import-all; }
+
+@stdall(){ 
+    @std ui
+    @std str
+}
 
 # Not good
 X_CMD_COM_RETURN=""
@@ -65,6 +61,3 @@ echon(){
 
 # Normally, output info, json or yml
 @out(){ echo "$*" >&1; }
-
-
-
