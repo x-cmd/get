@@ -117,24 +117,6 @@ title(){
     fi
 }
 
-rot13(){
-    tr '[a-zA-Z]' '[n-za-mN-ZA-M]'
-}
-
-rot(){
-    local rot=${1:-13}
-    local letter='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+'
-    local before=${letter:0:$rot}
-    local after=${letter:$rot}
-    tr $letter $after$before
-}
-
-rot.encode(){ rot "$*"; }
-rot.decode(){ local ROT=${1:-13}; rot $(( 65 - ROT )); }
-rot.brb.encode(){ base64 | rot.encode $1 | base64; }
-rot.brb.decode(){ base64 -d | rot.decode $1 | base64 -d; }
-
-
 # kv
 
 map.open(){

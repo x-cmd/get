@@ -107,12 +107,72 @@ str.remove_eol_space(){
     fi
 }
 
-crypto.base64(){
-    echo $(str.trim $(echo -n ${1:?Provide string} | base64))
+# rot13(){
+#     tr '[a-zA-Z]' '[n-za-mN-ZA-M]'
+# }
+
+str._rot(){
+    local rot=${1:-13}
+    local letter='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+'
+    local before=${letter:0:$rot}
+    local after=${letter:$rot}
+    tr $letter $after$before
 }
 
-crypto.unbase64(){
-    echo $(str.trim $(echo -n ${1:?Provide string} | base64 -d))
+str.rot.encode(){
+    local ROT=${1:?Provide rot number}
+    shift
+    if [ $# -eq 0 ]; then
+        str._rot $ROT
+    else
+        echo -n "$1" | str._rot $ROT
+    fi
+}
+
+str.rot.decode(){
+    local ROT=${1:?Provide rot number}
+    shift
+    if [ $# -eq 0 ]; then
+        str._rot $(( 65 - ROT ))
+    else
+        echo -n "$1" | str._rot $(( 65 - ROT ))
+    fi
+}
+
+str.brb.encode(){
+    local ROT=${1:?Provide rot number}
+    shift
+    if [ $# -eq 0 ]; then
+        base64 | str.rot.encode $ROT | base64; 
+    else
+        echo -n "$1" | base64 | str.rot.encode $ROT | base64; 
+    fi
+}
+
+str.brb.decode(){ 
+    local ROT=${1:?Provide rot number}
+    shift
+    if [ $# -eq 0 ]; then
+        base64 -d | str.rot.decode $ROT | base64 -d
+    else
+        echo -n "$1" | base64 -d | str.rot.decode $ROT | base64 -d
+    fi
+}
+
+str.base64(){
+    if [ $# -eq 0 ]; then
+        base64
+    else
+        echo $(str.trim $(echo -n ${1:?Provide string} | base64))
+    fi
+}
+
+str.unbase64(){
+    if [ $# -eq 0 ]; then
+        base64 -d
+    else
+        echo $(str.trim $(echo -n ${1:?Provide string} | base64 -d))
+    fi
 }
 
 
