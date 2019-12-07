@@ -107,6 +107,14 @@ str.remove_eol_space(){
     fi
 }
 
+crypto.base64(){
+    echo $(str.trim $(echo -n ${1:?Provide string} | base64))
+}
+
+crypto.unbase64(){
+    echo $(str.trim $(echo -n ${1:?Provide string} | base64 -d))
+}
+
 
 ## Regular Expression design
 
