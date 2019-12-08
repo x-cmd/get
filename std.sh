@@ -32,7 +32,7 @@ init.curl(){
 }
 
 @std(){ 
-    @use "std/$1" 
+    @use "std/$1"
 }
 
 @stdall(){ 

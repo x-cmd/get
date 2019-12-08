@@ -1,0 +1,60 @@
+
+
+assert(){
+    if [ $# -ne 0 ]; then
+        eval "$*"
+    else
+        code=$(cat)
+        eval "$code"
+    fi
+
+    if [ $? -eq 0 ]; then
+        return 0
+    else
+        echo "$FAIL"
+        return 1
+    fi
+}
+
+
+assert.grep(){
+    local pattern=$1
+    local filepath=$2
+    grep "$pattern" "$filepath"
+    if [ $? -eq 0 ]; then 
+        return 0
+    else
+        echo "$FAIL"
+        return 1
+    fi
+}
+
+assert.eq(){
+    local pattern=$1
+    local filepath=$2
+    grep "$pattern" "$filepath"
+    if [ $? -eq 0 ]; then 
+        return 0
+    else
+        echo "$FAIL"
+        return 1
+    fi
+}
+
+testFun(){
+    TMP_1=$(tmp.open)
+    docker run -it ubuntu bash > $TMP_1
+    FAIL="testFun failed"
+    assert.grep "work" $TMP_1
+    FAIL="" assert.grep $(line $TMP_1 2) $TMP_2
+    FAIL="testFun failed for reason like" assert.grep "$(line $TMP_1 3)" $TMP_2
+    FAIL="" assert.eq $(line $TMP_1 3) 2
+    line $TMP_1 3
+    tmp.close $TMP_1
+}
+
+# Example:
+# TIMEOUT=3 FAILURE="Fail if wrong" @ts "work1" testFun1
+# TIMEOUT=3 FAILURE="Fail if wrong" @testsuite "work1" testFun1
+# TIMEOUT=5 @ts "work2" testFun2
+
