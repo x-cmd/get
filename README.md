@@ -3,12 +3,12 @@
 ## 引用库
 
 ```bash
-eval "$(curl https://x-bash.github.io/std.sh)"
+eval "$(curl https://x-bash.github.io/boot)"
 @std str # equivalent to '@use std/str'
 @use std/ui
 ```
 
-最佳实践：
+最佳实践：(Not Implemented)
 
 ```bash
 eval "$(x bash)"
