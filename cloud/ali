@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 
 ali.dns.add.record(){
-    local DomainName=${1:?"Domain Name"}
-    local RR=${2:?"Provide RR"}
-    local Type=${3:?"Provide Type"}
+    local DomainName=${1:?"Domain Name. If you want to setup 'xxx.domain.com', please input 'domain.com'"}
+    local RR=${2:?"Provide RR. If you want to setup 'xxx.domain.com', please input 'xxx'"}
+    local Type=${3:?"Provide Type: A"}
     local Value=${4:?"Provide IP"}
     aliyun alidns AddDomainRecord \
         --DomainName "$DomainName" \
