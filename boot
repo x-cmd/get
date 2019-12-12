@@ -30,7 +30,7 @@ init.curl(){
     init.curl
     local URL="https://x-bash.github.io/$1"
     local TGT="$HOME/.x-cmd.com/x-bash/$1"
-    if [[ "$URL" =~ ^http:// ]] || [[ "$URL" =~ ^https:// ]]; then
+    if [[ "$1" =~ ^http:// ]] || [[ "$1" =~ ^https:// ]]; then
         URL="$1"
         TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
     fi
