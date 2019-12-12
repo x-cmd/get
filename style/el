@@ -1,0 +1,5 @@
+export PS1="\n$CLR_BOLD$CLR_YELLOW\$(date +%H:%M:%S)  $CLR_0$CLR_UNDERLINE$CLR_GREEN\$PWD$CLR_0  $CLR_BOLD$CLR_BLUE\u$CLR_0 $CLR_BLUE\$(displayLHOSTNAME) $CLR_RED$CLR_BOLD\$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\n$CLR_RED\$$CLR_0 "
+export PS2='\[\e[0;32m\]~>\[\e[m\]'
+
+export PS3='Enter your choices:'
+export PS4='\[\e[0;37;44m\]$LINENO@$0:\[\e[m\]'
