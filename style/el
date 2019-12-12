@@ -1,6 +1,8 @@
 # Setting bash style
 # Reference: https://blog.gtwang.org/linux/how-to-make-a-fancy-and-useful-bash-prompt-in-linux-2/
 
+# TODO: Use no tput no CLR_* variables in this file.
+
 export CLR_BOLD="\[$(tput bold)\]"
 export CLR_UNDERLINE="\[$(tput smul)\]" # \e[0;4m
 export CLD_DIM="\[$(tput dim)\]"

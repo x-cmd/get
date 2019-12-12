@@ -20,25 +20,35 @@ init.curl(){
     return 1
 }
 
-@use(){ 
+@use(){
+
+    # if [ -e "$1" ]; then
+    #     source "$1"
+    #     return 1
+    # fi
+
     init.curl
-    mkdir -p "$HOME/.x-cmd.com/x-bash/std"
-    mkdir -p "$HOME/.x-cmd.com/x-bash/cloud"
-    if [ ! -e "$HOME/.x-cmd.com/x-bash/$1" ]; then
-        $CURL https://x-bash.github.io/$1 \
-            >"$HOME/.x-cmd.com/x-bash/$1" 2>/dev/null
-        if grep ^\<\!DOCTYPE "$HOME/.x-cmd.com/x-bash/$1" >/dev/null; then
-            rm "$HOME/.x-cmd.com/x-bash/$1"
+    local URL="https://x-bash.github.io/$1"
+    local TGT="$HOME/.x-cmd.com/x-bash/$1"
+    if [[ "$URL" =~ ^http:// ]] || [[ "$URL" =~ ^https:// ]]; then
+        URL="$1"
+        TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
+    fi
+    
+    if [ ! -e "$TGT" ]; then
+        mkdir -p $(dirname "$TGT")
+        $CURL "$URL" >"$TGT" 2>/dev/null
+        if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
+            rm "$TGT"
             echo "Failed to load $1, do you want to load std/$1?"
             return 1
         fi
     fi
     
-    [ $? -eq 0 ] && source "$HOME/.x-cmd.com/x-bash/$1"
-    # eval "$($CURL https://x-bash.github.io/$1)"
+    [ $? -eq 0 ] && source "$TGT"
 }
 
-@clear-cache(){
+@use.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"
 }
 
@@ -63,7 +73,7 @@ X_CMD_COM_RETURN=""
 
 # WCSS #8
 echon(){
-    printf "$s" "$*"
+    printf "%s" "$*"
 }
 
 # Normally, output the progress
