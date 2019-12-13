@@ -5,13 +5,13 @@ init.curl(){
         return
     fi
 
-    curl --version
+    curl --version 1>/dev/null 2>&1
     if [ $? -eq 0 ]; then
         export CURL=curl
         return
     fi
 
-    x curl --version
+    x curl --version 1>/dev/null 2>&1
     if [ $? -eq 0 ]; then
         export CURL="x curl"
         return
