@@ -39,8 +39,7 @@ source $(x which bash)
 在`~/.bashrc`后面加入：
 
 ```bash
-D="$HOME/.x-cmd.com/x-bash/boot" \
-    eval '[ -e $D ] || curl "https://x-bash.github.io/boot" >$D && source $D'
+D="$HOME/.x-cmd.com/x-bash/boot" eval '[ -e $D ] || curl "https://x-bash.github.io/boot" >$D && source $D'
 ```
 
 上述代码完成如下操作：

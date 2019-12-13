@@ -1,0 +1,9 @@
+
+# Doesn't work on some occations.
+
+file.exist_or_append(){
+  local filename="$1"
+  local string_to_append="$2"
+  grep -F --quiet "$string_to_append" "$filename" || echo "$string_to_append" >> "$filename"
+  echo "$filename"
+}
