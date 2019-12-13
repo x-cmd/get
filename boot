@@ -20,7 +20,7 @@ init.curl(){
     return 1
 }
 
-@use(){
+@src(){
 
     # if [ -e "$1" ]; then
     #     source "$1"
@@ -45,21 +45,17 @@ init.curl(){
         fi
     fi
     
-    [ $? -eq 0 ] && source "$TGT"
+    [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD?-source} "$TGT"
 }
 
-@use.clear-cache(){
+@src.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"
 }
 
-@std(){ 
-    @use "std/$1"
+@run(){
+    X_CMD_COM_PARAM_CMD=bash @src "$*"
 }
 
-@stdall(){ 
-    @std ui
-    @std str
-}
 
 # Not good
 X_CMD_COM_RETURN=""
@@ -83,7 +79,7 @@ echon(){
 # Normally, output info, json or yml
 @out(){ echo "$*" >&1; }
 
-@install_in_bashrc(){
+@install(){
     local STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -e \$D ] || mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D && source \$D' "
     if grep "https://x-bash.github.io/boot" "$HOME/.bashrc" >/dev/null; then
         @log Already install
@@ -95,5 +91,7 @@ echon(){
 }
 
 if [ ! -z "$INSTALL" ]; then
-    @install_in_bashrc
+    @run install
+    # @src install
+    # @src upgrade
 fi
