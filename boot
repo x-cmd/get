@@ -83,7 +83,7 @@ echon(){
 # Normally, output info, json or yml
 @out(){ echo "$*" >&1; }
 
-install_in_bashrc(){
+@install_in_bashrc(){
     local STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -e \$D ] || mkdir -p $(dirname $D) && curl \"https://x-bash.github.io/boot\" >\$D && source \$D' "
     if grep "https://x-bash.github.io/boot" "$HOME/.bashrc" >/dev/null; then
         @log Already install
@@ -95,5 +95,5 @@ install_in_bashrc(){
 }
 
 if [ ! -z "$INSTALL" ]; then
-    install_in_bashrc
+    @install_in_bashrc
 fi
