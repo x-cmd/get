@@ -4,13 +4,10 @@
 2. 支持云cache
 3. 必要时，可以将@use替换成相应的库函数，打包成可用的bash函数；采用
 
-
 ```bash
 https://x-bash.github.io
 提供bash基本库
 ```
-
-
 
 ```bash
 eval "$(curl https://x-bash.github.io)"

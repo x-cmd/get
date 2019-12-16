@@ -1,5 +1,28 @@
 #! /usr/bin/env bash
 
+# Not good
+X_CMD_COM_RETURN=""
+@ret(){
+    export X_CMD_COM_RETURN="$@"
+}
+
+@res(){
+    echo "$X_CMD_COM_RETURN"
+}
+
+# WCSS #8
+echon(){
+    printf "%s" "$*"
+}
+
+# Normally, output the progress
+@log(){ echo "$*" >&2; } # fine
+@fatal(){ echo "$*" >&2; exit; } # error
+
+# Normally, output info, json or yml
+@out(){ echo "$*" >&1; }
+
+
 str.trim(){
     local var="$*"
     # remove leading whitespace characters
@@ -101,10 +124,15 @@ rand.str(){
 
 
 # Cookbook 1.15
-repeat(){ while :; do "$@"; sleep ${INTERVAL:-3}; done }
-repeat.until.success(){ while :; do "$@" && return; sleep ${INTERVAL:-3}; done }
+try(){ while :; do "$@"; sleep ${INTERVAL:-3}; done }
+try.until.success(){ while :; do "$@" && return; sleep ${INTERVAL:-3}; done }
 
-
+repeat(){
+    local time=3
+    for i in `seq $time`; do
+        eval "$*"
+    done
+}
 
 # Using X, or using curl to include method
 

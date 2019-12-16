@@ -2,22 +2,37 @@
 
 ## 安装
 
-### 引用并且安装在`~/.bashrc`上
+### 先睹为快：引用并且安装在`~/.bashrc`上
 
 ```bash
-INSTALL=1 eval "$(curl https://x-bash.github.io/boot)"
+eval "$(curl https://x-bash.github.io/boot)" && @run install
+```
+
+如果你是`x-cmd`用户
+
+```bash
+eval "$(x bash/boot)" && @run install
 ```
 
 ### 直接引用
 
 ```bash
 eval "$(curl https://x-bash.github.io/boot)"
-
-# 如果需要设置启动bash时自动加载
-@install_in_bashrc
 ```
 
-### 手动配置`~/.bashrc`文件，自动加载
+```bash
+eval $(x @bash/boot)
+```
+
+### 配置`~/.bashrc`文件，实行自动加载boot
+
+**使用脚本自动配置**
+
+```bash
+@run install
+```
+
+**手动配置`~/.bashrc`文件，自动加载**
 
 在`~/.bashrc`后面加入：
 
