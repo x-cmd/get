@@ -1,0 +1,17 @@
+
+# See https://stackoverflow.com/questions/22009364/is-there-a-try-catch-command-in-bash
+# Solutions based upon subshell, which is not my intention.
+
+# This solution is not good. If there is multiple function. @try, @finally, @catch just wrong.
+@go-try(){
+    @try
+    local code=$?
+    [ $? -ne 0 ] && @catch
+    @finally
+    return $code
+}
+
+@defer(){
+    trap "$1" RETURN
+    echo "In defer"
+}
