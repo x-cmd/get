@@ -1,0 +1,29 @@
+# Hashset
+
+# using declared set
+
+set.create(){
+    :
+}
+
+set.free(){
+    :
+}
+
+set.has(){
+    :
+}
+
+set.put(){
+    :
+}
+
+# give key
+set.remove(){
+    :
+}
+
+set.list(){
+    :
+}
+

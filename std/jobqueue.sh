@@ -1,69 +1,46 @@
+# @use std/list
+# @use std/utils
 
-# Reference: https://hackthology.com/a-job-queue-in-bash.html
-
-# Reference: https://blog.garage-coding.com/2016/02/05/bash-fifo-jobqueue.html#sec-3-1-1
-
-queue.create(){
-    queue="${TMPDIR}concurrent.$RANDOM"
-    mkdir -p $queue
-    mkfifo $queue/fifo
-    queue.set_max $1
-    queue.daemon $queue & # 1>$queue/stdout 2>$queue/stderr &
+jobqueue.create(){
+    eval "export ${1:?Provide queue name}=()"
+    eval "export $1_max=${2:-6}"
+    export O=$1
 }
 
-queue.daemon(){
-    # cat ${queue:?"env queue is empty"}/fifo | while read command; do
-    while read -r command; do
-        echo "Start: Get Command: $command" >&2
-        if [ "$command" = "exit" ]; then
-            echo "Deamon ends" >&2
-            return 0
-        fi
-
-        while :; do
-            local current_consumer_num=$(( $(ls $queue | wc -l ) - 4  ))
-            local max=$(cat $queue/max)
-
-            echo "a" $current_consumer_num >&2
-            echo "b" $max >&2
-
-            if [ "$current_consumer_num" -lt "$max" ]; then
-                break
-            fi
-            echo "continue sleep" >&2
-            sleep 3s
-        done
-
-        echo "Get Command: $command" >&2
-        # (
-        #     local NAME=$queue/$RANDOM
-        #     touch $NAME
-        #     eval "$command"
-        #     rm $NAME
-        # ) &
-        # ) 1>>$queue/stdout 2>>$queue/stderr &
-    done <${queue:?"env queue is empty"}/fifo
+jobqueue.set_max(){
+    eval "export ${O:?Provide queue size}_max=3"
 }
 
-queue.set_max(){
-    local max=${1:-3}
-    echo $max >${queue:?"env queue is empty"}/max
+jobqueue.get_max(){
+    eval "echo \$${O:?Provide queue size}_max"
 }
 
-queue.add_job(){
-    if [ ! -e ${queue:?"env queue is empty"}/fifo ]; then
-        echo "$queue/fifo doesn't exists. It is provided in first argument." >&2
-        return 1
+jobqueue.offer(){
+    local cur=$(jobs | wc -l)
+    local max=$(jobqueue.get_max)
+    if [ $cur -le $max ]; then
+        (eval "$@") 1>&1 2>&2 &
+        return 0
     fi
-    echo "$*" >$queue/fifo
+    return 1
 }
 
-queue.shutdown(){
-    echo "exit" >${queue:?"env queue is empty"}/fifo
-    rm $queue/*
-    rm -f $queue
+jobqueue.put(){
+    until jobqueue.offer $@; do
+        sleep 3s;
+    done
 }
 
-queue.clear(){
-    rm -rf "${TMPDIR}concurrent.*"
+jobqueue.clear(){
+    eval "export $1=()"
 }
+
+jobqueue.test.ping(){
+    jobqueue.create queue4ping 100
+    for ip in ${1:?Provide ip range like 192.168.6}.{1..255}; do 
+        echo $ip;
+        jobqueue.put "ping -c 2 $ip && echo $ip >>available.ip.list"; 
+    done
+    jobqueue.clear
+}
+

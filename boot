@@ -21,7 +21,7 @@
     return 1
 }
 
-@src(){
+@src.one(){
     @init.curl
     local URL="https://x-bash.github.io/$1"
     local TGT="$HOME/.x-cmd.com/x-bash/$1"
@@ -42,6 +42,8 @@
     
     [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD?-source} "$TGT"
 }
+
+@src(){ for i in "$@"; do @src.one $1; done }
 
 @src.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"

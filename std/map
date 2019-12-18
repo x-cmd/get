@@ -1,0 +1,33 @@
+# Hashset
+
+# using declared set
+
+map.create(){
+    :
+}
+
+map.free(){
+    :
+}
+
+map.has(){
+    :
+}
+
+map.get(){
+    :
+}
+
+map.put(){
+    :
+}
+
+# give key
+map.remove(){
+    :
+}
+
+set.list(){
+    :
+}
+
