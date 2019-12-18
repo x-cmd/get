@@ -1,6 +1,12 @@
 {
-    "[plaintext]": {
-       
-    },
     "files.defaultLanguage": "shellscript",
+    "files.associations": {
+        "**/std/*": "shellscript",
+        "**/tools/*": "shellscript",
+        "**/cloud/*": "shellscript",
+        "**/con/*": "shellscript",
+        "**/style/*": "shellscript",
+        "boot": "shellscript",
+        "install*": "shellscript",
+    }
 }
