@@ -1,0 +1,33 @@
+# Hashset
+
+# using declared set
+
+fmap.create(){
+    :
+}
+
+fmap.free(){
+    :
+}
+
+fmap.has(){
+    :
+}
+
+fmap.get(){
+    :
+}
+
+fmap.put(){
+    :
+}
+
+# give key
+fmap.remove(){
+    :
+}
+
+fmap.list(){
+    :
+}
+

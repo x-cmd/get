@@ -1,0 +1,29 @@
+# Hashset
+
+# using declared fset
+
+fset.create(){
+    :
+}
+
+fset.free(){
+    :
+}
+
+fset.has(){
+    :
+}
+
+fset.put(){
+    :
+}
+
+# give key
+fset.remove(){
+    :
+}
+
+fset.list(){
+    :
+}
+

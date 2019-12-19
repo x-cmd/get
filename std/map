@@ -2,16 +2,20 @@
 
 # using declared set
 
+# Using 
+
 map.create(){
-    :
+    # eval "export $1=()"
+    eval "declare -A $1"
+    export O=$1
 }
 
 map.free(){
-    :
+    eval "unset $O"
 }
 
 map.has(){
-    :
+    
 }
 
 map.get(){
@@ -27,7 +31,7 @@ map.remove(){
     :
 }
 
-set.list(){
+map.list(){
     :
 }
 
