@@ -1,33 +1,44 @@
-# Hashset
 
-# using declared set
+# kv
 
-fmap.create(){
-    :
+@src str
+
+fmap.open(){
+    export KV_MAP=${1:?map}
+    touch $KV_MAP
 }
 
-fmap.free(){
-    :
+fmap.keys(){
+    for e in $(cat ${KV_MAP:?"Please invoke map.init()"} | cut -d ' ' -f 1); do
+        str.unbase64 $e
+    done
 }
 
-fmap.has(){
-    :
-}
-
-fmap.get(){
-    :
+fmap.values(){
+    for e in $(cat ${KV_MAP:?"Please invoke map.init()"} | cut -d ' ' -f 2); do
+        str.unbase64 $e
+    done
 }
 
 fmap.put(){
-    :
+    echo "$(str.base64 $1) $(str.base64 $2)" >> $KV_MAP
+    #TODO: sort and unique
+    # cat $KV_MAP | sort | unique
 }
 
-# give key
-fmap.remove(){
-    :
+fmap.get(){
+    local MAP=${KV_MAP:?"Please invoke map.init()"}
+    local TARGET=$(str.base64 ${1:?Provide target})
+    # notice the following not works: for e in $(cat $MAP); do 
+    cat $MAP | while read e
+    do
+        # echo "111" $e
+        local KEY=$(echo $e | cut -d ' ' -f 1)
+        if [ "$KEY" == "$TARGET" ]; then
+            local VALUE=$(echo $e | cut -d ' ' -f 2)
+            # echo $KEY $VALUE
+            str.unbase64 $VALUE
+            return
+        fi
+    done
 }
-
-fmap.list(){
-    :
-}
-

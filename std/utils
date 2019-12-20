@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+@use str
+
 # Not good
 X_CMD_COM_RETURN=""
 @ret(){
@@ -23,31 +25,17 @@ echon(){
 @out(){ echo "$*" >&1; }
 
 
-str.trim(){
-    local var="$*"
-    # remove leading whitespace characters
-    var="${var#"${var%%[![:space:]]*}"}"
-    # remove trailing whitespace characters
-    var="${var%"${var##*[![:space:]]}"}"   
-    echo -n "$var"
-}
+# str.trim(){
+#     local var="$*"
+#     # remove leading whitespace characters
+#     var="${var#"${var%%[![:space:]]*}"}"
+#     # remove trailing whitespace characters
+#     var="${var%"${var##*[![:space:]]}"}"   
+#     echo -n "$var"
+# }
 
 
 # str.lower(){ echo -n $1 | tr [:upper:] [:lower:]; }
-
-yesno(){
-    while true; do
-        read -p "$1 (Input 'y' for yes or 'n' for no): " p
-        p="$(str.trim $p)"
-        if [ "$p" == "y" ]; then
-            return 0
-        fi
-
-        if [ "$p" == "n" ]; then
-            return 1
-        fi
-    done
-}
 
 
 # Protected folders
@@ -144,48 +132,6 @@ title(){
     else
         echo -e "\033]0;$@\007"
     fi
-}
-
-# kv
-
-map.open(){
-    export KV_MAP=${1:?map}
-    touch $KV_MAP
-}
-
-map.keys(){
-    for e in $(cat ${KV_MAP:?"Please invoke map.init()"} | cut -d ' ' -f 1); do
-        crypto.unbase64 $e
-    done
-}
-
-map.values(){
-    for e in $(cat ${KV_MAP:?"Please invoke map.init()"} | cut -d ' ' -f 2); do
-        crypto.unbase64 $e
-    done
-}
-
-map.put(){
-    echo "$(crypto.base64 $1) $(crypto.base64 $2)" >> $KV_MAP
-    #TODO: sort and unique
-    cat $KV_MAP | sort
-}
-
-map.get(){
-    local MAP=${KV_MAP:?"Please invoke map.init()"}
-    local TARGET=$(crypto.base64 ${1:?Provide target})
-    # notice the following not works: for e in $(cat $MAP); do 
-    cat $MAP | while read e
-    do
-        # echo "111" $e
-        local KEY=$(echo $e | cut -d ' ' -f 1)
-        if [ "$KEY" == "$TARGET" ]; then
-            local VALUE=$(echo $e | cut -d ' ' -f 2)
-            # echo $KEY $VALUE
-            crypto.unbase64 $VALUE
-            return
-        fi
-    done
 }
 
 arr.indexof(){

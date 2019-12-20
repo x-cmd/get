@@ -33,3 +33,13 @@ set.print(){
     done
 }
 
+set.dump(){
+    list.print
+}
+
+set.load(){
+    map.create
+    while read s; do
+        list.push s
+    done
+}

@@ -45,3 +45,20 @@ alias @std="@src std/"
 @std str
 ```
 
+```bash
+str: string operations
+
+list: using work
+map: provide map facility
+set: set facility
+fmap: filebased map facility
+
+job: concurrent facility
+
+
+```
+
+# 以何种程度为宜
+
+
+

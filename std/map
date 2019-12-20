@@ -66,3 +66,13 @@ map.print(){
     done
 }
 
+map.dump(){
+    list.print
+}
+
+map.load(){
+    map.create
+    while read s; do
+        list.push s
+    done
+}

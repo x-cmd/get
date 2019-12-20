@@ -95,3 +95,17 @@ RUN_CMD_WITH_STEP() {
 # x con "~hello~"
 # x con ""
 
+
+ui.yesno(){
+    while true; do
+        read -p "$1 (Input 'y' for yes or 'n' for no): " p
+        p="$(str.trim $p)"
+        if [ "$p" == "y" ]; then
+            return 0
+        fi
+
+        if [ "$p" == "n" ]; then
+            return 1
+        fi
+    done
+}

@@ -7,3 +7,7 @@ file.exist_or_append(){
   grep -F --quiet "$string_to_append" "$filename" || echo "$string_to_append" >> "$filename"
   echo "$filename"
 }
+
+# file.find(){
+  
+# }
