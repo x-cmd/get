@@ -3,7 +3,7 @@
 # using declared set
 
 # source `dirname ${BASH_SOURCE[0]}`/map
-@use map
+@src map
 
 set.create(){
     map.create "$@"

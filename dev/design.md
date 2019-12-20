@@ -2,7 +2,7 @@
 
 1. 提供一个轻量级的bash库，来显著提升bash的可读性
 2. 支持云cache
-3. 必要时，可以将@use替换成相应的库函数，打包成可用的bash函数；采用
+3. 必要时，可以将@src替换成相应的库函数，打包成可用的bash函数；采用
 
 ```bash
 https://x-bash.github.io
@@ -13,22 +13,22 @@ https://x-bash.github.io
 eval "$(curl https://x-bash.github.io)"
 
 # str处理
-@use str
+@src str
 str.trim_left "  hello"
 
 # math处理
-@use math
+@src math
 
 # json object处理
-@use json
+@src json
 
-@use net
+@src net
 
-@use ui
+@src ui
 
-@use x
+@src x
 
-@use crypto
+@src crypto
 
 x install network
 ```

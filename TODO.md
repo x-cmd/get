@@ -1,7 +1,7 @@
 # Which is better
 
 
-`@use` vs `@src`
+`@src` vs `@src`
 
 `@src.cache.clear`
 

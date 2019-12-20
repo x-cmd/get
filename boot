@@ -40,7 +40,7 @@
         fi
     fi
     
-    [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD?-source} "$TGT"
+    [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
 }
 
 @src(){ for i in "$@"; do @src.one $1; done }

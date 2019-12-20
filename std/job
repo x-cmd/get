@@ -1,5 +1,5 @@
-# @use std/list
-# @use std/utils
+# @src std/list
+# @src std/utils
 
 # One bash only have one queue?
 
@@ -42,7 +42,7 @@ job.test.ping(){
     job.wait_until_finished
 }
 
-# @use std/list
+# @src std/list
 job.pool.create(){
     eval "export ${1:?Provide queue name}=()"
     eval "export $1_max=${2:-6}"

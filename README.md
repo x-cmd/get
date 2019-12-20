@@ -51,8 +51,8 @@ D="$HOME/.x-cmd.com/x-bash/boot" eval '[ -e $D ] || mkdir -p $(dirname $D) && cu
 
 ```bash
 eval "$(curl https://x-bash.github.io/boot)"
-@std str # equivalent to '@use std/str'
-@use std/ui
+@std str # equivalent to '@src std/str'
+@src std/ui
 ```
 
 最佳实践：(Not Implemented)
@@ -68,7 +68,7 @@ source $(x which bash)
 例如，引用str模块
 
 ```bash
-@use std/str
+@src std/str
 # 或者
 @std str # 引用str模块
 ```
@@ -76,7 +76,7 @@ source $(x which bash)
 引用aws模块
 
 ```bash
-@use cloud/aws
-@use cloud/ali
-@use cloud/az
+@src cloud/aws
+@src cloud/ali
+@src cloud/az
 ```

@@ -1,4 +1,4 @@
-@use std/job
+@src std/job
 
 net.is_ping_available(){
     ping -c 2 ${1:?ip} 1>/dev/null 2>&1

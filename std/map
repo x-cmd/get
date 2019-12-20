@@ -4,8 +4,8 @@
 
 # Using 
 
-@use std/list
-@use std/str
+@src std/list
+@src std/str
 
 map.create(){
     list.create "$@"
