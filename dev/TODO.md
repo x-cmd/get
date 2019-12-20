@@ -11,3 +11,15 @@
 2. 在大部分环境中，不需要太多的预装和依赖
 3. 在大部分环境中，tab的自动补全可用；不需要额外依赖更多的工具
 
+# Which is better
+
+
+`@src` vs `@src`
+
+`@src.cache.clear`
+
+`@install_in_bashrc`
+vs
+
+`@install`, `@upgrade`, `@reload`
+
