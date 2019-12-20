@@ -23,3 +23,25 @@ vs
 
 `@install`, `@upgrade`, `@reload`
 
+# 使用习惯
+
+```bash
+alias @std="@src std/"
+@src std/str
+@std str
+
+@src cloud/ali
+```
+
+# 这个库的边界？
+
+1. 提供str, ui, net, set, test
+2. （见仁见智）提供基础的bash命令shortcut，例如`git，ali，azure`，用来加快运维速度
+
+
+```bash
+@src str
+
+@std str
+```
+
