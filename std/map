@@ -4,34 +4,65 @@
 
 # Using 
 
+source `dirname ${BASH_SOURCE[0]}`/list
+source `dirname ${BASH_SOURCE[0]}`/str
+
 map.create(){
-    # eval "export $1=()"
-    eval "declare -A $1"
-    export O=$1
+    list.create "$@"
 }
 
 map.free(){
-    eval "unset $O"
+    list.free
 }
 
 map.has(){
-    
+    map.get "$1" > /dev/null
 }
 
 map.get(){
-    :
+    local key=${1:?Provide key}
+    local keyecode=$(str.base64 $key)
+    for i in $(list.print); do
+        local k=$(echo $i | cut -d ':' -f 1)
+        if [ "$k" = "$keyecode" ]; then
+            local v=$(echo $i | cut -d ':' -f 2)
+            echo "$(str.unbase64 $v)"
+            return 0
+        fi
+    done
+    return 1
 }
 
 map.put(){
-    :
+    local key="$(str.base64 "${1:?Provide key}")"
+    local value="$(str.base64 "${2:?Provide value}")"
+    map.remove $1
+    echo "$key":"$value"
+    list.push "$key:$value"
 }
 
 # give key
 map.remove(){
-    :
+    local key="${1:?Key}"
+    local key_base="$(str.base64 "${1:?Provide key}")"
+    local idx=0
+    for i in $(list.print); do
+        local k=$(echo -n $i | cut -d ':' -f 1)
+        if [ "$k" = "$key_base" ]; then
+            echo remove $idx
+            list.remove "$idx"
+            return 0
+        fi
+        let idx=idx+1
+    done
+    return 1
 }
 
-map.list(){
-    :
+map.print(){
+    for i in $(list.print); do
+        local k=$(echo -n $i | cut -d ':' -f 1)
+        local v=$(echo -n $i | cut -d ':' -f 2)
+        echo "$(str.unbase64 $k) = $(str.unbase64 $v)"
+    done
 }
 

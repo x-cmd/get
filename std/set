@@ -2,28 +2,34 @@
 
 # using declared set
 
+source `dirname ${BASH_SOURCE[0]}`/map
+# @use map
+
 set.create(){
-    :
+    map.create "$@"
 }
 
 set.free(){
-    :
+    map.free
 }
 
 set.has(){
-    :
+    map.has ${1:?Provide value}
 }
 
 set.put(){
-    :
+    map.put ${1:?Provide value} "1"
 }
 
 # give key
 set.remove(){
-    :
+    map.remove ${1:?Provide value}
 }
 
-set.list(){
-    :
+set.print(){
+    for i in $(list.print); do
+        local k=$(echo -n $i | cut -d ':' -f 1)
+        echo "$(str.unbase64 $k)"
+    done
 }
 

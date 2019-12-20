@@ -31,6 +31,27 @@ list.first(){
     return 0
 }
 
+list.get(){
+    local idx=${1:?Index}
+    if [ $idx -ge $(list.size) ]; then
+        echo "Index exceeds size" >&2
+        return 1
+    fi
+    eval "echo \${$O[$idx]}"
+    return 0
+}
+
+list.remove(){
+    local idx=${1:?Index}
+    if [ $idx -ge $(list.size) ]; then
+        echo "Index exceeds size" >&2
+        return 1
+    fi
+    # eval "echo \${$O[$idx]}"
+    eval "$O=( \"\${$O[@]:0:$idx}\" \"\${$O[@]:$((idx+1))}\" )"
+    return 0
+}
+
 list.shift(){
     if [ $(list.size) -le 0 ]; then
         echo "No element to shift" >&2

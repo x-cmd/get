@@ -21,7 +21,7 @@ eval "$(curl https://x-bash.github.io/boot)"
 ```
 
 ```bash
-eval $(x @bash/boot)
+eval "$(x @bash/boot)"
 ```
 
 ### 配置`~/.bashrc`文件，实行自动加载boot
