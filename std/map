@@ -4,8 +4,8 @@
 
 # Using 
 
-source `dirname ${BASH_SOURCE[0]}`/list
-source `dirname ${BASH_SOURCE[0]}`/str
+@use std/list
+@use std/str
 
 map.create(){
     list.create "$@"

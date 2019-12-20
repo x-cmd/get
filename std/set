@@ -2,8 +2,8 @@
 
 # using declared set
 
-source `dirname ${BASH_SOURCE[0]}`/map
-# @use map
+# source `dirname ${BASH_SOURCE[0]}`/map
+@use map
 
 set.create(){
     map.create "$@"
