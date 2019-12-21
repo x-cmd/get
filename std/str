@@ -175,6 +175,30 @@ str.unbase64(){
     fi
 }
 
+str.md5(){
+    if which md5 >/dev/null 2>&1; then
+        echo -n ${1:?hint} | md5 | cut -d ' ' -f 1
+    else
+        echo -n ${1:?hint} | md5sum | cut -d ' ' -f 1
+    fi
+}
+
+str.sha(){
+    local ALGOR=${ALGOR:-1}
+    if which shasum >/dev/null 2>&1; then
+        echo -n ${1:?str to encrypt} | shasum -a $ALGOR | cut -d ' ' -f 1
+        return 0
+    fi
+
+    local cmd=sha$ALGORsum
+    if which $cmd >/dev/null 2>&1; then
+        echo -n ${1:?str to encrypt} | $cmd | cut -d ' ' -f 1
+        return 0
+    fi
+
+    # TODO: Install x and provide encryption
+}
+
 
 ## Regular Expression design
 

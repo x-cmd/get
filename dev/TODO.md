@@ -35,6 +35,8 @@ alias @std="@src std/"
 
 # 这个库的边界？
 
+其实不应该提供纯运行的函数，应该采用@run
+
 1. 提供str, ui, net, set, test
 2. （见仁见智）提供基础的bash命令shortcut，例如`git，ali，azure`，用来加快运维速度
 
