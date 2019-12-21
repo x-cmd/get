@@ -12,9 +12,9 @@
         return
     fi
 
-    x curl --version 1>/dev/null 2>&1
+    which x 1>/dev/null 2>&1
     if [ $? -eq 0 ]; then
-        export CURL="x curl"
+        export CURL="x cat"
         return
     fi
     
