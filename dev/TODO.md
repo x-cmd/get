@@ -77,8 +77,6 @@ db/:
     mongo: mongo client对数据进行备份和转移
     mysql
     postgres
-
-
 ```
 
 | 采用std等树状分级 | 完全扁平化 |
@@ -87,11 +85,14 @@ db/:
 树状分级 vs 扁平化
 
 1. （树状）适合代码规模扩展，减少冲突可能
-2. （扁平化）减少记忆复杂度
-3. （树状）树木更多，更容易管理
-4. 
+2. （扁平化）缩短输入字符数字，当文件很多时也能减少记忆复杂度
+3. （树状）数目更多，更容易管理
+4.  (树状) 如果分配得当，也能降低复杂度：std，cloud，net，style
 
-# 以何种程度为宜
+归类：
 
-
-
+std: str/job/ui/... bash relative optimization
+cloud: aws/ali/az/gae/.../tencent/bae
+net: http/nmap/ping/nessus/proxy/nginx
+db: postgres/mysql/mongo
+word: some file processing
