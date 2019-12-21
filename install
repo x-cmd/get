@@ -5,3 +5,30 @@ else
     echo $STR >> $HOME/.bashrc
     echo Installed in "$HOME/.bashrc" >&2
 fi
+
+if ${ALL?-""}; then
+    exit 0
+fi
+
+LS=(
+    std/file
+    std/find
+    std/fmap
+    std/fset
+    std/ip
+    std/job
+    std/list
+    std/map
+    std/net
+    std/set
+    std/str
+    std/test
+    std/ui
+    std/utils
+)
+
+eval "$SRC"
+for i in ${LS[@]}; do;
+    @src $i
+done
+
