@@ -1,5 +1,6 @@
 eval "$(curl https://x-bash.github.io/boot)"
-@src std/list std/utils
+
+@src std/list std/utils std/test
 
 list.test(){
     list.create testwork

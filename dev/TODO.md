@@ -41,22 +41,55 @@ alias @std="@src std/"
 
 ```bash
 @src str
-
-@std str
 ```
 
-```bash
-str: string operations
+```markdown
 
-list: using work
-map: provide map facility
-set: set facility
-fmap: filebased map facility
+std/: 提供facility，基于bash的标准内建命令
+    str: string operations
 
-job: concurrent facility
+    list: using work
+    map: provide map facility
+    set: set facility
+    fmap: filebased map facility
+    fset: filebased set facility
+    
+    job: concurrent facility based upon jobs
+
+    test: test facility
+    ui: facility for ui elements
+    utils: other utils
+
+
+style/: 风格库
+
+其他则是各种命令下的增强
+cloud/:
+    aws
+    az
+    ali
+
+net/: facility for linux
+    nmap: nmap命令基本封装
+    ping: ping封装
+
+db/:
+    mongo: mongo client对数据进行备份和转移
+    mysql
+    postgres
 
 
 ```
+
+| 采用std等树状分级 | 完全扁平化 |
+| --- | --- |
+
+树状分级 vs 扁平化
+
+1. （树状）适合代码规模扩展，减少冲突可能
+2. （扁平化）减少记忆复杂度
+3. （树状）树木更多，更容易管理
+4. 
 
 # 以何种程度为宜
 

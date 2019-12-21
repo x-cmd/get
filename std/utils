@@ -54,23 +54,6 @@ rmrf(){
     done
 }
 
-
-
-# path
-alias path.dirname=dirname
-alias path.basename=basename
-path.extension(){
-    local filepath=$(basename ${1:?Provide file path})
-    local ret=${filepath#*.}
-    # to handle the situation: `path.extensions abc`, ret="abc", should return ""
-    [ "$ret" == "$filepath" ] || echo $ret
-}
-
-path.filename(){
-    local filepath=$(basename ${1:?Provide file path})
-    echo ${filepath%.*}
-}
-
 # fp
 
 # In linux, `readlink -f <filepath>`. Not works in BSD system

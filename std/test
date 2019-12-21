@@ -16,6 +16,15 @@ assert(){
     fi
 }
 
+test.expect(){
+    local s1=${1:?Real}
+    local s2=${2:?Expect}
+    if [ "$s1" = "$2" ]; then
+        echo "Failed. Expect '$s1' to be '$s2'" >&2
+        return 1
+    fi
+}
+
 
 assert.grep(){
     local pattern=$1
