@@ -18,6 +18,7 @@ path.abs(){
     echo $(cd {$1:-.}; pwd)
 }
 
+# TODO
 path.common2(){
     local a=$1
     local b=$2   

@@ -67,12 +67,26 @@ map.print(){
 }
 
 map.dump(){
-    list.print
+    if [ $# -eq 0 ]; then
+        list.print
+        return 0
+    fi
+    list.print | tee "$@"
 }
 
 map.load(){
-    map.create
+    local name=${1?:Provide name}
+    shift
+    map.create $name
+
+    if [ $# -eq 0 ]; then
+        while read s; do
+            list.push s
+        done
+        return 0
+    fi
+
     while read s; do
         list.push s
-    done
+    done <$1
 }
