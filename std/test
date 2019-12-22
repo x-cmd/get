@@ -40,15 +40,17 @@ assert.grep(){
 }
 
 testFun(){
+    # Do it in usual way
     TMP_1=$(tmp.open)
+    trap "tmp.close $TMP_1" RETURN
+
     docker run -it ubuntu bash > $TMP_1
     FAIL="testFun failed"
-    assert.grep "work" $TMP_1
+    assert.grep "work" <$TMP_1
     FAIL="" assert.grep $(line $TMP_1 2) $TMP_2
     FAIL="testFun failed for reason like" assert.grep "$(line $TMP_1 3)" $TMP_2
     FAIL="" assert.eq $(line $TMP_1 3) 2
     line $TMP_1 3
-    tmp.close $TMP_1
 }
 
 # Example:

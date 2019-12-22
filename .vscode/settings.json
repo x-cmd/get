@@ -5,7 +5,7 @@
         "**/tools/*": "shellscript",
         "**/cloud/*": "shellscript",
         "**/con/*": "shellscript",
-        "**/style/*": "shellscript",
+        "**/net/*": "shellscript",
         "boot": "shellscript",
         "install*": "shellscript",
     }
