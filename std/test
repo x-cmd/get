@@ -16,7 +16,7 @@ assert(){
     fi
 }
 
-test.expect(){
+assert.eq(){
     local s1=${1:?Real}
     local s2=${2:?Expect}
     if [ "$s1" = "$2" ]; then

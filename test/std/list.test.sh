@@ -16,17 +16,17 @@ list.test(){
 
     list.push a b c d e f
 
-    test.expect $(list.first default) "a"
-    test.expect $(list.top default) "f"
+    assert.eq $(list.first default) "a"
+    assert.eq $(list.top default) "f"
 
-    # test.expect $(list.first default) "a1"
-    # test.expect $(list.first default) "a2"
+    # assert.eq $(list.first default) "a1"
+    # assert.eq $(list.first default) "a2"
 
     list.shift
-    test.expect $(list.first default) "b"
-    test.expect $(list.top default) "f"
+    assert.eq $(list.first default) "b"
+    assert.eq $(list.top default) "f"
 
     list.pop
-    test.expect $(list.first default) "b"
-    test.expect $(list.top default) "e"
+    assert.eq $(list.first default) "b"
+    assert.eq $(list.top default) "e"
 }
