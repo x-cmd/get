@@ -8,6 +8,14 @@ file.exist_or_append(){
   echo "$filename"
 }
 
+# Temp facility
+@src std/utils
+
+file.tmp.create(){
+  local filepath="${TMPDIR}concurrent.$RANDOM"
+  touch $filepath
+}
+
 # file.find(){
   
 # }

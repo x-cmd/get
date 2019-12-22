@@ -11,7 +11,7 @@ assert(){
     if [ $? -eq 0 ]; then
         return 0
     else
-        echo "$FAIL"
+        echo "$MSG"
         return 1
     fi
 }
@@ -34,27 +34,33 @@ assert.grep(){
     if [ $? -eq 0 ]; then
         return 0
     else
-        echo "$FAIL"
+        echo "$MSG"
         return 1
     fi
 }
 
 testFun(){
     # Do it in usual way
-    TMP_1=$(tmp.open)
-    trap "tmp.close $TMP_1" RETURN
-
+    TMP_1=$(file.tmp.create)
+    # Using queue
+    @catch-final '' "
+        tmp.close $TMP_1"
+    "
+    
     docker run -it ubuntu bash > $TMP_1
-    FAIL="testFun failed"
-    assert.grep "work" <$TMP_1
-    FAIL="" assert.grep $(line $TMP_1 2) $TMP_2
-    FAIL="testFun failed for reason like" assert.grep "$(line $TMP_1 3)" $TMP_2
-    FAIL="" assert.eq $(line $TMP_1 3) 2
+    MSG="testFun failed" \
+        assert.grep "work" <$TMP_1
+    MSG="" \
+        assert.grep $(line $TMP_1 2) $TMP_2
+    MSG="testFun failed for reason like" \
+        assert.grep "$(line $TMP_1 3)" $TMP_2
+    
+    assert.eq $(line $TMP_1 3) 2
     line $TMP_1 3
 }
 
 # Example:
-# TIMEOUT=3 FAILURE="Fail if wrong" @ts "work1" testFun1
-# TIMEOUT=3 FAILURE="Fail if wrong" @testsuite "work1" testFun1
+# TIMEOUT=3 MSGURE="Fail if wrong" @ts "work1" testFun1
+# TIMEOUT=3 MSGURE="Fail if wrong" @testsuite "work1" testFun1
 # TIMEOUT=5 @ts "work2" testFun2
 
