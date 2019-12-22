@@ -25,24 +25,13 @@ assert.eq(){
     fi
 }
 
-
+# Two ways
+# assert.grep hi <<<"hello hi"
+# assert.grep hi <README.md
 assert.grep(){
     local pattern=$1
-    local filepath=$2
-    grep "$pattern" "$filepath"
-    if [ $? -eq 0 ]; then 
-        return 0
-    else
-        echo "$FAIL"
-        return 1
-    fi
-}
-
-assert.eq(){
-    local pattern=$1
-    local filepath=$2
-    grep "$pattern" "$filepath"
-    if [ $? -eq 0 ]; then 
+    grep "${1:?Please provide grep pattern}"
+    if [ $? -eq 0 ]; then
         return 0
     else
         echo "$FAIL"
