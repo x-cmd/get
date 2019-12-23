@@ -32,7 +32,7 @@ assert.grep(){
     if [ $? -eq 0 ]; then
         return 0
     else
-        echo "$MSG"
+        echo "${MSG:-Grep Pattern Failed matching: $1}"
         return 1
     fi
 }
