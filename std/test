@@ -48,13 +48,13 @@ testFun(){
     MSG="testFun failed for reason like" \
         assert.grep "$(line $TMP_1 3)" $TMP_2
 
-    assert.grep "work" -- "testFun failed" <$TMP_1
-    assert.grep $(line $TMP_1 2) $TMP_2
-    assert.grep "$(line $TMP_1 3)" $TMP_2 -- "testFun failed for reason like" 
+    # assert.grep "work" -- "testFun failed" <$TMP_1
+    # assert.grep $(line $TMP_1 2) $TMP_2
+    # assert.grep "$(line $TMP_1 3)" $TMP_2 -- "testFun failed for reason like" 
 
-    assert.eq 2 $(line $TMP_1 3)
-    assert.eq 2 $(file.line $TMP_1 3)
-    assert.eq 2 $(sed -n 3p $TMP_1)
+    # assert.eq 2 $(line $TMP_1 3)
+    # assert.eq 2 $(file.line $TMP_1 3)
+    # assert.eq 2 $(sed -n 3p $TMP_1)
 }
 
 # Example:
