@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-@use str
+@src str
 
 # Not good
 X_CMD_COM_RETURN=""
@@ -165,6 +165,27 @@ valid.int(){
 #     trap "$code" ERR
 # }
 
+alias tmpfile='
+local return-queue
+list.create "return-queue"
+
+'
+
+@trap.return(){
+    # setup finally
+    local latest_return=$(trap -p return)
+    # O="return-queue" list.push 
+    # Smart as I, using eval to avoid the real return statement being invoked when this function ends.
+    local final_code="eval \"
+        $2
+        ${latest_err:-trap ERR}
+        ${latest_return:-trap return}
+    \\\" return\"
+    "
+    # echo "$final_code"
+    trap "$final_code" return
+}
+
 @catch-final(){
     # setup catch
     local latest_err=$(trap -p ERR)
@@ -188,4 +209,68 @@ valid.int(){
     "
     # echo "$final_code"
     trap "$final_code" return
+}
+
+
+alias @trap.return='
+[ -z "$_STACK" ] && {
+
+    local _STACK=()
+    _eval_stack(){
+        for i in "${_STACK[@]}"; do
+            eval "$i"
+        done
+    }
+    
+    local _LATEST_RETURN=$(trap -p return)
+    trap "
+        _eval_stack
+        ${_LATEST_RETURN:-trap return}
+    " RETURN
+
+    _add_stack(){
+        _STACK=( "${_STACK[@]}"  "$1" )
+    }
+}
+
+_add_stack'
+
+alias defer='
+[ -z "$_RETURN_STACK" ] && {
+
+    _eval_stack(){
+        for i in "${_RETURN_STACK[@]}"; do
+            eval "$i"
+        done
+    }
+
+    _add_stack(){
+        _RETURN_STACK=(  "$1" "${_RETURN_STACK[@]}"  )
+    }
+
+    # Using RETURN
+
+    local _RETURN_STACK 2>/dev/null
+    if [ $? -eq 0 ]; then
+        _RETURN_STACK=()
+        local _LATEST_RETURN=$(trap -p RETURN)
+        trap "
+            _eval_stack
+            ${_LATEST_RETURN:-trap RETURN}
+        " RETURN
+    else
+        _RETURN_STACK=()
+        _LATEST_EXIT=$(trap -p EXIT)
+        trap "
+            _eval_stack
+            ${_LATEST_EXIT:-trap EXIT}
+        " EXIT
+    fi
+}
+
+_add_stack'
+
+work(){
+    @trap.return "echo final"
+    @trap.return "echo end"
 }

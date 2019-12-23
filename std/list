@@ -12,6 +12,10 @@ list.size(){
     eval "$code"
 }
 
+list.isempty(){
+    [ $(list.size) -eq 0 ]
+}
+
 list.last_idx(){
     echo $(($(list.size) - 1))
 }

@@ -13,6 +13,14 @@ set.free(){
     map.free
 }
 
+set.size(){
+    list.size
+}
+
+set.isempty(){
+    list.isempty
+}
+
 set.has(){
     map.has ${1:?Provide value}
 }

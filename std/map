@@ -19,6 +19,14 @@ map.has(){
     map.get "$1" > /dev/null
 }
 
+map.size(){
+    list.size
+}
+
+map.isempty(){
+    list.isempty
+}
+
 map.get(){
     local key=${1:?Provide key}
     local keyecode=$(str.base64 $key)

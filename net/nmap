@@ -9,5 +9,5 @@ nmap.scan.ips(){
 }
 
 nmap.scan.all.work(){
-    
+    :
 }

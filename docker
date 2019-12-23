@@ -1,4 +1,4 @@
-_X_CMD_COM_X-BASH_DOCKER_VERSION=0.0.0
+_X_CMD_COM_X_BASH_DOCKER_VERSION=0.0.0
 
 docker.rm.unused_images() {
     docker system prune "$@"

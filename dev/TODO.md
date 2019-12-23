@@ -33,7 +33,7 @@ alias @std="@src std/"
 @src cloud/ali
 ```
 
-# 这个库的边界？
+# 这个库的边界
 
 其实不应该提供纯运行的函数，应该采用@run
 
@@ -98,3 +98,21 @@ cloud: aws/ali/az/gae/.../tencent/bae
 net: http/nmap/ping/nessus/proxy/nginx
 db: postgres/mysql/mongo
 word: some file processing
+
+# 案例
+
+1. 编写x-bash自身的测试
+2. 编写static-build测试套件，保证基本功能
+3. 使用x-bash来实现基本云资源管理功能
+
+## 参考
+
+rebash
+
+https://github.com/jandob/rebash#function-array_get_index
+
+bash-oo-framwork
+
+bash practise
+https://cloud.tencent.com/developer/article/1157462
+
