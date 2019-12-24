@@ -4,6 +4,7 @@
         "**/std/*": "shellscript",
         "**/tools/*": "shellscript",
         "**/cloud/*": "shellscript",
+        "**/cmd/*": "shellscript",
         "**/con/*": "shellscript",
         "**/net/*": "shellscript",
         "boot": "shellscript",
