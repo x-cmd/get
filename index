@@ -1,15 +1,4 @@
 std/file
-std/find
-std/ip
-std/job
-std/list
-std/map
-std/net
-std/set
-std/str
-std/test
-std/ui
-std/utilsstd/file
 std/job
 std/list
 std/map
@@ -24,7 +13,7 @@ net/nmap
 net/openvas
 cmd/docker
 cmd/git
+cmd/k
 cloud/ali
 cloud/aws
 cloud/az
-
