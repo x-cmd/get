@@ -17,6 +17,13 @@ else
     echo Installed in "$HOME/.bashrc" >&2
 fi
 
+if grep -F "$X_STR" "$HOME/.bash_profile" >/dev/null; then
+    echo Already install >&2
+else
+    echo "$X_STR" >> $HOME/.bash_profile
+    echo Installed in "$HOME/.bash_profile" >&2
+fi
+
 eval "$X_STR"
 
 if [ ! -z "$ALL" ]; then
