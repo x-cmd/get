@@ -1,4 +1,4 @@
-STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D' "
+STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -e \$D ] || mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D && source \$D' "
 
 if grep "https://x-bash.github.io/boot" "$HOME/.bashrc" >/dev/null; then
     echo Already install >&2

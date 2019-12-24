@@ -1,4 +1,4 @@
-eval "$(curl https://x-bash.github.io/boot)"
+# eval "$(curl https://x-bash.github.io/boot)"
 
 @src std/list std/utils std/test
 

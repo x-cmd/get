@@ -1,35 +1,27 @@
-#! /usr/bin/env bash
 
-if [ -e "/usr/local/bin/x" ]; then
-    echo "Alread have X installed";
-    echo "If you want to update, please remove original X in /usr/local/bin/x"
+which x
+
+if [ $? -ne 0 ]; then
+    curl https://x-cmder.github.io/install | bash
+fi
+
+SSTR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
+
+if grep -F "$SSTR"
+
+STR='eval "$(x @bash/boot)"'
+
+# TODO: remove the line
+# if grep "https://x-bash.github.io/boot"
+
+if grep 'eval "$(x @bash/boot)"' "$HOME/.bashrc" >/dev/null; then
+    echo Already install >&2
+else
+    echo "$STR" >> $HOME/.bashrc
+    eval "$STR"
+    echo Installed in "$HOME/.bashrc" >&2
+fi
+
+if ${ALL?-""}; then
     exit 0
 fi
-
-RAN=v1df323dvfdafasf
-NODESHELL_PATH=/tmp/vvsh.$RAN
-
-SYS=$(uname)
-
-# TODO: consider, curl the zip file and unzip. If unzip not installed. Curl the binary.
-
-if [ ! "$SYS" == "Linux" ] && [ ! "$SYS" == "Darwin" ]; then
-    echo "System NOT supported. $SYS"
-    echo "If you are window user. Please download the exe visiting:"
-    echo "   https://github.com/lteam18/x/releases"
-    echo "x is the command placed in /usr/local/bin/x"
-    exit 1
-fi
-
-if [ "Linux" == "$SYS"  ]; then
-    curl -L https://github.com/lteam18/x/releases/download/latest-dev/x-installer.linux-amd64 > $NODESHELL_PATH
-else
-    # so, Darwin
-    #if [ "Darwin" == "$SYS" ]; then
-    curl -L https://github.com/lteam18/x/releases/download/latest-dev/x-installer.darwin-amd64 > $NODESHELL_PATH
-fi
-
-chmod +x $NODESHELL_PATH
-$NODESHELL_PATH install
-rm $NODESHELL_PATH
-# mv $NODESHELL_PATH /usr/local/bin/vvsh

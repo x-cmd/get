@@ -5,7 +5,7 @@
 ### 先睹为快：引用并且安装在`~/.bashrc`上
 
 ```bash
-eval "$(curl https://x-bash.github.io/boot)" && @run install
+eval "$(curl https://x-bash.github.io/install)"
 ```
 
 如果你是`x-cmd`用户

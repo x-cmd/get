@@ -1,5 +1,9 @@
 #! /usr/bin/env bash
 
+# [ -z "$__X_CMD_COM_BOOT_IMPORTED" ]
+
+__X_CMD_COM_BOOT_IMPORTED=true
+
 # TODO: Get rid of this function
 @init.curl(){
     if [ ! "$CURL" == "" ]; then
