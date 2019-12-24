@@ -25,7 +25,25 @@ path.common2(){
 }
 
 path.common(){
-    for i in "$@" do;
+    for i in "$@"; do
         :
     done
+}
+
+# path variable operations
+# code from el-logic
+
+path.display(){
+    IFS=":"
+    for i in $PATH; do 
+        echo "$i";
+    done
+}
+
+path.append(){
+    PATH=$PATH:${1:?"Provide new path"}
+}
+
+path.prepend(){
+    PATH=${1:?"Provide new path"}:$PATH
 }
