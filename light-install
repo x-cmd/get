@@ -10,7 +10,7 @@ fi
 eval "$STR"
 
 if [ ! -z "$ALL" ]; then
-    for i in "$(curl https://x-bash.github.io/all)"; do;
+    for i in "$(curl https://x-bash.github.io/index)"; do;
         @src $i
     done
 fi
