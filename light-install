@@ -1,34 +1,17 @@
-STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -e \$D ] || mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D && source \$D' "
+STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
 
-if grep "https://x-bash.github.io/boot" "$HOME/.bashrc" >/dev/null; then
+if grep -F "$STR" "$HOME/.bashrc" >/dev/null; then
     echo Already install >&2
 else
     echo "$STR" >> $HOME/.bashrc
-    eval "$STR"
     echo Installed in "$HOME/.bashrc" >&2
 fi
 
-if ${ALL?-""}; then
-    exit 0
+eval "$STR"
+
+if [ ! -z "$ALL" ]; then
+    for i in "$(curl https://x-bash.github.io/all)"; do;
+        @src $i
+    done
 fi
-
-LS=(
-    std/file
-    std/find
-    std/ip
-    std/job
-    std/list
-    std/map
-    std/net
-    std/set
-    std/str
-    std/test
-    std/ui
-    std/utils
-)
-
-eval "$SRC"
-for i in ${LS[@]}; do;
-    @src $i
-done
 

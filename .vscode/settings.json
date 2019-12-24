@@ -7,6 +7,6 @@
         "**/con/*": "shellscript",
         "**/net/*": "shellscript",
         "boot": "shellscript",
-        "install*": "shellscript",
+        "*install*": "shellscript",
     }
 }

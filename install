@@ -1,27 +1,26 @@
-
 which x
 
 if [ $? -ne 0 ]; then
     curl https://x-cmder.github.io/install | bash
 fi
 
-SSTR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
-
-if grep -F "$SSTR"
-
-STR='eval "$(x @bash/boot)"'
-
 # TODO: remove the line
-# if grep "https://x-bash.github.io/boot"
+# CMD_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
+# if grep -F "$CMD_STR"
 
-if grep 'eval "$(x @bash/boot)"' "$HOME/.bashrc" >/dev/null; then
+X_STR='eval "$(x @bash/boot)"'
+
+if grep -F "$X_STR" "$HOME/.bashrc" >/dev/null; then
     echo Already install >&2
 else
-    echo "$STR" >> $HOME/.bashrc
-    eval "$STR"
+    echo "$X_STR" >> $HOME/.bashrc
     echo Installed in "$HOME/.bashrc" >&2
 fi
 
-if ${ALL?-""}; then
-    exit 0
+eval "$X_STR"
+
+if [ ! -z "$ALL" ]; then
+    for i in "$(curl https://x-bash.github.io/all)"; do;
+        @src $i
+    done
 fi
