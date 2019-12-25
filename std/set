@@ -6,11 +6,11 @@
 @src map
 
 set.create(){
-    map.create "$@"
+    dict.create "$@"
 }
 
 set.free(){
-    map.free
+    dict.free
 }
 
 set.size(){
@@ -22,16 +22,16 @@ set.isempty(){
 }
 
 set.has(){
-    map.has ${1:?Provide value}
+    dict.has ${1:?Provide value}
 }
 
 set.put(){
-    map.put ${1:?Provide value} "1"
+    dict.put ${1:?Provide value} "1"
 }
 
 # give key
 set.remove(){
-    map.remove ${1:?Provide value}
+    dict.remove ${1:?Provide value}
 }
 
 set.print(){
@@ -52,7 +52,7 @@ set.dump(){
 set.load(){
     local name=${1?:Provide name}
     shift
-    map.create $name
+    dict.create $name
 
     if [ $# -eq 0 ]; then
         while read s; do
