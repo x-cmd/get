@@ -82,6 +82,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
     rm -rf "$HOME/.x-cmd.com/x-bash"
 }
 
+# Consider removing this function, @x will be much better
 @run(){
     X_CMD_COM_PARAM_CMD=bash @src "$*"
 }
