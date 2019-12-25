@@ -1,7 +1,7 @@
-[ -z "$RELOAD" -a ! -z "$__X_CMD_COM_BOOT_VERSION" ] && return 0
+[ -z "$RELOAD" -a ! -z "$_X_CMD_COM_X_BASH_BOOT_VERSION" ] && return 0
 
 echo "Initialize the boot enviroment"
-__X_CMD_COM_BOOT_VERSION=0.0.0
+_X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
 
 # TODO: Get rid of this function
 @init.curl(){
