@@ -1,0 +1,14 @@
+
+
+timer.create(){
+    local timer=${1:?Provide timer name}
+    eval "export $timer=$(date +%s)"
+    export O=$1
+}
+
+timer.elapsed(){
+    local end_time="$(date +%s)"
+    local name=${O:?provider O}
+    local start_time=${!name}
+    echo $(( $end_time  - $start_time ))
+}

@@ -45,6 +45,18 @@ list.get(){
     return 0
 }
 
+list.index_of(){
+    local i=0
+    for elem in $(list.print); do
+        if [ "$elem" = "$1" ]; then
+            echo $i
+            return 0
+        fi
+        let i=i+1
+    done
+    return 1
+}
+
 list.remove(){
     local idx=${1:?Index}
     if [ $idx -ge $(list.size) ]; then

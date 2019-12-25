@@ -116,3 +116,7 @@ bash-oo-framwork
 bash practise
 https://cloud.tencent.com/developer/article/1157462
 
+bash guide
+
+http://mywiki.wooledge.org/BashGuide/Practices
+

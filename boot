@@ -34,9 +34,19 @@
             local TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
         else
             local module=${1:?provide module name}
+
             if [[ ! $module =~ \/ ]]; then
+                # Strategy: if there is local file in cache. Use it.
+                local LOCAL_FILE=$(ls "$HOME/.x-cmd.com/x-bash/*/$1" | head -n 1)
+                [ -r "$LOCAL_FILE" ] && {
+                    echo "Try using local file: $LOCAL_FILE"
+                    ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+                    return 0
+                }
+
                 local index_file="$HOME/.x-cmd.com/x-bash/index"
                 # File not exists or file is not modified more than one hour
+                # If not found
                 if [ ! -r $index_file ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
                     mkdir -p $(dirname "$index_file")
                     local content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"

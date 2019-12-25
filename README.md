@@ -1,4 +1,6 @@
-# bash
+# x-bash
+
+A light-weight handy bash library to make life easier.
 
 ## 安装
 
