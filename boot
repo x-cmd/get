@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-[ -z "$__X_CMD_COM_BOOT_IMPORTED" ] && {
+[ -z "$__X_CMD_COM_BOOT_IMPORTED" -o ! -z "$RELOAD" ] && {
 
     echo "Initialize the boot enviroment"
     __X_CMD_COM_BOOT_IMPORTED=true
@@ -28,15 +28,32 @@
 
     @src.one(){
         @init.curl
-        local URL="https://x-bash.github.io/$1"
-        local TGT="$HOME/.x-cmd.com/x-bash/$1"
+
         if [[ "$1" =~ ^http:// ]] || [[ "$1" =~ ^https:// ]]; then
-            URL="$1"
-            TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
+            local URL="$1"
+            local TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
+        else
+            local module=${1:?provide module name}
+            if [[ ! $module =~ \/ ]]; then
+                local index_file="$HOME/.x-cmd.com/x-bash/index"
+                # File not exists or file is not modified more than one hour
+                if [ ! -r $index_file ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
+                    mkdir -p $(dirname "$index_file")
+                    local content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"
+                    (echo "$content" | grep "std/str" 1>/dev/null) && echo "$content" >$index_file
+                fi
+
+                module="$(grep "$1" "$index_file" | head -n 1)"
+                echo "Try using $module" >&2
+            fi
+
+            local URL="https://x-bash.github.io/$module"
+            local TGT="$HOME/.x-cmd.com/x-bash/$module"
         fi
-        
+
         if [ ! -e "$TGT" ]; then
             mkdir -p $(dirname "$TGT")
+
             $CURL "$URL" >"$TGT" 2>/dev/null
             if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
                 rm "$TGT"
