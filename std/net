@@ -16,3 +16,8 @@ net.mping(){
     echo "Waiting until all jobs finished" >&2
     job.wait_until_finished
 }
+
+net.public_ip(){
+    # Provide more choices
+    curl https://ipecho.net/plain 2>/dev/null
+}
