@@ -7,27 +7,27 @@
 @src std/list
 @src std/str
 
-map.create(){
+dict.create(){
     list.create "$@"
 }
 
-map.free(){
+dict.free(){
     list.free
 }
 
-map.has(){
-    map.get "$1" > /dev/null
+dict.has(){
+    dict.get "$1" > /dev/null
 }
 
-map.size(){
+dict.size(){
     list.size
 }
 
-map.isempty(){
+dict.isempty(){
     list.isempty
 }
 
-map.get(){
+dict.get(){
     local key=${1:?Provide key}
     local keyecode=$(str.base64 $key)
     for i in $(list.print); do
@@ -41,16 +41,16 @@ map.get(){
     return 1
 }
 
-map.put(){
+dict.put(){
     local key="$(str.base64 "${1:?Provide key}")"
     local value="$(str.base64 "${2:?Provide value}")"
-    map.remove $1
+    dict.remove $1
     echo "$key":"$value"
     list.push "$key:$value"
 }
 
 # give key
-map.remove(){
+dict.remove(){
     local key="${1:?Key}"
     local key_base="$(str.base64 "${1:?Provide key}")"
     local idx=0
@@ -66,7 +66,7 @@ map.remove(){
     return 1
 }
 
-map.print(){
+dict.print(){
     for i in $(list.print); do
         local k=$(echo -n $i | cut -d ':' -f 1)
         local v=$(echo -n $i | cut -d ':' -f 2)
@@ -74,7 +74,7 @@ map.print(){
     done
 }
 
-map.dump(){
+dict.dump(){
     if [ $# -eq 0 ]; then
         list.print
         return 0
@@ -82,10 +82,10 @@ map.dump(){
     list.print | tee "$@"
 }
 
-map.load(){
+dict.load(){
     local name=${1?:Provide name}
     shift
-    map.create $name
+    dict.create $name
 
     if [ $# -eq 0 ]; then
         while read s; do
