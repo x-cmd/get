@@ -24,56 +24,59 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
     return 1
 }
 
-@src.one(){
+@src(){
     @init.curl
 
-    if [[ "$1" =~ ^http:// ]] || [[ "$1" =~ ^https:// ]]; then
-        local URL="$1"
-        local TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
-    else
-        local module=${1:?provide module name}
+    while [ $# -gt 0 ]; do
+        local RESOURCE_NAME=$1
 
-        if [[ ! $module =~ \/ ]]; then
-            # Strategy: if there is local file in cache. Use it.
-            local LOCAL_FILE=$(ls "$HOME/.x-cmd.com/x-bash/*/$1" | head -n 1)
-            [ -r "$LOCAL_FILE" ] && {
-                echo "Try using local file: $LOCAL_FILE"
-                ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
-                return 0
-            }
+        if [[ "$RESOURCE_NAME" =~ ^http:// ]] || [[ "$RESOURCE_NAME" =~ ^https:// ]]; then
+            local URL="$RESOURCE_NAME"
+            local TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
+        else
+            local module=$RESOURCE_NAME
 
-            local index_file="$HOME/.x-cmd.com/x-bash/index"
-            # File not exists or file is not modified more than one hour
-            # If not found
-            if [ ! -r $index_file ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
-                mkdir -p $(dirname "$index_file")
-                local content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"
-                (echo "$content" | grep "std/str" 1>/dev/null) && echo "$content" >$index_file
+            if [[ ! $module =~ \/ ]]; then
+                # Strategy: if there is local file in cache. Use it.
+                local LOCAL_FILE=$(ls "$HOME/.x-cmd.com/x-bash/*/$RESOURCE_NAME" 2>/dev/null | head -n 1)
+                [ -r "$LOCAL_FILE" ] && {
+                    echo "Try using local file: $LOCAL_FILE"
+                    ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+                    return 0
+                }
+
+                local index_file="$HOME/.x-cmd.com/x-bash/index"
+                # File not exists or file is not modified more than one hour
+                # If not found
+                if [ ! -r $index_file ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
+                    mkdir -p $(dirname "$index_file")
+                    local content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"
+                    (echo "$content" | grep "std/str" 1>/dev/null) && echo "$content" >$index_file
+                fi
+
+                module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+                echo "Using $module" >&2
             fi
 
-            module="$(grep "$1" "$index_file" | head -n 1)"
-            echo "Try using $module" >&2
+            local URL="https://x-bash.github.io/$module"
+            local TGT="$HOME/.x-cmd.com/x-bash/$module"
         fi
 
-        local URL="https://x-bash.github.io/$module"
-        local TGT="$HOME/.x-cmd.com/x-bash/$module"
-    fi
+        if [ ! -e "$TGT" ]; then
+            mkdir -p $(dirname "$TGT")
 
-    if [ ! -e "$TGT" ]; then
-        mkdir -p $(dirname "$TGT")
-
-        $CURL "$URL" >"$TGT" 2>/dev/null
-        if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
-            rm "$TGT"
-            echo "Failed to load $1, do you want to load std/$1?"
-            return 1
+            $CURL "$URL" >"$TGT" 2>/dev/null
+            if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
+                rm "$TGT"
+                echo "Failed to load $RESOURCE_NAME, do you want to load std/$RESOURCE_NAME?"
+                return 1
+            fi
         fi
-    fi
-    
-    [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+        
+        [ $? -eq 0 ] && ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+        shift
+    done
 }
-
-@src(){ for i in "$@"; do @src.one $1; done }
 
 @src.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"
