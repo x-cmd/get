@@ -18,8 +18,8 @@ eval "$STR"
 
 if [ ! -z "$ALL" ]; then
     # TODO: download release/tar/gz. So we donot need to download the files one by one
-    for i in "$(curl https://x-bash.github.io/index)"; do;
-        @src $i
+    for i in "$(curl https://x-bash.github.io/index)"; do
+        @src "$i"
     done
 fi
 
