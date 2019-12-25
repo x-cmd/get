@@ -176,10 +176,16 @@ str.unbase64(){
 }
 
 str.md5(){
+    local cmd
     if which md5 >/dev/null 2>&1; then
-        echo -n ${1:?hint} | md5 | cut -d ' ' -f 1
+        cmd=md5
     else
-        echo -n ${1:?hint} | md5sum | cut -d ' ' -f 1
+        cmd=md5sum
+    fi
+    if [ -z "$1" ]; then
+        $cmd | cut -d ' ' -f 1
+    else
+        echo -n "$1" | $cmd | cut -d ' ' -f 1
     fi
 }
 
