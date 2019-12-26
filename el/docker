@@ -1,0 +1,20 @@
+@src cmd/docker
+
+# basic images providing
+
+# system: ubuntu, debian, centos
+
+# arch: arm64, providing building environment
+
+# version: using date
+
+# version categories:
+
+# all with x inside
+
+# clean: clean version
+# cache: using apt cache
+# dev: including python, java, rust, gcc, with vscode editor ready
+# sec: nmap, metasploit, all of the other security handy tools
+
+
