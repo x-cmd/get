@@ -29,8 +29,7 @@ FINE() { COLBP 4 "$@"; }
 @err() { COLBP 1 "$@"; }
 # @info() { COLBP 2 "$@"; }
 
-
-@echop(){
+@echop() {
   [ '' != "$FG" ] && tput setaf "$FG"
   [ '' != "$BG" ] && tput setab "$BG"
   tput bold
@@ -41,14 +40,14 @@ FINE() { COLBP 4 "$@"; }
 ## tput screen facility
 
 ui.save_screen() { tput smcup; }
-ui.restore_screen(){ tput rmcup; }
+ui.restore_screen() { tput rmcup; }
 ui.screen() {
   ui.save_screen
   eval "$@"
   ui.restore_screen
 }
 
-@screen(){ ui.screen "$@"; }
+@screen() { ui.screen "$@"; }
 
 ui.banner() {
   # echo -n ${BG:-$UI_BG_BLUE}${FG:-$UI_FG_WHITE}
@@ -95,22 +94,21 @@ RUN_CMD_WITH_STEP() {
 # x con "~hello~"
 # x con ""
 
+ui.yesno() {
+  while true; do
+    read -p "$1 (Input 'y' for yes or 'n' for no): " p
+    p="$(str.trim $p)"
+    if [ "$p" == "y" ]; then
+      return 0
+    fi
 
-ui.yesno(){
-    while true; do
-        read -p "$1 (Input 'y' for yes or 'n' for no): " p
-        p="$(str.trim $p)"
-        if [ "$p" == "y" ]; then
-            return 0
-        fi
-
-        if [ "$p" == "n" ]; then
-            return 1
-        fi
-    done
+    if [ "$p" == "n" ]; then
+      return 1
+    fi
+  done
 }
 
-ui.select(){
+ui.select() {
   echo "" >&2
   echo ${MSG:-"Select in the following list:"} >&2
   local x=0
@@ -133,11 +131,11 @@ ui.select(){
 
 }
 
-ui.readint(){
+ui.readint() {
   local min=${1:?Provide min}
   local max=${2:?Provide max}
   local choice
-  
+
   while true; do
     read -p "${MSG:-Read integer: }" choice
     if [[ "$choice" =~ ^[0-9]+$ ]]; then
@@ -150,4 +148,3 @@ ui.readint(){
 }
 
 # A=$(ui.read_integer)
-
