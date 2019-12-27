@@ -1,4 +1,4 @@
-
+@src utils
 
 timer.make(){
     while [ $# -gt 0 ]; do
@@ -36,20 +36,6 @@ timer.new(){
     #     done
     #     shift
     # done
-    utils.create_new_function "$@"
+    utils.create_new_function timer "$@"
 }
 
-utils.create_new_function(){
-    local prototype=$1
-    shift
-    $prototype.make "$@"
-    while [ $# -gt 0 ]; do
-        local obj=$1
-        local method
-        for func in $(typeset -F | cut -d ' ' -f 3 | grep "^$prototype.*" | grep -v -E "(make)|(new)" | cut -d ' ' -f 1); do
-            local method=$(echo $func | cut -d '.' -f 2)
-            eval "$obj.$method(){ O=$obj $func \"\$@\"; }"
-        done
-        shift
-    done
-}

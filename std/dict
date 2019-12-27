@@ -7,7 +7,7 @@
 @src std/list
 @src std/str
 
-dict.create(){
+dict.make(){
     list.make "$@"
 }
 

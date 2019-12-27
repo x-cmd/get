@@ -1,27 +1,34 @@
+@src utils
+
 list.make(){
     eval "export $1=()"
-    export O=$1
+    # export O=$1
 }
 
+# list.new(){
+#     list.make "$@"
+#     while [ $# -gt 0 ]; do
+#         eval "
+#         $1.free(){ O=$1 list.free; }
+#         $1.size(){ O=$1 list.size; }
+#         $1.isempty(){ O=$1 list.isempty; }
+#         $1.last_idx(){ O=$1 list.last_idx; }
+#         $1.first(){ O=$1 list.first; }
+#         $1.get(){ O=$1 list.get "\$@"; }
+#         $1.index_of(){ O=$1 list.index_of "\$@"; }
+#         $1.remove(){ O=$1 list.remove "\$@"; }
+#         $1.pop(){ O=$1 list.pop "\$@"; }
+#         $1.push(){ O=$1 list.push "\$@"; }
+#         $1.top(){ O=$1 list.top "\$@"; }
+#         $1.print(){ O=$1 list.print "\$@"; }
+#         "
+#         shift
+#     done
+# }
+
+
 list.new(){
-    list.make "$@"
-    while [ $# -gt 0 ]; do
-        eval "
-        $1.free(){ O=$1 list.free; }
-        $1.size(){ O=$1 list.size; }
-        $1.isempty(){ O=$1 list.isempty; }
-        $1.last_idx(){ O=$1 list.last_idx; }
-        $1.first(){ O=$1 list.first; }
-        $1.get(){ O=$1 list.get "\$@"; }
-        $1.index_of(){ O=$1 list.index_of "\$@"; }
-        $1.remove(){ O=$1 list.remove "\$@"; }
-        $1.pop(){ O=$1 list.pop "\$@"; }
-        $1.push(){ O=$1 list.push "\$@"; }
-        $1.top(){ O=$1 list.top "\$@"; }
-        $1.print(){ O=$1 list.print "\$@"; }
-        "
-        shift
-    done
+    utils.create_new_function list "$@"
 }
 
 list.free(){

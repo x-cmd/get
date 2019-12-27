@@ -3,10 +3,14 @@
 # using declared set
 
 # source `dirname ${BASH_SOURCE[0]}`/map
-@src dict
+@src dict # utils
 
-set.create(){
-    dict.create "$@"
+set.make(){
+    dict.make "$@"
+}
+
+set.new(){
+    utils.create_new_function set "$@"
 }
 
 set.free(){
