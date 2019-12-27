@@ -1,4 +1,4 @@
-
+# shellcheck shell=bash
 # Doesn't work on some occations.
 
 alias defer='

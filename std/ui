@@ -1,4 +1,4 @@
-#! /usr/env/bin bash
+# shellcheck shell=bash
 
 # For some advancing usage. Refer to http://linuxcommand.org/lc3_adv_tput.php
 

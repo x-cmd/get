@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 assert(){
     if [ $# -ne 0 ]; then
         eval "$*"

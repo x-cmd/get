@@ -1,4 +1,4 @@
-
+# shellcheck shell=bash
 # path
 alias path.dirname=dirname
 alias path.basename=basename

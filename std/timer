@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 @src utils
 
 timer.make(){
