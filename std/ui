@@ -109,3 +109,45 @@ ui.yesno(){
         fi
     done
 }
+
+ui.select(){
+  echo "" >&2
+  echo ${MSG:-"Select in the following list:"} >&2
+  local x=0
+  for i in "$@"; do
+    let x=x+1
+    echo "$x: $i" >&2
+  done
+  echo "" >&2
+  local choice
+
+  while true; do
+    read -p "Input your choice: " choice >&2
+    if [[ "$choice" =~ ^[0-9]+$ ]]; then
+      if [ "$choice" -gt 0 -a "$choice" -le "$#" ]; then
+        echo "$choice"
+        return 0
+      fi
+    fi
+  done
+
+}
+
+ui.readint(){
+  local min=${1:?Provide min}
+  local max=${2:?Provide max}
+  local choice
+  
+  while true; do
+    read -p "${MSG:-Read integer: }" choice
+    if [[ "$choice" =~ ^[0-9]+$ ]]; then
+      if [ "$choice" -ge "$min" -a "$choice" -le "$max" ]; then
+        echo "$choice"
+        return 0
+      fi
+    fi
+  done
+}
+
+# A=$(ui.read_integer)
+
