@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-@src str
+@src std/str
 
 # Not good
 X_CMD_COM_RETURN=""
@@ -59,7 +59,7 @@ rmrf(){
 # In linux, `readlink -f <filepath>`. Not works in BSD system
 # https://superuser.com/questions/330199/how-get-full-path-to-target-of-link
 
-function readlink.fullpath(){
+readlink.fullpath(){
     local TGT=${1:?"Provide name"}
 
     local ORI=$(pwd)
@@ -167,11 +167,11 @@ valid.int(){
 
 alias tmpfile='
 local return-queue
-list.create "return-queue"
+list.make "return-queue"
 
 '
 
-@trap.return(){
+function @trap.return(){
     # setup finally
     local latest_return=$(trap -p return)
     # O="return-queue" list.push 

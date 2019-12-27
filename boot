@@ -32,12 +32,13 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
 
         if [[ "$RESOURCE_NAME" =~ ^http:// ]] || [[ "$RESOURCE_NAME" =~ ^https:// ]]; then
             local URL="$RESOURCE_NAME"
-            local TGT="$HOME/.x-cmd.com/x-bash/$(echo $URL | base64)"
+            local TGT="$HOME/.x-cmd.com/x-bash/$(echo -n $URL | base64)"
         else
             local module=$RESOURCE_NAME
 
             if [[ ! $module =~ \/ ]]; then
                 # Strategy: if there is local file in cache. Use it.
+                # Bug...
                 local LOCAL_FILE=$(ls "$HOME/.x-cmd.com/x-bash/*/$RESOURCE_NAME" 2>/dev/null | head -n 1)
                 [ -r "$LOCAL_FILE" ] && {
                     echo "Try using local file: $LOCAL_FILE"

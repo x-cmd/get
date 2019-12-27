@@ -39,7 +39,7 @@ assert.grep(){
 
 testFun(){
     # Do it in usual way
-    TMP_1=$(file.tmp)
+    local TMP_1=$(file.tmp)
     
     docker run -it ubuntu bash > $TMP_1
     MSG="testFun failed" \
