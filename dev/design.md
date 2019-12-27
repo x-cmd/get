@@ -54,21 +54,21 @@ bash不适合嵌套函数的使用，这样会带来难以定位的bug。
 
 ```bash
 # Python Style
-list.create students teachers
+list.make students teachers
 O=students list.push Chollet Marcus LeCun
 O=teachers list.push Richard Steward William
 O=stduents list.print
 O=teachers list.print
 
 # C Style
-list.create students teachers
+list.make students teachers
 list.push students Chollet Marcus LeCun
 list.push teachers Richard Steward William
 list.print stduents
 list.print teachers
 
 # OO Style: Problem is, adding too many functions in bash
-list.create students teachers
+list.make students teachers
 students.push Chollet Marcus LeCun
 teachers.push Richard Steward William
 students.print

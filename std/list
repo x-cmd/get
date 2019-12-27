@@ -1,10 +1,10 @@
-list.create(){
+list.make(){
     eval "export $1=()"
     export O=$1
 }
 
 list.new(){
-    list.create "$@"
+    list.make "$@"
     while [ $# -gt 0 ]; do
         eval "
         $1.free(){ O=$1 list.free; }

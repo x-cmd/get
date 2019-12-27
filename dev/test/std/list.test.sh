@@ -3,7 +3,7 @@
 @src std/list std/utils std/test
 
 list.test(){
-    list.create testwork
+    list.make testwork
 
     @catch-final '
         echo catch error: codeline $LINENO
