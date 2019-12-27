@@ -61,9 +61,10 @@ file.to_array(){
   eval "$REF=()"  # FILE_ARRAY=()
 
   while [ $# -gt 0 ]; do
-    while read line; do
+    #shellcheck disable=SC2034
+    while read -r line; do
         eval "$REF=(\"\${$REF[@]}\" \"\$line\")" # FILE_ARRAY=("${FILE_ARRAY[@]}" "$line")
-    done <$1
+    done <"$1"
     shift
   done
 }

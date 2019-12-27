@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-@src utils
+@src std/utils
 
 timer.make(){
     while [ $# -gt 0 ]; do
@@ -19,7 +19,7 @@ timer.elapsed(){
     end_time="$(date +%s)"
     local name=${O:?provider O}
     local start_time=${!name}
-    echo $(( $end_time  - $start_time ))
+    echo $(( end_time  - start_time ))
 }
 
 timer.free(){
