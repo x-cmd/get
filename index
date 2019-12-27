@@ -1,12 +1,13 @@
+std/dict
 std/file
 std/job
 std/list
-std/map
 std/net
 std/path
 std/set
 std/str
 std/test
+std/timer
 std/ui
 std/utils
 net/nmap
