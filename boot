@@ -24,7 +24,13 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
     return 1
 }
 
+
 @src(){
+    [ ! -z "$X_BASH_SRC_PATH" ] && {
+        source "$X_BASH_SRC_PATH"/$1
+        return 0
+    }
+
     @init.curl
 
     while [ $# -gt 0 ]; do
