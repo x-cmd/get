@@ -10,7 +10,7 @@ net.mping(){
         job.put "${MAX:-100}" "net.is_ping_available $ip && echo $ip"
     done
 
-    while read -d ' ' ip; do
+    while read -r -d ' ' ip; do
         job.put "${MAX:-100}" "net.is_ping_available $ip && echo $ip"
     done
 

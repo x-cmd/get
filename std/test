@@ -28,7 +28,6 @@ assert.eq(){
 # assert.grep hi <<<"hello hi"
 # assert.grep hi <README.md
 assert.grep(){
-    local pattern=$1
     grep "${1:?Please provide grep pattern}"
     if [ $? -eq 0 ]; then
         return 0
@@ -40,14 +39,16 @@ assert.grep(){
 
 testFun(){
     # Do it in usual way
-    local TMP_1=$(file.tmp)
+    local TMP_1 TMP_2
+    TMP_1=$(file.tmp)
+    TMP_2=$(file.tmp)
     
-    docker run -it ubuntu bash > $TMP_1
+    docker run -it ubuntu bash > "$TMP_1"
     MSG="testFun failed" \
-        assert.grep "work" -- "work" <$TMP_1
-    assert.grep $(line $TMP_1 2) $TMP_2
+        assert.grep "work" -- "work" <"$TMP_1"
+    assert.grep "$(line "$TMP_1" 2)" "$TMP_2"
     MSG="testFun failed for reason like" \
-        assert.grep "$(line $TMP_1 3)" $TMP_2
+        assert.grep "$(line "$TMP_1" 3)" "$TMP_2"
 
     # assert.grep "work" -- "testFun failed" <$TMP_1
     # assert.grep $(line $TMP_1 2) $TMP_2

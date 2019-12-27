@@ -27,22 +27,23 @@ set.isempty(){
 }
 
 set.has(){
-    dict.has ${1:?Provide value}
+    dict.has "${1:?Provide value}"
 }
 
 set.put(){
-    dict.put ${1:?Provide value} "1"
+    dict.put "${1:?Provide value}" "1"
 }
 
 # give key
 set.remove(){
-    dict.remove ${1:?Provide value}
+    dict.remove "${1:?Provide value}"
 }
 
 set.print(){
+    local k
     for i in $(list.print); do
-        local k=$(echo -n $i | cut -d ':' -f 1)
-        echo "$(str.unbase64 $k)"
+        k=$(echo -n "$i" | cut -d ':' -f 1)
+        str.unbase64 "$k"
     done
 }
 
@@ -57,17 +58,17 @@ set.dump(){
 set.load(){
     local name=${1?:Provide name}
     shift
-    dict.create $name
+    dict.make "$name"
 
     if [ $# -eq 0 ]; then
-        while read s; do
-            list.push s
+        while read -r s; do
+            list.push "$s"
         done
         return 0
     fi
 
-    while read s; do
-        list.push s
-    done <$1
+    while read -r s; do
+        list.push "$s"
+    done <"$1"
     
 }

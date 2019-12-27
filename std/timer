@@ -15,7 +15,8 @@ timer.reset(){
 }
 
 timer.elapsed(){
-    local end_time="$(date +%s)"
+    local end_time
+    end_time="$(date +%s)"
     local name=${O:?provider O}
     local start_time=${!name}
     echo $(( $end_time  - $start_time ))

@@ -5,7 +5,7 @@
 # Not good
 X_CMD_COM_RETURN=""
 @ret(){
-    export X_CMD_COM_RETURN="$@"
+    export X_CMD_COM_RETURN="$*"
 }
 
 @res(){
@@ -42,7 +42,8 @@ echon(){
 
 rmrf(){
     for i in "$@"; do
-        local tgt="$(str.trim $i)"
+        local tgt
+        tgt="$(str.trim "$i")"
         [ "$tgt" == "" ] && continue
 
         # TODO: add other patterns
@@ -50,7 +51,7 @@ rmrf(){
             yesno "WARNING: Sure of removing '$tgt': " || continue
         fi
 
-        rm -rf $i
+        rm -rf "$i"
     done
 }
 
@@ -61,15 +62,12 @@ rmrf(){
 
 readlink.fullpath(){
     local TGT=${1:?"Provide name"}
-
-    local ORI=$(pwd)
-    local A=$(readlink $TGT)
-    cd $(dirname $TGT)
-    cd $(dirname $A)
-    local RES=$(pwd)
-    cd $ORI
-
-    echo $RES/$(basename $A)
+    local ORI A RES
+    ORI=$(pwd)
+    A=$(readlink "$TGT")
+    cd "$(dirname "$TGT")" && cd "$(dirname "$A")" || return 1
+    RES=$(pwd)
+    cd "$ORI" && echo "$RES/$(basename "$A")"
 }
 
 
@@ -96,12 +94,12 @@ rand.str(){
 
 # Cookbook 1.15
 # like watch command
-try(){ while :; do "$@"; sleep ${INTERVAL:-3}; done }
-try.until.success(){ while :; do "$@" && return; sleep ${INTERVAL:-3}; done }
+try(){ while :; do "$@"; sleep "${INTERVAL:-3}"; done }
+try.until.success(){ while :; do "$@" && return; sleep "${INTERVAL:-3}"; done }
 
 repeat(){
     local time=3
-    for i in `seq $time`; do
+    for i in $(seq $time); do
         eval "$*"
     done
 }

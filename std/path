@@ -3,19 +3,21 @@
 alias path.dirname=dirname
 alias path.basename=basename
 path.extension(){
-    local filepath=$(basename ${1:?Provide file path})
+    local filepath
+    filepath=$(basename "${1:?Provide file path}")
     local ret=${filepath#*.}
     # to handle the situation: `path.extensions abc`, ret="abc", should return ""
     [ "$ret" == "$filepath" ] || echo $ret
 }
 
 path.filename(){
-    local filepath=$(basename ${1:?Provide file path})
-    echo ${filepath%.*}
+    local filepath
+    filepath=$(basename "${1:?Provide file path}")
+    echo "${filepath%.*}"
 }
 
 path.abs(){
-    echo $(cd {$1:-.}; pwd)
+    echo "$(cd "${1:-.}"; pwd)"
 }
 
 # TODO

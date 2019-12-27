@@ -42,7 +42,7 @@ list.size(){
 }
 
 list.isempty(){
-    [ $(list.size) -eq 0 ]
+    [ "$(list.size)" -eq 0 ]
 }
 
 list.last_idx(){
@@ -50,7 +50,7 @@ list.last_idx(){
 }
 
 list.first(){
-    if [ $(list.size) -gt 0 ]; then
+    if [ "$(list.size)" -gt 0 ]; then
         eval "echo \${$O[0]}"
         return 0
     fi
@@ -60,13 +60,13 @@ list.first(){
         return 1
     fi
 
-    echo $1
+    echo "$1"
     return 0
 }
 
 list.get(){
     local idx=${1:?Index}
-    if [ $idx -ge $(list.size) ]; then
+    if [ "$idx" -ge "$(list.size)" ]; then
         echo "Index exceeds size" >&2
         return 1
     fi
@@ -81,14 +81,14 @@ list.index_of(){
             echo $i
             return 0
         fi
-        let i=i+1
+        ((i=i+1))
     done
     return 1
 }
 
 list.remove(){
     local idx=${1:?Index}
-    if [ $idx -ge $(list.size) ]; then
+    if [ "$idx" -ge "$(list.size)" ]; then
         echo "Index exceeds size" >&2
         return 1
     fi
@@ -98,7 +98,7 @@ list.remove(){
 }
 
 list.shift(){
-    if [ $(list.size) -le 0 ]; then
+    if [ "$(list.size)" -le 0 ]; then
         echo "No element to shift" >&2
         return 1
     fi
@@ -119,16 +119,18 @@ list._push(){
 }
 
 list.pop(){
-    local last_idx=$(list.last_idx)
+    local last_idx
+    last_idx=$(list.last_idx)
     [ $? -ne 0 ] && return $?
     eval "$O=( \"\${$O[@]:0:$last_idx}\" )"
 }
 
 list.top(){
-    local last_idx=$(list.last_idx)
+    local last_idx
+    last_idx=$(list.last_idx)
     [ $? -ne 0 ] && return $?
 
-    if [ $last_idx -ge 0 ]; then
+    if [ "$last_idx" -ge 0 ]; then
         eval "echo \${$O[$last_idx]}"
         return 0
     fi
@@ -137,7 +139,7 @@ list.top(){
         echo "No element to pop" >&2
         return 1
     fi
-    echo $1
+    echo "$1"
 }
 
 list.print(){

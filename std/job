@@ -11,8 +11,9 @@ job.get_active_size(){
 job.offer(){
     local MAX=${1:?Provide the max number of jobs could hold}
     shift
-    local cur=$(job.get_active_size)
-    if [ $cur -le ${MAX:-3} ]; then
+    local cur
+    cur=$(job.get_active_size)
+    if [ "$cur" -le "${MAX:-3}" ]; then
         (eval "$@") 1>&1 2>&2 &
         return 0
     fi
@@ -21,14 +22,15 @@ job.offer(){
 
 # Will block
 job.put(){
-    until job.offer $@; do
-        sleep ${interval:-3s};
+    until job.offer "$@"; do
+        sleep "${interval:-3s}"
     done
 }
 
 job.wait_until_finished(){
+    local s
     while :; do
-        local s=$(job.get_active_size)
+        s=$(job.get_active_size)
         [ "$s" -eq 0 ] && return
         sleep 1s
     done
@@ -37,7 +39,7 @@ job.wait_until_finished(){
 job.test.ping(){
     local outfile=${1:?Provide output file path}
     for ip in ${2:?Provide ip range like 192.168.6}.{1..255}; do 
-        echo $ip;
+        echo "$ip"
         job.put 100 "ping -c 2 $ip 1>/dev/null 2>&1 && echo $ip >>$outfile"; 
     done
     job.wait_until_finished
@@ -63,9 +65,10 @@ job.pool.get_active_size(){
 }
 
 job.pool.offer(){
-    local cur=$(jobpool.get_active_size)
-    local max=$(jobpool.get_max)
-    if [ $cur -le $max ]; then
+    local cur max
+    cur=$(jobpool.get_active_size)
+    max=$(jobpool.get_max)
+    if [ "$cur" -le "$max" ]; then
         (eval "$@") 1>&1 2>&2 &
         return 0
     fi
@@ -74,7 +77,7 @@ job.pool.offer(){
 
 # Will block
 job.pool.put(){
-    until jobpool.offer $@; do
+    until jobpool.offer "$@"; do
         sleep 3s;
     done
 }
@@ -84,8 +87,9 @@ job.pool.clear(){
 }
 
 job.pool.wait_until_finished(){
+    local s
     while :; do
-        local s=$(job.pool.get_active_size)
+        s=$(job.pool.get_active_size)
         [ "$s" -eq 0 ] && return
         sleep 1s
     done
@@ -95,7 +99,7 @@ job.pool.test.ping(){
     local outfile=${1:?Provide output file path}
     jobpool.create queue4ping 100
     for ip in ${2:?Provide ip range like 192.168.6}.{1..255}; do
-        echo $ip;
+        echo "$ip"
         jobpool.put "ping -c 2 $ip && echo $ip >>$outfile";
     done
     jobpool.clear
