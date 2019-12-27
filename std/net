@@ -6,11 +6,11 @@ net.is_ping_available(){
 
 net.mping(){
     for ip in "$@"; do
-        job.put ${MAX:-100} "ping.is_ping_available $ip && echo $ip"
+        job.put ${MAX:-100} "net.is_ping_available $ip && echo $ip"
     done
 
     while read -d ' ' ip; do
-        job.put ${MAX:-100} "ping.is_ping_available $ip && echo $ip"
+        job.put ${MAX:-100} "net.is_ping_available $ip && echo $ip"
     done
 
     echo "Waiting until all jobs finished" >&2
