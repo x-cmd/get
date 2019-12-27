@@ -11,6 +11,10 @@ dict.make(){
     list.make "$@"
 }
 
+dict.new(){
+    utils.create_new_function dict "$@"
+}
+
 dict.free(){
     list.free
 }
