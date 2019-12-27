@@ -54,8 +54,11 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                     local content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"
                     (echo "$content" | grep "std/str" 1>/dev/null) && echo "$content" >$index_file
                 fi
-
                 module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+                [ -z "$module" ] && {
+                    echo "$module not found" >&2
+                    return 1
+                }
                 echo "Using $module" >&2
             fi
 

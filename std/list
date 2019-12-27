@@ -1,4 +1,4 @@
-@src utils
+@src std/utils
 
 list.make(){
     eval "export $1=()"
