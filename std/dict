@@ -8,7 +8,7 @@
 @src std/str
 
 dict.create(){
-    list.create "$@"
+    list.make "$@"
 }
 
 dict.free(){
