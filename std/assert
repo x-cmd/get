@@ -24,6 +24,22 @@ assert.eq(){
     fi
 }
 
+assert.t(){
+    if eval "$*"; then
+        :
+    else
+        echo "${MSG:-"Expect command execution to be true: $*"}" >&2
+    fi
+}
+
+assert.f(){
+    if eval "$*"; then
+        echo "${MSG:-"Expect command execution to be false: $*"}" >&2
+    else
+        :
+    fi
+}
+
 # Two ways
 # assert.grep hi <<<"hello hi"
 # assert.grep hi <README.md

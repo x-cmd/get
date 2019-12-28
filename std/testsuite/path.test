@@ -1,1 +1,9 @@
 # shellcheck shell=bash
+
+@src std/path std/test
+
+testcase(){
+    :
+}
+
+testcase

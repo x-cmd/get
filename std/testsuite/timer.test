@@ -1,1 +1,16 @@
 # shellcheck shell=bash
+
+@src std/timer std/test
+
+testcase(){
+    timer.new ttt
+    sleep 1
+    assert.eq "$(ttt.elapsed)" 1
+    ttt.reset
+    assert.eq "$(ttt.elapsed)" 0
+    sleep 1
+    assert.eq "$(ttt.elapsed)" 1
+}
+
+# Temporary disable
+# testcase
