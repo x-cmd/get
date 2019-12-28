@@ -34,12 +34,15 @@ dict.isempty(){
 
 dict.get(){
     local key=${1:?Provide key}
-    local keyecode=$(str.base64 $key)
+    local keyecode
+    keyecode=$(str.base64 "$key")
     for i in $(list.print); do
-        local k=$(echo $i | cut -d ':' -f 1)
+        local k
+        k=$(echo "$i" | cut -d ':' -f 1)
         if [ "$k" = "$keyecode" ]; then
-            local v=$(echo $i | cut -d ':' -f 2)
-            echo "$(str.unbase64 $v)"
+            local v
+            v=$(echo "$i" | cut -d ':' -f 2)
+            str.unbase64 "$v"
             return 0
         fi
     done
@@ -47,9 +50,11 @@ dict.get(){
 }
 
 dict.put(){
-    local key="$(str.base64 "${1:?Provide key}")"
-    local value="$(str.base64 "${2:?Provide value}")"
-    dict.remove $1
+    local key
+    key="$(str.base64 "${1:?Provide key}")"
+    local value
+    value="$(str.base64 "${2:?Provide value}")"
+    dict.remove "$1"
     echo "$key":"$value"
     list.push "$key:$value"
 }
@@ -57,25 +62,28 @@ dict.put(){
 # give key
 dict.remove(){
     local key="${1:?Key}"
-    local key_base="$(str.base64 "${1:?Provide key}")"
+    local key_base
+    key_base="$(str.base64 "${1:?Provide key}")"
     local idx=0
     for i in $(list.print); do
-        local k=$(echo -n $i | cut -d ':' -f 1)
+        local k
+        k=$(echo -n "$i" | cut -d ':' -f 1)
         if [ "$k" = "$key_base" ]; then
             echo remove $idx
             list.remove "$idx"
             return 0
         fi
-        let idx=idx+1
+        (( idx=idx+1 ))
     done
     return 1
 }
 
 dict.print(){
+    local k v
     for i in $(list.print); do
-        local k=$(echo -n $i | cut -d ':' -f 1)
-        local v=$(echo -n $i | cut -d ':' -f 2)
-        echo "$(str.unbase64 $k) = $(str.unbase64 $v)"
+        k=$(echo -n "$i" | cut -d ':' -f 1)
+        v=$(echo -n "$i" | cut -d ':' -f 2)
+        echo "$(str.unbase64 "$k") = $(str.unbase64 "$v")"
     done
 }
 
@@ -90,16 +98,16 @@ dict.dump(){
 dict.load(){
     local name=${1?:Provide name}
     shift
-    dict.create $name
+    dict.make "$name"
 
     if [ $# -eq 0 ]; then
-        while read s; do
-            list.push s
+        while read -r s; do
+            list.push "$s"
         done
         return 0
     fi
 
-    while read s; do
-        list.push s
-    done <$1
+    while read -r s; do
+        list.push "$s"
+    done <"$1"
 }
