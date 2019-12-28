@@ -78,13 +78,15 @@ file.dict.open(){
 }
 
 file.dict.keys(){
-    for e in $(cat ${KV_MAP:?"Please invoke dict.init()"} | cut -d ' ' -f 1); do
+    # for e in $(cat ${KV_MAP:?"Please invoke dict.init()"} | cut -d ' ' -f 1); do
+    cut -d ' ' -f 1 "${KV_MAP:?"Please invoke dict.init()"}" | while read -r e; do
         str.unbase64 "$e"
     done
 }
 
 file.dict.values(){
-    for e in $(cat ${KV_MAP:?"Please invoke dict.init()"} | cut -d ' ' -f 2); do
+    # for e in $(cat ${KV_MAP:?"Please invoke dict.init()"} | cut -d ' ' -f 2); do
+    cut -d ' ' -f 2 "${KV_MAP:?"Please invoke dict.init()"}" | while read -r e; do
         str.unbase64 "$e"
     done
 }
