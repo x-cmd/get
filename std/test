@@ -18,7 +18,7 @@ assert(){
 assert.eq(){
     local s1=${1:?Real}
     local s2=${2:?Expect}
-    if [ "$s1" = "$2" ]; then
+    if [ "$s1" != "$2" ]; then
         echo "Failed. Expect '$s1' to be '$s2'" >&2
         return 1
     fi

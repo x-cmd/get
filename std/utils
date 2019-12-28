@@ -122,7 +122,7 @@ arr.indexof(){
     for i in "$@"; do
         a=$((a + 1))
         if [ "$i" == "$target" ]; then
-            echo $a
+            echo "$a"
             return 0
         fi
     done
