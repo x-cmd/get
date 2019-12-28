@@ -276,14 +276,23 @@ work(){
 utils.create_new_function(){
     local prototype=$1
     shift
-    $prototype.make "$@"
+    "$prototype.make" "$@"
     while [ $# -gt 0 ]; do
         local obj=$1
         local method
+        local method_list=()
         for func in $(typeset -F | cut -d ' ' -f 3 | grep "^$prototype.*" | grep -v -E "(make)|(new)" | cut -d ' ' -f 1); do
-            local method=$(echo $func | cut -d '.' -f 2)
+            local method
+            method=$(echo "$func" | cut -d '.' -f 2)
+            method_list=("${method_list[@]}" "$obj.$method")
             eval "$obj.$method(){ O=$obj $func \"\$@\"; }"
         done
+
+        eval "$obj.delete(){
+            unset -f ${method_list[*]};
+            unset -f $obj.delete
+        }"
+
         shift
     done
 }
