@@ -91,7 +91,7 @@ list.push(){
 
 list._push(){
     local code="${O:?Require Object Name}[\${#${O}[*]}]=$1"
-    # echo $code
+    echo "$code"
     eval "$code"
 }
 
