@@ -2,6 +2,7 @@
 
 @src(){
     while [ $# -gt 0 ]; do
+        #shellcheck disable=SC1090
         source "$(dirname "${BASH_SOURCE[0]}")/../../$1"
         shift
     done
@@ -9,6 +10,5 @@
 
 find "$(dirname "${BASH_SOURCE[0]}")"/*.test | while read -r i; do
     #shellcheck disable=SC1090
-    # ( source "$i" )
-    source "$i"
+    ( source "$i" )
 done

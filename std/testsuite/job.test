@@ -1,15 +1,11 @@
 # shellcheck shell=bash
 
-@src std/dict std/assert
+@src std/job std/assert
 
 testcase(){
-    dict.new adict
-    adict.put k1 v1
-    adict.put k2 v2
-    adict.put k3 v3
-
-    assert.t adict.has k3
-    assert.f adict.has k5
+    job.put 1 "sleep 3s;"
+    assert.f 'job.offer 1 "sleep 3"'
+    assert.t 'job.offer 3 "sleep 3"'
 }
 
 testcase

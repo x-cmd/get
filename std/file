@@ -57,7 +57,7 @@ alias file.tmp='__file_tmp_filepath="${TMPDIR}tmpfile.$RANDOM"; echo $__file_tmp
 
 # mapfile
 file.to_array(){
-  local REF=${VAR:-FILE_ARRAY}
+  local REF=${V:?Provide variable name}
   eval "$REF=()"  # FILE_ARRAY=()
 
   while [ $# -gt 0 ]; do

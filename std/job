@@ -13,7 +13,8 @@ job.offer(){
     shift
     local cur
     cur=$(job.get_active_size)
-    if [ "$cur" -le "${MAX:-3}" ]; then
+    # echo "size: $cur"
+    if [ "$cur" -lt "${MAX:-3}" ]; then
         (eval "$@") 1>&1 2>&2 &
         return 0
     fi
