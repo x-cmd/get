@@ -5,7 +5,9 @@ alias path.basename=basename
 path.extension(){
     local filepath
     filepath=$(basename "${1:?Provide file path}")
-    local ret=${filepath#*.}
+    local ret
+    ret=${filepath##*.}
+    # ret=$(cut -d '.')
     # to handle the situation: `path.extensions abc`, ret="abc", should return ""
     [ "$ret" == "$filepath" ] || echo "$ret"
 }
