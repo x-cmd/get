@@ -2,7 +2,7 @@
 
 @src std/list std/utils std/assert
 
-testcase1(){
+test.list.basic(){
     list.new test
 
     @catch-final "
@@ -31,4 +31,4 @@ testcase1(){
     assert.eq "$(test.top default)" "e"
 }
 
-testcase1
+test.list.basic

@@ -2,10 +2,10 @@
 
 @src std/job std/assert
 
-testcase(){
-    job.put 1 "sleep 3s;"
+test.job.offer(){
+    job.offer 1 "sleep 3s;"
     assert.f 'job.offer 1 "sleep 3"'
     assert.t 'job.offer 3 "sleep 3"'
 }
 
-testcase
+test.job.offer
