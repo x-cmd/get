@@ -6,7 +6,7 @@ std/net
 std/path
 std/set
 std/str
-std/test
+std/assert
 std/timer
 std/ui
 std/utils

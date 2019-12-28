@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-@src std/path std/test
+@src std/path std/assert
 
 testcase(){
     :

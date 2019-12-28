@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-@src std/timer std/test
+@src std/timer std/assert
 
 testcase(){
     timer.new ttt

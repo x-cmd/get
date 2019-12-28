@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # eval "$(curl https://x-bash.github.io/boot)"
 
-@src std/list std/utils std/test
+@src std/list std/utils std/assert
 
 list.test(){
     list.new test

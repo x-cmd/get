@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-@src std/dict std/test
+@src std/dict std/assert
 
 testcase(){
     dict.new adict
