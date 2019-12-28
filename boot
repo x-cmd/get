@@ -52,7 +52,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                 # shellcheck disable=SC2086
                 LOCAL_FILE="$(find $HOME/.x-cmd.com/x-bash/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
                 [ -r "$LOCAL_FILE" ] && {
-                    echo "Try using local file: $LOCAL_FILE" >&2
+                    echo "INFO: Using local file: $LOCAL_FILE" >&2
                     ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
                     return 0
                 }
@@ -68,10 +68,10 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                 fi
                 module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
                 [ -z "$module" ] && {
-                    echo "$module not found" >&2
+                    echo "ERROR: $module not found" >&2
                     return 1
                 }
-                echo "Using $module" >&2
+                echo "INFO: Using $module" >&2
             fi
 
             local URL="https://x-bash.github.io/$module"
@@ -85,15 +85,15 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
 
             if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
                 rm "$TGT"
-                echo "Failed to load $RESOURCE_NAME, do you want to load std/$RESOURCE_NAME?" >&2
+                echo "ERROR: Failed to load $RESOURCE_NAME, do you want to load std/$RESOURCE_NAME?" >&2
                 return 1
             fi
         fi
         
         ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
         shift
-    done
-}
+    done 
+} 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
 @src.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"
