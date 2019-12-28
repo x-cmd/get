@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 subfolder=(
     std net cmd cloud other
 )
@@ -11,6 +12,6 @@ subfolder=(
 
 rm index
 for i in "${subfolder[@]}"; do
-    ls $i/*
+    ls "$i"/*
 done 2>/dev/null >>index
 

@@ -1,25 +1,25 @@
+# shellcheck shell=bash
 STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
 
 if grep -F "$STR" "$HOME/.bashrc" >/dev/null; then
     echo Already install in "$HOME/.bashrc" >&2
 else
-    echo "$STR" >> $HOME/.bashrc
+    echo "$STR" >> "$HOME/.bashrc"
     echo Installed in "$HOME/.bashrc" >&2
 fi
 
 if grep -F "$STR" "$HOME/.bash_profile" >/dev/null; then
     echo Already install in "$HOME/.bash_profile">&2
 else
-    echo "$STR" >> $HOME/.bash_profile
+    echo "$STR" >> "$HOME/.bash_profile"
     echo Installed in "$HOME/.bash_profile" >&2
 fi
 
 eval "$STR"
 
-if [ ! -z "$ALL" ]; then
+[ -n "$ALL" ] && {
     # TODO: download release/tar/gz. So we donot need to download the files one by one
-    for i in "$(curl https://x-bash.github.io/index)"; do
+    for i in $(curl https://x-bash.github.io/index); do
         @src "$i"
     done
-fi
-
+}
