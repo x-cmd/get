@@ -1,8 +1,5 @@
 # shellcheck shell=bash
 
-# shellcheck shell=bash
-# eval "$(curl https://x-bash.github.io/boot)"
-
 @src std/list std/utils std/test
 
 testcase1(){

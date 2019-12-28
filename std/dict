@@ -55,7 +55,7 @@ dict.put(){
     local value
     value="$(str.base64 "${2:?Provide value}")"
     dict.remove "$1"
-    echo "$key":"$value"
+    # echo "$key":"$value"
     list.push "$key:$value"
 }
 
