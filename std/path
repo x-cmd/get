@@ -7,7 +7,7 @@ path.extension(){
     filepath=$(basename "${1:?Provide file path}")
     local ret=${filepath#*.}
     # to handle the situation: `path.extensions abc`, ret="abc", should return ""
-    [ "$ret" == "$filepath" ] || echo $ret
+    [ "$ret" == "$filepath" ] || echo "$ret"
 }
 
 path.filename(){
@@ -17,13 +17,14 @@ path.filename(){
 }
 
 path.abs(){
-    echo "$(cd "${1:-.}"; pwd)"
+    (cd "${1:-.}" && pwd)
 }
 
 # TODO
 path.common2(){
-    local a=$1
-    local b=$2   
+    # local a=$1
+    # local b=$2   
+    :
 }
 
 path.common(){
