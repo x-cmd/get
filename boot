@@ -28,9 +28,10 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
     [ -n "$X_BASH_SRC_PATH" ] && {
         local FILE="$X_BASH_SRC_PATH"/$1
         #shellcheck disable=SC1090
-        [ -r "$FILE" ] && {
-            source "$FILE" && return 0
-        }
+        [ -r "$FILE" ] && \
+            source "$FILE" && \
+            echo "Local file sourced: $FILE" >&2 && \
+            return 0
     }
 
     @init.curl

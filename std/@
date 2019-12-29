@@ -19,6 +19,8 @@
 #     trap "$code" ERR
 # }
 
+shopt -s expand_aliases
+
 function @trap.return(){
     # setup finally
     local latest_return
@@ -91,7 +93,7 @@ _add_stack'
 
 
 # shellcheck disable=SC2142
-alias @defer='
+alias defer='
 declare -F _eval_stack 1>/dev/null || _eval_stack(){
     for i in "${_X_CMD_RETURN_STACK[@]}"; do
         eval "$i"
@@ -131,7 +133,7 @@ work(){
 }
 
 test.defer(){
-    @defer "echo a"
-    @defer "echo b"
-    @defer "echo c"
+    defer "echo a"
+    defer "echo b"
+    defer "echo c"
 }

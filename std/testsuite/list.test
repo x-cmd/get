@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-@src std/list std/utils std/assert
+@src std/list std/@ std/assert
 
 test.list.basic(){
     list.new test
