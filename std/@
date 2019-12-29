@@ -112,13 +112,3 @@ fi
 
 _add_stack '
 
-work(){
-    @trap.return "echo final"
-    @trap.return "echo end"
-}
-
-test.defer(){
-    @defer "echo a"
-    @defer "echo b"
-    @defer "echo c"
-}
