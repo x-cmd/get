@@ -78,3 +78,8 @@ fi
 
 _add_stack'
 ```
+
+defer design is unnessary complicated.
+
+1. RETURN behavior is tricky.
+2. Base on one asumption: if you use @defer, @trap.return, @trap.exit, @trap.error, do not use trap return or trap exit
