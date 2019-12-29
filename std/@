@@ -89,43 +89,49 @@ alias @trap.return='
 
 _add_stack'
 
+
 # shellcheck disable=SC2142
-alias defer='
-[ -z "$_RETURN_STACK" ] && {
+alias @defer='
+declare -F _eval_stack 1>/dev/null || _eval_stack(){
+    for i in "${_X_CMD_RETURN_STACK[@]}"; do
+        eval "$i"
+    done
+}
 
-    _eval_stack(){
-        for i in "${_RETURN_STACK[@]}"; do
-            eval "$i"
-        done
-    }
+declare -F _add_stack 1>/dev/null || _add_stack(){
+    _X_CMD_RETURN_STACK=(  "$1" "${_X_CMD_RETURN_STACK[@]}"  )
+}
 
-    _add_stack(){
-        _RETURN_STACK=(  "$1" "${_RETURN_STACK[@]}"  )
-    }
-
-    # Using RETURN
-
-    local _RETURN_STACK 2>/dev/null
-    if [ $? -eq 0 ]; then
-        _RETURN_STACK=()
+local _X_CMD_RETURN_STACK 2>/dev/null
+if [ $? -eq 0 ]; then
+    [ -z "$_X_CMD_RETURN_STACK" ] && {
+        _X_CMD_RETURN_STACK=()
         local _LATEST_RETURN=$(trap -p RETURN)
         trap "
             _eval_stack
             ${_LATEST_RETURN:-trap RETURN}
         " RETURN
-    else
-        _RETURN_STACK=()
+    }
+else
+    [ -z "$_X_CMD_RETURN_STACK" ] && {
+        _X_CMD_RETURN_STACK=()
         _LATEST_EXIT=$(trap -p EXIT)
         trap "
             _eval_stack
             ${_LATEST_EXIT:-trap EXIT}
         " EXIT
-    fi
-}
+    }
+fi
 
-_add_stack'
+_add_stack '
 
 work(){
     @trap.return "echo final"
     @trap.return "echo end"
+}
+
+test.defer(){
+    @defer "echo a"
+    @defer "echo b"
+    @defer "echo c"
 }

@@ -1,0 +1,13 @@
+# shellcheck shell=bash
+
+@src std/@ std/assert
+
+test.defer(){
+    work(){
+        @defer "echo a"
+        @defer "echo b"
+    }
+    assert.eq "$(work)" "$(echo b; echo a)"
+}
+
+test.defer
