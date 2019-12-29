@@ -6,12 +6,10 @@ test.list.basic(){
     list.new test
 
     @catch-final "
-        echo catch error: codeline \$LINENO
+        Test Fail: codeline \$LINENO
     " "
-        # echo before free
         test.free
         # aaa # Wrong command
-        # echo after free
     "
 
     test.push a b c d e f

@@ -4,8 +4,8 @@
 
 test.defer(){
     work(){
-        defer "echo a"
-        defer "echo b"
+        @defer "echo a"
+        @defer "echo b"
     }
     assert.eq "$(work)" "$(echo b; echo a)"
 }
