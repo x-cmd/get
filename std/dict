@@ -13,7 +13,7 @@ dict.make(){
 }
 
 dict.new(){
-    utils.create_new_function dict "$@"
+    oo.create_new_function dict "$@"
 }
 
 dict.free(){

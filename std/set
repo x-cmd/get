@@ -11,7 +11,7 @@ set.make(){
 }
 
 set.new(){
-    utils.create_new_function set "$@"
+    oo.create_new_function set "$@"
 }
 
 set.free(){

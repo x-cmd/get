@@ -1,0 +1,26 @@
+# shellcheck shell=bash
+
+oo.create_new_function(){
+    local prototype=$1
+    shift
+    "$prototype.make" "$@"
+    while [ $# -gt 0 ]; do
+        local obj=$1
+        local method 1>/dev/null # to support zsh
+        local method_list=()
+        # typeset -f | grep '[A-Za-z_-]\+ ()' | cut -d ' ' -f 1
+        # for func in $(typeset -F | cut -d ' ' -f 3 | grep "^$prototype.*" | grep -v -E "(make)|(new)" | cut -d ' ' -f 1); do
+        for func in $(typeset -f | grep '[A-Za-z_-]\+ ()' | cut -d ' ' -f 1 | grep "^$prototype.*" | grep -v -E "(make)|(new)" | cut -d ' ' -f 1); do
+            method=$(echo "$func" | cut -d '.' -f 2)
+            method_list=("${method_list[@]}" "$obj.$method")
+            eval "$obj.$method(){ O=$obj $func \"\$@\"; }"
+        done
+
+        eval "$obj.delete(){
+            unset -f ${method_list[*]};
+            unset -f $obj.delete
+        }"
+
+        shift
+    done
+}

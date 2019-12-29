@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-@src std/utils
+@src std/oo
 
 timer.make(){
     while [ $# -gt 0 ]; do
@@ -38,6 +38,6 @@ timer.new(){
     #     done
     #     shift
     # done
-    utils.create_new_function timer "$@"
+    oo.create_new_function timer "$@"
 }
 

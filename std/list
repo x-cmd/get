@@ -1,12 +1,12 @@
 # shellcheck shell=bash
-@src std/utils
+@src std/oo
 
 list.make(){
     eval "export $1=()"
 }
 
 list.new(){
-    utils.create_new_function list "$@"
+    oo.create_new_function list "$@"
 }
 
 list.free(){
