@@ -1,43 +1,6 @@
 # shellcheck shell=bash
 # Doesn't work on some occations.
 
-# shellcheck disable=SC2142
-alias defer='
-[ -z "$_RETURN_STACK" ] && {
-
-    _eval_stack(){
-        for i in "${_RETURN_STACK[@]}"; do
-            eval "$i"
-        done
-    }
-
-    _add_stack(){
-        _RETURN_STACK=(  "$1" "${_RETURN_STACK[@]}"  )
-    }
-
-    # Using RETURN
-
-    local _RETURN_STACK 2>/dev/null
-    if [ $? -eq 0 ]; then
-        _RETURN_STACK=()
-        local _LATEST_RETURN=$(trap -p RETURN)
-        trap "
-            _eval_stack
-            ${_LATEST_RETURN:-trap RETURN}
-        " RETURN
-    else
-        _RETURN_STACK=()
-        _LATEST_EXIT=$(trap -p EXIT)
-        trap "
-            _eval_stack
-            ${_LATEST_EXIT:-trap EXIT}
-        " EXIT
-    fi
-}
-
-_add_stack'
-
-
 file.exist_or_append(){
   local filename="$1"
   local string_to_append="$2"
@@ -45,15 +8,9 @@ file.exist_or_append(){
   echo "$filename"
 }
 
-# Temp facility
-@src std/utils
-
 # Auto delete
-alias file.tmp='__file_tmp_filepath="${TMPDIR}tmpfile.$RANDOM"; echo $__file_tmp_filepath; defer "rm -f $__file_tmp_filepath"'
-
-# file.find(){
-  
-# }
+@src std/@
+alias file.tmp='__file_tmp_filepath="${TMPDIR}tmpfile.$RANDOM"; echo $__file_tmp_filepath; @defer "rm -f $__file_tmp_filepath"'
 
 # mapfile
 file.to_array(){
