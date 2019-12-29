@@ -30,7 +30,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
         #shellcheck disable=SC1090
         [ -r "$FILE" ] && \
             source "$FILE" && \
-            echo "Local file sourced: $FILE" >&2 && \
+            echo "INFO: Local file sourced $FILE" >&2 && \
             return 0
     }
 
