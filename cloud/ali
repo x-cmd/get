@@ -48,10 +48,10 @@ ali.dns.update.record(){
     local Type=${3:?"Provide Type"}
     local Value=${4:?"Provide Work"}
     aliyun alidns UpdateDomainRecord \
-        --RecordId $RecordId \
-        --RR $RR \
-        --Type $Type \
-        --Value $Value
+        --RecordId "$RecordId" \
+        --RR "$RR" \
+        --Type "$Type" \
+        --Value "$Value"
 }
 
 ali.dns.delete.record(){
@@ -66,31 +66,31 @@ ali.dns.put.record(){
     local Type=${3:?"Provide Type"}
     local Value=${4:?"Provide IP"}
 
-    local RID=$(ali.dns.id.exact.record $DomainName $RR)
+    local RID=$(ali.dns.id.exact.record "$DomainName" "$RR")
     if [ "$RID" == "" ]; then
         echo "Add New Record: $DomainName $RR $Type $Value"
-        ali.dns.add.record $DomainName $RR $Type $Value
+        ali.dns.add.record "$DomainName" "$RR" "$Type" "$Value"
     else
         echo "Already Register. Try to update: $RID $RR $Type $Value"
         # CMD=(ali.dns.update.record $RID $RR $Type $Value)
         # eval "${CMD[@]}"
-        ali.dns.update.record $RID $RR $Type $Value
+        ali.dns.update.record "$RID" "$RR" "$Type" "$Value"
     fi
 }
 
 ali.config.ak(){
-    local PROFILE=$(1:?"Provide Profile")
-    local ID=$(1:?"Provide AccessKey ID")
-    local KEY=$(2:?"Provide AccessKey Secret")
-    local REGION=$(3:?"cn-shenzhen")
+    local PROFILE=${1:?"Provide Profile"}
+    local ID=${1:?"Provide AccessKey ID"}
+    local KEY=${2:?"Provide AccessKey Secret"}
+    local REGION=${3:?"cn-shenzhen"}
 
     aliyun configure set \
-        --profile $PROFILE \
+        --profile "$PROFILE" \
         --language en \
-        --region $REGION \
+        --region "$REGION" \
         --mode AK \
-        --access-key-id $ID \
-        --access-key-secret $KEY
+        --access-key-id "$ID" \
+        --access-key-secret "$KEY"
 }
 
 
