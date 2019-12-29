@@ -15,6 +15,11 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
         return
     fi
 
+    if wget --help 1>/dev/null 2>&1; then
+        export CURL="wget -qO -"
+        return
+    fi
+
     if command -v x 1>/dev/null 2>&1; then
         export CURL="x cat"
         return
