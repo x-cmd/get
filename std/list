@@ -51,6 +51,7 @@ list.get(){
     return 0
 }
 
+# refer arr.indexof in utils
 list.index_of(){
     local i=0
     for elem in $(list.print); do
@@ -60,6 +61,7 @@ list.index_of(){
         fi
         ((i=i+1))
     done
+    echo -1
     return 1
 }
 

@@ -7,7 +7,8 @@ assert(){
         eval "$code"
     fi
 
-    if [ $? -eq 0 ]; then
+    # shellcheck disable=SC2181
+    if [ "$?" -eq 0 ]; then
         return 0
     else
         echo "$MSG"
@@ -51,6 +52,16 @@ assert.grep(){
         echo "${MSG:-Grep Pattern Failed matching: $1}"
         return 1
     fi
+}
+
+assert.float(){
+    [[ "$1" =~ ^[\ \t]+[0-9]+(.[0-9]+)?[\ \t]+$ ]]
+    return $?
+}
+
+assert.int(){
+    [[ "$1" =~ ^[\ \t]+[0-9]+[\ \t]+$ ]]
+    return $?
 }
 
 testFun(){

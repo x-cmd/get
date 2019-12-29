@@ -1,0 +1,131 @@
+# shellcheck shell=bash
+
+# @final(){
+#     local latest_code=$(trap -p return)
+#     # Smart as I, using eval to avoid the real return statement being invoked when this function ends.
+#     local code="eval \"trap \\\"$1
+#     ${latest_code:-trap return}
+#     \\\" return\"
+#     "
+#     # echo "$code"
+#     trap "$code" return
+# }
+
+# @catch(){
+#     local latest_code=$(trap -p ERR)
+#     echo after latest
+#     local code="$1; ${latest_code:-trap ERR}"
+#     # echo CATCH-CODE "$code"
+#     trap "$code" ERR
+# }
+
+function @trap.return(){
+    # setup finally
+    local latest_return
+    latest_return=$(trap -p return)
+    # O="return-queue" list.push 
+    # Smart as I, using eval to avoid the real return statement being invoked when this function ends.
+    local final_code="eval \"
+        $2
+        ${latest_err:-trap ERR}
+        ${latest_return:-trap return}
+    \\\" return\"
+    "
+    # echo "$final_code"
+     # shellcheck disable=SC2064
+    trap "$final_code" return
+}
+
+@catch-final(){
+    # setup catch
+    local latest_err
+    latest_err=$(trap -p ERR)
+    local catch_code="
+        __RET_CODE=$?
+        $1
+        ${latest_err:-trap ERR}
+        return $__RET_CODE
+    "
+    # echo "$catch_code"
+     # shellcheck disable=SC2064
+    trap "$catch_code" ERR
+
+    # setup finally
+    local latest_return
+    latest_return=$(trap -p return)
+    # Smart as I, using eval to avoid the real return statement being invoked when this function ends.
+    local final_code="eval \"trap \\\"trap ERR
+        $2
+        ${latest_err:-trap ERR}
+        ${latest_return:-trap return}
+    \\\" return\"
+    "
+    # echo "$final_code"
+    # shellcheck disable=SC2064
+    trap "$final_code" return
+}
+
+# shellcheck disable=SC2142
+alias @trap.return='
+[ -z "$_STACK" ] && {
+
+    local _STACK=()
+    _eval_stack(){
+        for i in "${_STACK[@]}"; do
+            eval "$i"
+        done
+    }
+    
+    local _LATEST_RETURN=$(trap -p return)
+    trap "
+        _eval_stack
+        ${_LATEST_RETURN:-trap return}
+    " RETURN
+
+    _add_stack(){
+        _STACK=( "${_STACK[@]}"  "$1" )
+    }
+}
+
+_add_stack'
+
+# shellcheck disable=SC2142
+alias defer='
+[ -z "$_RETURN_STACK" ] && {
+
+    _eval_stack(){
+        for i in "${_RETURN_STACK[@]}"; do
+            eval "$i"
+        done
+    }
+
+    _add_stack(){
+        _RETURN_STACK=(  "$1" "${_RETURN_STACK[@]}"  )
+    }
+
+    # Using RETURN
+
+    local _RETURN_STACK 2>/dev/null
+    if [ $? -eq 0 ]; then
+        _RETURN_STACK=()
+        local _LATEST_RETURN=$(trap -p RETURN)
+        trap "
+            _eval_stack
+            ${_LATEST_RETURN:-trap RETURN}
+        " RETURN
+    else
+        _RETURN_STACK=()
+        _LATEST_EXIT=$(trap -p EXIT)
+        trap "
+            _eval_stack
+            ${_LATEST_EXIT:-trap EXIT}
+        " EXIT
+    fi
+}
+
+_add_stack'
+
+work(){
+    @trap.return "echo final"
+    @trap.return "echo end"
+}
