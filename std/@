@@ -21,23 +21,6 @@
 
 shopt -s expand_aliases
 
-function @trap.return(){
-    # setup finally
-    local latest_return
-    latest_return=$(trap -p return)
-    # O="return-queue" list.push 
-    # Smart as I, using eval to avoid the real return statement being invoked when this function ends.
-    local final_code="eval \"
-        $2
-        ${latest_err:-trap ERR}
-        ${latest_return:-trap return}
-    \\\" return\"
-    "
-    # echo "$final_code"
-     # shellcheck disable=SC2064
-    trap "$final_code" return
-}
-
 @catch-final(){
     # setup catch
     local latest_err
@@ -69,31 +52,33 @@ function @trap.return(){
 
 # shellcheck disable=SC2142
 alias @trap.return='
-[ -z "$_STACK" ] && {
-
-    local _STACK=()
-    _eval_stack(){
-        for i in "${_STACK[@]}"; do
+if local _X_CMD_RETURN_STACK 2>/dev/null; then
+    declare -F _eval_stack 1>/dev/null || _eval_stack(){
+        for i in "${_X_CMD_RETURN_STACK[@]}"; do
             eval "$i"
         done
     }
-    
-    local _LATEST_RETURN=$(trap -p return)
-    trap "
-        _eval_stack
-        ${_LATEST_RETURN:-trap return}
-    " RETURN
 
-    _add_stack(){
-        _STACK=( "${_STACK[@]}"  "$1" )
+    declare -F _add_stack 1>/dev/null || _add_stack(){
+        _X_CMD_RETURN_STACK=(  "$1" "${_X_CMD_RETURN_STACK[@]}"  )
     }
-}
+
+    [ -z "$_X_CMD_RETURN_STACK" ] && {
+        _X_CMD_RETURN_STACK=()
+        local _LATEST_RETURN=$(trap -p RETURN)
+        trap "
+            _eval_stack
+            ${_LATEST_RETURN:-trap RETURN}
+        " RETURN
+    }
+else
+    echo "Only available in function scope." >&2
+fi
 
 _add_stack'
 
-
 # shellcheck disable=SC2142
-alias defer='
+alias @defer='
 declare -F _eval_stack 1>/dev/null || _eval_stack(){
     for i in "${_X_CMD_RETURN_STACK[@]}"; do
         eval "$i"
@@ -133,7 +118,7 @@ work(){
 }
 
 test.defer(){
-    defer "echo a"
-    defer "echo b"
-    defer "echo c"
+    @defer "echo a"
+    @defer "echo b"
+    @defer "echo c"
 }
