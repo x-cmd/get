@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+# shellcheck shell=bash
 
 aws.setup(){ 
     aws configure set aws_access_key_id $1

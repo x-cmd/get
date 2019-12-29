@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 @src cmd/docker
 
 # basic images providing

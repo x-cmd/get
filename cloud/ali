@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+# shellcheck shell=bash
 
 ali.dns.add.record(){
     local DomainName=${1:?"Domain Name. If you want to setup 'xxx.domain.com', please input 'domain.com'"}
