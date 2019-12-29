@@ -6,10 +6,11 @@ test.file.to_array(){
     for i in $(seq 0 9); do
         echo "$i"
     done >./test.tmp
+    @defer "rm $(pwd)/test.tmp"
+
     local vvv
     V=vvv file.to_array ./test.tmp
     assert.eq "${vvv[8]}" 8
-    rm ./test.tmp
 }
 
 test.file.to_array

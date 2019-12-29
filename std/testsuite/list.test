@@ -8,7 +8,7 @@ test.list.basic(){
     @catch-final "
         Test Fail: codeline \$LINENO
     " "
-        test.free
+        test.delete
         # aaa # Wrong command
     "
 
