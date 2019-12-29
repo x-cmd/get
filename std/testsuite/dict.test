@@ -2,7 +2,7 @@
 
 @src std/dict std/assert std/@
 
-testcase(){
+test.basic(){
     dict.new adict
     @defer "adict.delete"
 
@@ -14,4 +14,4 @@ testcase(){
     assert.f adict.has k5
 }
 
-testcase
+test.basic
