@@ -22,12 +22,19 @@ str.trim(){
 }
 
 str.trim_left(){
-    :
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    echo -n "$var"
 }
 
 str.trim_right(){
-    :
+    local var="$*"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"
+    echo -n "$var"
 }
+
 
 # According to str.split
 str.split(){
@@ -72,7 +79,7 @@ str.slice(){
     
     local srcStr=$1
     local start=0
-    local end=7
+    local end=0
     local resStr=""
     
     case $# in
