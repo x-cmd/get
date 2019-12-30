@@ -17,7 +17,7 @@ str.trim(){
     # remove leading whitespace characters
     var="${var#"${var%%[![:space:]]*}"}"
     # remove trailing whitespace characters
-    var="${var%"${var##*[![:space:]]}"}"   
+    var="${var%"${var##*[![:space:]]}"}"
     echo -n "$var"
 }
 
@@ -42,11 +42,11 @@ str.upper(){
     if [ "$#" -eq 0 ]; then
         tr "[:lower:]" "[:upper:]"
     else
-        echo -n $1 | tr "[:lower:]" "[:upper:]"
+        echo -n "$1" | tr "[:lower:]" "[:upper:]"
     fi
 }
 
-str.lower(){ 
+str.lower(){
     if [ "$#" -eq 0 ]; then
         tr "[:upper:]" "[:lower:]"
     else
@@ -65,7 +65,32 @@ str.ends_with(){
 }
 
 str.slice(){
-    :
+    if [ "$#" -lt 1 ]; then
+        echo "Please input a string to slice"
+        return 0
+    fi
+    
+    local srcStr=$1
+    local start=0
+    local end=7
+    local resStr=""
+    
+    case $# in
+        1) echo "$srcStr"
+        return 1 ;;
+        2) end=$2  ;;
+        3) start=$2
+        end=$3 ;;
+        *) echo "Too many parameters"
+    esac
+    
+    if [ "$end" -lt 0 ]; then
+        resStr=${srcStr: -end}
+    else
+        resStr=${srcStr:start:end}
+    fi
+    
+    echo "$resStr"
 }
 
 str.indexof(){
@@ -144,13 +169,13 @@ str.brb.encode(){
     local ROT=${1:?Provide rot number}
     shift
     if [ $# -eq 0 ]; then
-        base64 | str.rot.encode "$ROT" | base64; 
+        base64 | str.rot.encode "$ROT" | base64;
     else
-        echo -n "$1" | base64 | str.rot.encode "$ROT" | base64; 
+        echo -n "$1" | base64 | str.rot.encode "$ROT" | base64;
     fi
 }
 
-str.brb.decode(){ 
+str.brb.decode(){
     local ROT=${1:?Provide rot number}
     shift
     if [ $# -eq 0 ]; then
@@ -196,13 +221,13 @@ str.sha(){
         echo -n "${1:?str to encrypt}" | shasum -a "$ALGOR" | cut -d ' ' -f 1
         return 0
     fi
-
+    
     local cmd=sha${ALGOR}sum
     if command -v "$cmd" >/dev/null 2>&1; then
         echo -n "${1:?str to encrypt}" | $cmd | cut -d ' ' -f 1
         return 0
     fi
-
+    
     # TODO: Install x and provide encryption
 }
 
