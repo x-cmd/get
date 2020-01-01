@@ -64,17 +64,35 @@ str.lower(){
 # other format using library
 
 str.starts_with(){
-    :
+    local strSrc=$1
+    local strTar=$2
+    
+    if [[ "$strSrc" == "$strTar"* ]]; then
+        echo "true"
+        return 0
+    else
+        echo "false"
+        return 1
+    fi
 }
 
 str.ends_with(){
-    :
+    local strSrc=$1
+    local strTar=$2
+    
+    if [[ "$strSrc" == *"$strTar" ]]; then
+        echo "true"
+        return 0
+    else
+        echo "false"
+        return 1
+    fi
 }
 
 str.slice(){
     if [ "$#" -lt 1 ]; then
-        echo "Please input a string to slice"
-        return 0
+        echo "Please input a string to slice" 1>&2
+        return 1
     fi
     
     local srcStr=$1
@@ -88,7 +106,7 @@ str.slice(){
         2) end=$2  ;;
         3) start=$2
         end=$3 ;;
-        *) echo "Too many parameters"
+        *) echo "Too many parameters" 1>&2 ;;
     esac
     
     if [ "$end" -lt 0 ]; then
