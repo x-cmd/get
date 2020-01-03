@@ -119,7 +119,42 @@ str.slice(){
 }
 
 str.indexof(){
-    :
+    
+    stra=$1
+    strb=$2
+    echo "stra=$stra"
+    echo "strb=$strb"
+    result=false
+    
+    lena=${#stra}
+    lenb=${#strb}
+    
+    if [ "$lena" -lt "$lenb" ]; then
+        echo "error lenb > lena" 1>&2
+        return 1
+    fi
+    
+    fora=$(( lena / lenb ))
+    
+    if [ $(( lena % lenb )) -ne 0 ]; then
+        ((fora++))
+    fi
+    
+    for (( i=0; $(( i + lenb <= lena ));i++ ))
+    do
+        res=$(str.slice "$stra" i $lenb)
+        echo "i=$i, "
+        echo "res=$res"
+        echo "lenb=$strb"
+        if [ "$res" = $strb ]; then
+            result=true
+            echo "result=$result, index=$i"
+            break
+        fi
+    done
+    if [ $result = false ]; then
+        echo "result=false"
+    fi
 }
 
 ## text
