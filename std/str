@@ -119,7 +119,6 @@ str.slice(){
 }
 
 str.indexof(){
-    
     stra=$1
     strb=$2
     echo "stra=$stra"
