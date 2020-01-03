@@ -64,59 +64,31 @@ str.lower(){
 # other format using library
 
 str.starts_with(){
-    local strSrc=$1
-    local strTar=$2
-    
-    if [[ "$strSrc" == "$strTar"* ]]; then
-        echo "true"
-        return 0
-    else
-        echo "false"
-        return 1
-    fi
+    [[ ${1:?Provide string} == ${2:?Provide prefix}* ]]
 }
 
 str.ends_with(){
-    local strSrc=$1
-    local strTar=$2
-    
-    if [[ "$strSrc" == *"$strTar" ]]; then
-        echo "true"
-        return 0
-    else
-        echo "false"
-        return 1
-    fi
+    [[ ${1?:Provide string} == *${2:?Provide suffix} ]]
 }
 
-str.slice(){
-    if [ "$#" -lt 1 ]; then
-        echo "Please input a string to slice" 1>&2
-        return 1
-    fi
-    
-    local srcStr=$1
-    local start=0
-    local end=0
-    local resStr=""
+str.slice(){    
+    local srcStr=${1:?Please input a string to slice}
+    local start=0, end=0
     
     case $# in
-        1) echo "$srcStr"
-        return 1 ;;
-        2) end=$2  ;;
-        3) start=$2
-        end=$3 ;;
-        *) echo "Too many parameters" 1>&2 ;;
+        1) echo "$srcStr"; return 0;;
+        2) end=$2;;
+        3) start=$2; end=$3;;
+        *) echo "Too many parameters" 1>&2;;
     esac
     
     if [ "$end" -lt 0 ]; then
-        resStr=${srcStr: -end}
+        echo "${srcStr: -end}"
     else
-        resStr=${srcStr:start:end}
+        echo "${srcStr:start:end}"
     fi
-    
-    echo "$resStr"
 }
+
 
 str.indexof(){
     stra=$1
@@ -156,6 +128,15 @@ str.indexof(){
     fi
 }
 
+str.indexof(){
+    local src=${1:?Provide src string}, tgt=${2:?Provide target str}
+    local after_tgt_in_src=${src#*${tgt}}
+    if [ "${#after_tgt_in_src}" -eq "${#src}" ]; then
+        return 1
+    fi
+    echo $(( ${#src} - ${#after_tgt_in_src} - ${#tgt} ))
+}
+
 ## text
 
 str.dos2unix(){
@@ -188,7 +169,7 @@ str.remove_eol_space(){
     if [ $# -eq 0 ]; then
         sed -e 's/[[:blank:]]*$//g'
     else
-        sed -e 's/[[:blank:]]*$//g' -i ${BAK:-""} "$@"
+        sed -e 's/[[:blank:]]*$//g' -i "${BAK:-""}" "$@"
     fi
 }
 
