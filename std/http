@@ -1,0 +1,90 @@
+# shellcheck shell=bash
+
+# Using object to make it right
+
+# Using curl
+# Using Object
+# Provide Github Object, to help automate the github
+
+
+# http.make(){
+#     dict.make "${1:?Provide name}"
+#     O="$1" dict.put "url" "${2:?Provide url}"
+#     O="$1" dict.put "header" "${3:?Provide default header}"
+#     # eval "export ${1:?Provide name}_header=()"
+# }
+
+# X=put D='{} http.request
+http.request(){
+    local method=${X:-GET}
+    local headers=${HEADER:-${H:?Provide header environemnts}}
+    local url=${URL:?Provide url environment}
+
+    curl -H "${headers[*]}" -x "$method" "$url"
+}
+
+# put header
+# remove header
+# list header
+http.header(){
+    :
+}
+
+http.get(){
+    X="get" http.request "$@"
+}
+
+http.post(){
+    X="post" http.request "$@"
+}
+
+http.put(){
+    X="put" http.request "$@"
+}
+
+http.delete(){
+    X="delete" http.request "$@"
+}
+
+X=put \
+D=(
+    a:5
+    b:4
+)\
+H=(
+    "${DH[*]}"
+    X-http-git:312
+    "X-http-time=12311"
+) http.request "www.website.com"
+
+
+H=("${DH[@]}" "A=3" "C=5") http.request "$URL"
+
+H=("${DH[@]}" "A=3" "C=5") \
+D=$(jo 'a=3 b=4 c=5 d={a:5, b:4}')\
+http.post "$URL"
+
+http.new o
+
+o.header.set "abc" "xce"
+o.header.set "cde" "xab"
+
+o.get /user/bac
+
+D=("name=ljh" "id=8888888") o.post /user/ljh
+
+D=$(jo name=cde id=111) o.post /user/cde
+
+# loose json
+D='{
+    name: cde
+    id: 123
+    work: oracle
+}' o.post /user/cde
+
+
+o.get /user/cde
+o.delete /user/cde
+
+o.destruct
+
