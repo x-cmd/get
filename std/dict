@@ -78,6 +78,7 @@ dict.remove(){
     return 1
 }
 
+# TODO: add key/value filter in arguments or enviroments
 dict.print(){
     local k v
     local sep=${DICT_PRINT_SEP:-" = "}
