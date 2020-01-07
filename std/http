@@ -6,13 +6,38 @@
 # Using Object
 # Provide Github Object, to help automate the github
 
+@src std/oo
 
-# http.make(){
-#     dict.make "${1:?Provide name}"
-#     O="$1" dict.put "url" "${2:?Provide url}"
-#     O="$1" dict.put "header" "${3:?Provide default header}"
-#     # eval "export ${1:?Provide name}_header=()"
-# }
+http.new(){
+    oo.create_new_function http "$@"
+}
+
+http.make(){
+    dict.make "${1:?Provide name}"
+    O="$1" dict.put "url" "${2:?Provide url}"
+    O="$1" dict.put "header" "${3:?Provide default header}"
+    # eval "export ${1:?Provide name}_header=()"
+}
+
+http._dict_get(){
+    [ -z "$O" ] && return 1
+    dict.get "${1:?Provide key}"
+}
+
+http.request(){
+    local URL=${URL:-$(http._dict_get "url")}
+    local X=${X:-$(http._dict_get "method")}
+    local HEADERS=${X:-$(http._dict_get "header")}
+    local D=${D:-$(http._dict_get "data")}
+
+    curl -H "${HEADERS[*]}" -x "$X" "$URL/$1"
+}
+
+http.cd(){
+    local URL=${URL:-$(http._dict_get "url")}
+    [ -z "$O" ] && return 1
+    dict.put "url" "$URL/${1:?Provide url}"
+}
 
 # X=put D='{} http.request
 http.request(){
@@ -57,6 +82,18 @@ H=(
     "X-http-time=12311"
 ) http.request "www.website.com"
 
+X=post \
+D=(
+    a:5
+    b:4
+)\
+URL="www.website.com"
+H=(
+    "${DH[*]}"
+    X-http-git:312
+    "X-http-time=12311"
+) http.request /abc
+
 
 H=("${DH[@]}" "A=3" "C=5") http.request "$URL"
 
@@ -64,12 +101,21 @@ H=("${DH[@]}" "A=3" "C=5") \
 D=$(jo 'a=3 b=4 c=5 d={a:5, b:4}')\
 http.post "$URL"
 
-http.new o
+URL="https://github.com/api/v3" http.new o
 
-o.header.set "abc" "xce"
-o.header.set "cde" "xab"
+o.header.set "x-password" "xce"
+o.header.set "x-elapsed" "xab"
 
-o.get /user/bac
+o.get /user/bac # curl "https://github.com/api/v3/user/abc"
+
+A="$(o.get /user/abc)"
+JQ_INPUT="$A"
+assert.eq "$(jq -r '.user')" admin
+assert.eq "$(jq -r '.score')" 100
+
+# assert.eq "$(echo "$A" | jq -r [ '.user', '.score' ])" '["admin", 100]'
+
+JQ_INPUT=$(cmd x x x) asssert.eq "$(echo $out | jq -r '.ret')" 0
 
 D=("name=ljh" "id=8888888") o.post /user/ljh
 
@@ -87,4 +133,8 @@ o.get /user/cde
 o.delete /user/cde
 
 o.destruct
+
+jo a=3 b=4
+
+
 
