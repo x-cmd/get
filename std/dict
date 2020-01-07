@@ -80,10 +80,11 @@ dict.remove(){
 
 dict.print(){
     local k v
+    local sep=${DICT_PRINT_SEP:-" = "}
     for i in $(list.print); do
         k=$(echo -n "$i" | cut -d ':' -f 1)
         v=$(echo -n "$i" | cut -d ':' -f 2)
-        echo "$(str.unbase64 "$k") = $(str.unbase64 "$v")"
+        echo "$(str.unbase64 "$k")${sep}$(str.unbase64 "$v")"
     done
 }
 
