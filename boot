@@ -75,7 +75,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                 fi
                 module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
                 [ -z "$module" ] && {
-                    echo "ERROR: $module not found" >&2
+                    echo "ERROR: $RESOURCE_NAME not found" >&2
                     return 1
                 }
                 echo "INFO: Using $module" >&2
@@ -88,16 +88,19 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
         if [ ! -e "$TGT" ]; then
             mkdir -p "$(dirname "$TGT")"
 
-            $CURL "$URL" >"$TGT" 2>/dev/null || return 1
+            local content
+            content="$($CURL "$URL" 2>/dev/null)"
 
-            if grep ^\<\!DOCTYPE "$TGT" >/dev/null; then
-                rm "$TGT"
-                echo "ERROR: Failed to load $RESOURCE_NAME, do you want to load std/$RESOURCE_NAME?" >&2
+            (echo "$content" | grep "shellcheck" 1>/dev/null) || {
+                echo "ERROR: Failed to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
                 return 1
-            fi
+            }
+
+            echo "$content" >"$TGT"
         fi
         
         ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+        echo "INFO: Module from $TGT" >&2
         shift
     done
 } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
