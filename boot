@@ -6,7 +6,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
 
 # TODO: Get rid of this function
 @init.curl(){
-    if [ -z "$CURL" ]; then
+    if [ -n "$CURL" ]; then
         return
     fi
 
@@ -58,8 +58,8 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                 # shellcheck disable=SC2086
                 LOCAL_FILE="$(find $HOME/.x-cmd.com/x-bash/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
                 [ -r "$LOCAL_FILE" ] && {
-                    echo "INFO: Using local file: $LOCAL_FILE" >&2
-                    ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
+                    echo "INFO: Using local file $LOCAL_FILE" >&2
+                    ${X_CMD_COM_PARAM_CMD:-source} "$LOCAL_FILE"
                     return 0
                 }
 
@@ -67,6 +67,7 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
                 # File not exists or file is not modified more than one hour
                 # If not found
                 if [ ! -r "$index_file" ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
+                    echo "INFO: Rebuilding $index_file" >&2
                     mkdir -p "$(dirname "$index_file")"
                     local content
                     content="$($CURL "https://x-bash.github.io/index" 2>/dev/null)"
@@ -98,8 +99,9 @@ _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
         
         ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
         shift
-    done 
-} 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
+    done
+} 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+# } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
 @src.clear-cache(){
     rm -rf "$HOME/.x-cmd.com/x-bash"
