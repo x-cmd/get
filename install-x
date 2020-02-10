@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+curl https://edwinjhlee.github.io/x/install | bash
