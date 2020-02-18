@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
-proxy.git.enable_with_socks5(){
-    local HOST_PORT="${1:?"Host like '127.0.0.1', 'localhost', or 'user@pass:127.0.0.1:7070'"}"
+proxy.git.enable.with_socks5(){
+    local HOST_PORT="${1:?"Accept one argument like '127.0.0.1:7070', 'localhost:18000', or 'user@pass:127.0.0.1:7070'"}"
     git config --global http.proxy "socks://$HOST_PORT"
     git config --global https.proxy "socks://$HOST_PORT"
 
@@ -36,7 +36,7 @@ proxy.git.disable(){
     git config --unset --global https.proxy
 }
 
-proxy.env.enable_with_socks5(){
+proxy.env.enable.with_socks5(){
     local HOST_PORT="${1:?"Host like '127.0.0.1', 'localhost', or 'user@pass:127.0.0.1:7070'"}"
     
     export all_proxy=socks5://$HOST_PORT
@@ -49,9 +49,7 @@ proxy.env.enable_with_socks5(){
     export HTTPS_PROXY=socks5://$HOST_PORT
 }
 
-proxy.env.unset(){
-    local HOST_PORT="${1:?"Host like '127.0.0.1', 'localhost', or 'user@pass:127.0.0.1:7070'"}"
-    
+proxy.env.unset(){ 
     export all_proxy=
     export ALL_PROXY=
 
