@@ -1,0 +1,7 @@
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+
+read -t 3 -p "Install latest node lts version. Dissapear In 3 seconds. (y/N)" ins
+[ $ins == "y" ] && (
+    exec -l $SHELL
+    nvm install --lts
+)
