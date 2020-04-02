@@ -23,7 +23,7 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted unive
     esac
 
     local SRC_FP BAK_FP
-    SRC_FP=/etc/apt/source.list
+    SRC_FP=/etc/apt/sources.list
     BAK_FP="$SRC_FP.$(date +%Y%M%d_%0H%m%S).bak"
     echo "Backing up $SRC_FP to $BAK_FP"
     cp $SRC_FP "$BAK_FP" && \
