@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+if [ Darwin == "$(uname)" ]; then
+    # source /dev/stdin <<< "$(curl --insecure https://lteam18.github.io/auto/install/docker.mac.sh)";
+    wget https://github.com/static-build/gost/releases/download/latest/gost.darwin.upx -O gost
+else
+    wget https://github.com/static-build/gost/releases/download/latest/gost.linux.upx -O gost
+fi
