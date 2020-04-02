@@ -22,12 +22,16 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted univer
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse';;
     esac
 
-    cp /etc/apt/source.list{,.bak} && \
+    local SRC_FP BAK_FP
+    SRC_FP=/etc/apt/source.list
+    BAK_FP="$SRC_FP.$(date +%Y%M%d_%0H%m%S).bak"
+    echo "Backing up $SRC_FP to $BAK_FP"
+    cp $SRC_FP "$BAK_FP" && \
     (
         echo "$CONTENT"
         echo ""
-        cat /etc/apt/source.list.bak
-    ) > /etc/apt/source.list
+        cat "$BAK_FP"
+    ) > $SRC_FP
 }
 
 setup.apt.src "$*"
