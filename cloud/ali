@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-ali.dns.add.record(){
+ali.dns.record.add(){
     local DomainName=${1:?"Domain Name. If you want to setup 'xxx.domain.com', please input 'domain.com'"}
     local RR=${2:?"Provide RR. If you want to setup 'xxx.domain.com', please input 'xxx'"}
     local Type=${3:?"Provide Type: A"}
@@ -12,35 +12,35 @@ ali.dns.add.record(){
         --Value "$Value"
 }
 
-ali.dns.id.record(){
+ali.dns.record.id(){
     aliyun alidns DescribeDomainRecords \
         --DomainName "$1" \
         --RRKeyWord "$2" | \
     jq -r '.DomainRecords.Record[].RecordId'
 }
 
-ali.dns.get.record(){
+ali.dns.record.get(){
     aliyun alidns DescribeDomainRecords \
         --DomainName "$1" \
         --RRKeyWord "$2" | \
     jq -r '.DomainRecords.Record[]'
 }
 
-ali.dns.id.exact.record(){
+ali.dns.record.id.exact(){
     aliyun alidns DescribeDomainRecords \
         --DomainName "$1" \
         --RRKeyWord "$2" | \
     jq -r ".DomainRecords.Record[] | select(.RR == \"$2\") | .RecordId"
 }
 
-ali.dns.get.exact.record(){
+aliali.dns.record.get.exact(){
     aliyun alidns DescribeDomainRecords \
         --DomainName "$1" \
         --RRKeyWord "$2" | \
     jq ".DomainRecords.Record[] | select(.RR == \"$2\")"
 }
 
-ali.dns.update.record(){
+ali.dns.record.update(){
     local RecordId=${1:?"Provide RecordId"}
     local RR=${2:?"Provide RR"}
     local Type=${3:?"Provide Type"}
@@ -52,29 +52,29 @@ ali.dns.update.record(){
         --Value "$Value"
 }
 
-ali.dns.delete.record(){
+ali.dns.record.delete(){
     local DomainName=${1:?"Domain Name"}
     local RR=${2:?"Provide RR"}
     local RID
-    RID=$(ali.dns.id.exact.record "$DomainName" "$RR") && \
+    RID=$(ali.dns.record.id.exact "$DomainName" "$RR") && \
     aliyun alidns DeleteDomainRecord --RecordId "$RID"
 }
 
-ali.dns.put.record(){
+alali.dns.record.put(){
     local DomainName=${1:?"Domain Name"}
     local RR=${2:?"Provide RR"}
     local Type=${3:?"Provide Type"}
     local Value=${4:?"Provide IP"}
 
-    local RID=$(ali.dns.id.exact.record "$DomainName" "$RR")
+    local RID=$(ali.dns.record.id.exact "$DomainName" "$RR")
     if [ "$RID" == "" ]; then
         echo "Add New Record: $DomainName $RR $Type $Value"
-        ali.dns.add.record "$DomainName" "$RR" "$Type" "$Value"
+        ali.dns.record.add "$DomainName" "$RR" "$Type" "$Value"
     else
         echo "Already Register. Try to update: $RID $RR $Type $Value"
-        # CMD=(ali.dns.update.record $RID $RR $Type $Value)
+        # CMD=(ali.dns.record.update $RID $RR $Type $Value)
         # eval "${CMD[@]}"
-        ali.dns.update.record "$RID" "$RR" "$Type" "$Value"
+        ali.dns.record.update "$RID" "$RR" "$Type" "$Value"
     fi
 }
 
