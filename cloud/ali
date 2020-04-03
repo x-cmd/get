@@ -40,8 +40,6 @@ ali.dns.get.exact.record(){
     jq ".DomainRecords.Record[] | select(.RR == \"$2\")"
 }
 
-
-
 ali.dns.update.record(){
     local RecordId=${1:?"Provide RecordId"}
     local RR=${2:?"Provide RR"}
@@ -55,9 +53,11 @@ ali.dns.update.record(){
 }
 
 ali.dns.delete.record(){
-    :
-    # TODO:
-    # aliyun alidns DeleteDomainRecord --RecordId
+    local DomainName=${1:?"Domain Name"}
+    local RR=${2:?"Provide RR"}
+    local RID
+    RID=$(ali.dns.id.exact.record "$DomainName" "$RR") && \
+    aliyun alidns DeleteDomainRecord --RecordId "$RID"
 }
 
 ali.dns.put.record(){
