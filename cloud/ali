@@ -60,7 +60,7 @@ ali.dns.record.delete(){
     aliyun alidns DeleteDomainRecord --RecordId "$RID"
 }
 
-alali.dns.record.put(){
+ali.dns.record.put(){
     local DomainName=${1:?"Domain Name"}
     local RR=${2:?"Provide RR"}
     local Type=${3:?"Provide Type"}

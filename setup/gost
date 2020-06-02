@@ -6,3 +6,5 @@ if [ Darwin == "$(uname)" ]; then
 else
     wget https://github.com/static-build/gost/releases/download/latest/gost.linux.upx -O gost
 fi
+
+# https://github.com/lteam18/x/releases/download/tmp/x.linux.upx

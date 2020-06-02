@@ -98,10 +98,12 @@ RUN_CMD_WITH_STEP() {
 # x con "~hello~"
 # x con ""
 
+@src str # Rely on @src str, consider remove this dependency
 ui.yesno() {
   local p
   while true; do
     read -r -p "$1 (Input 'y' for yes or 'n' for no): " p
+    # TODO: Rely on @src str, consider remove this dependency
     p="$(str.trim "$p")"
     if [ "$p" == "y" ]; then
       return 0
