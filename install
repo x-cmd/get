@@ -1,14 +1,22 @@
 # shellcheck shell=bash
-command -v x || {
-    curl https://x-cmder.github.io/install | bash
-}
 
-# TODO: remove the line
-# CMD_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
-# if grep -F "$CMD_STR"
+# Do you want to install in light-mode or normal-mode
 
-# shellcheck disable=SC2016
-X_STR='eval "$(x @bash/boot)"'
+# Default to normal mode
+
+if [ -n "$LIGHT" ]; then
+    X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
+else
+    echo "Setting up x-bash in normal mode." >&2
+    echo "First we have to check whether x-cmd is available." >&2
+    command -v x || {
+        echo "x-cmd is NOT available. Install x-cmd from https://x-cmder.github.io/install" >&2
+        curl https://x-cmder.github.io/install | bash
+    }
+
+    # shellcheck disable=SC2016
+    X_STR='eval "$(x @bash/boot)"'
+fi
 
 if grep -F "$X_STR" "$HOME/.bashrc" >/dev/null; then
     echo Already install >&2
