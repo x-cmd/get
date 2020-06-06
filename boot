@@ -31,7 +31,6 @@ if [ -n "$RELOAD" ] || [ -z "$_X_CMD_COM_X_BASH_BOOT_VERSION" ]; then
         return 1
     }
 
-
     @src(){
         [ -n "$X_BASH_SRC_PATH" ] && {
             local FILE="$X_BASH_SRC_PATH"/$1
@@ -96,6 +95,7 @@ if [ -n "$RELOAD" ] || [ -z "$_X_CMD_COM_X_BASH_BOOT_VERSION" ]; then
 
                 (echo "$content" | grep "shellcheck" 1>/dev/null) || {
                     echo "ERROR: Failed to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
+                    echo "shellcheck not exists in content of $URL" >&2
                     return 1
                 }
 
