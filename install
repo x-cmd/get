@@ -1,9 +1,6 @@
 # shellcheck shell=bash
 
-# Do you want to install in light-mode or normal-mode
-
-# Default to normal mode
-
+# Default to normal mode, unless you enable LIGHT environment variable.
 if [ -n "$LIGHT" ]; then
     X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
 else
