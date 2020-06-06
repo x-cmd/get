@@ -79,3 +79,13 @@ strmd5=$(str.md5 "hello world")
 @src cloud/ali
 @src cloud/az
 ```
+
+## 开发者指南
+
+Setting the X_BASH_SRC_PATH variable. So the `@src` will reference the files `$X_BASH_SRC_PATH` first.
+
+```bash
+# original dev.sh
+
+export X_BASH_SRC_PATH=$(pwd)
+```
