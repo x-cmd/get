@@ -2,6 +2,8 @@
 
 A light-weight handy bash library to make life easier.
 
+x-bash library is designed to involved x-cmd. We think life is pretty much easier with x-cmd. But we still provide a light-mode for users who want to use x-bash without x-cmd (It will be deeply appreciated if you could tell us under issue.).
+
 ## 安装
 
 ### 先睹为快：引用并且安装在`~/.bashrc`上
@@ -80,9 +82,21 @@ strmd5=$(str.md5 "hello world")
 @src cloud/az
 ```
 
+**模块一览表**
+
+| module | description |
+| --- | --- |
+| std | 标准模块, 简写既能导入。例如 `@src str` == `@src std/str` |
+| cloud | effective helpers scripts for major cloud provider |
+| docker | using official docker images to setup facilities. Mostly using docker-stack |
+| db | db efficiency improvement scripts |
+| style | style to make bash prettier and easier to use |
+| setup | setup scripts for common softwares |
+| mirror | alternate source settings for python, apt, yum, etc. |
+
 ## 开发者指南
 
-Setting the X_BASH_SRC_PATH variable. So the `@src` will reference the files `$X_BASH_SRC_PATH` first.
+Setting the `X_BASH_SRC_PATH` variable. So the `@src` will reference the files `$X_BASH_SRC_PATH` first.
 
 ```bash
 # original dev.sh
