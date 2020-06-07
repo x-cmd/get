@@ -101,6 +101,7 @@ D="$HOME/.x-cmd.com/x-bash/boot" eval '[ -f $D ] || (mkdir -p $(dirname $D) && c
     - 如果该文件不存在，创建文件夹，并从`https://x-bash.github.io/boot`下载
 2. 本地加载`"$HOME/.x-cmd.com/x-bash/boot"`
 
+
 ## 开发者指南
 
 Setting the `X_BASH_SRC_PATH` variable. So the `@src` will reference the files `$X_BASH_SRC_PATH` first.

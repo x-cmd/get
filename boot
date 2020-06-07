@@ -7,6 +7,17 @@ if [ -n "$RELOAD" ] || [ -z "$_X_CMD_COM_X_BASH_BOOT_VERSION" ]; then
     echo "Initialize the boot enviroment"
     _X_CMD_COM_X_BASH_BOOT_VERSION=0.0.0
 
+    # TODO: do we need this?
+    # TODO: If we source the boot file, we have to set X_BASH_SRC_PATH to the directory folder
+    # X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+    # TODO: what if we reset X_BASH_SRC_PATH. _X_CMD_COM_X_BASH_BOOT_VERSION should be reset again.
+    # TODO: I think we should add @src.reset funtion.
+    @src.reset(){
+        RELOAD=1 source "${1:?Please provide boot file path}"
+    }
+
+
     # TODO: Get rid of this function
     @init.curl(){
         if [ -n "$CURL" ]; then
@@ -32,6 +43,7 @@ if [ -n "$RELOAD" ] || [ -z "$_X_CMD_COM_X_BASH_BOOT_VERSION" ]; then
     }
 
     @src(){
+        # TODO: There is a bug. if X_BASH_SRC_PATH exists, but we still refer the default folder?
         [ -n "$X_BASH_SRC_PATH" ] && {
             local FILE="$X_BASH_SRC_PATH"/$1
             #shellcheck disable=SC1090
