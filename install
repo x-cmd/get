@@ -1,18 +1,21 @@
 # shellcheck shell=bash
 
-# Default to normal mode, unless you enable LIGHT environment variable.
-if [ -n "$LIGHT" ]; then
-    X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
-else
-    echo "Setting up x-bash in normal mode." >&2
+if command -v x && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
+    echo "X is detected." >&2
     echo "First we have to check whether x-cmd is available." >&2
-    command -v x || {
-        echo "x-cmd is NOT available. Install x-cmd from https://x-cmder.github.io/install" >&2
-        curl https://x-cmder.github.io/install | bash
-    }
-
     # shellcheck disable=SC2016
     X_STR='eval "$(x @bash/boot)"'
+else
+    # Default to normal mode, unless you enable LIGHT environment variable.
+    if [ -n "$LIGHT" ]; then
+        X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.github.io/boot\" >\$D) && source \$D'"
+    else
+        echo "Setting up x-bash in normal mode." >&2
+        echo "x-cmd is NOT available. Install x-cmd from https://x-cmder.github.io/install" >&2
+        curl https://x-cmder.github.io/install | bash
+        # shellcheck disable=SC2016
+        X_STR='eval "$(x @bash/boot)"'
+    fi
 fi
 
 if grep -F "$X_STR" "$HOME/.bashrc" >/dev/null; then
