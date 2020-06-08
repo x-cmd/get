@@ -118,6 +118,7 @@ export X_BASH_SRC_PATH=$(pwd)
 
 ```bash
 x @bash/pack --entrypoint main.sh
+输出 bash main.sh --rcfile $(pwd)
 ```
 
 此时，我们会生成一个新的folder main-bash
@@ -127,7 +128,7 @@ x @bash/pack --entrypoint main.sh
 ```bash
 - /
   - x-bash.x-cmder.com #生成新的目录包含所有x-bash的目录
-  - main.with-x-bash-lib.sh
+  - 
   - main.sh
   - 其他文件
 ```
@@ -136,9 +137,14 @@ x @bash/pack --entrypoint main.sh
 
 ```bash
 ## auto-generated
-X_BASH_SRC_PATH=$(pwd)/x-bash.x-cmder.com
-cd abc
-bash main.sh "$@'
+source $(dirname ${BASH_SOURCE[0]})/x-bash.x-cmder.com/boot
+bash $(dirname ${BASH_SOURCE[0]})/main.sh "$@'
 ```
 
 你对这个目录用你想打包的方式打包，运送到其他所需的环境，即可轻松而不需要网络运行。
+
+## 开发者引用指南
+
+1. 对于entry文件，进行boot文件引用
+2. 对于用于集成的库代码文件，不需要引入boot
+3. 对于脱离环境的用户，采用 `bash main.with-x-bash-lib.sh`
