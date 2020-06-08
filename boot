@@ -19,8 +19,8 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         rm -rf "$X_BASH_SRC_PATH"
     }
 
-    @srcs(){
-        for i in "$@"; do @src "$i"; done
+    @src(){
+        for i in "$@"; do @src.one "$i"; done
     }
 
     # Consider removing this function, @x will be much better
@@ -28,42 +28,34 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         SRC_LOADER=bash @src "$@"
     }
 
-    # rename http.cat
     @src.curl(){
-        # TODO: using variable to optimize
-        local webfile=${1:?Provide url of web file}
+        local REDIRECT=/dev/stdout
+        [ -n "$CACHE" ] && REDIRECT=$TMPDIR/.x-bash-temp-download
 
-        if command -v x 1>/dev/null 2>&1; then
-            x cat "$webfile" 2>/dev/null
-            return  # If fail, return code is 2
+        if ! command -v @src.http.get 1>/dev/null 2>&1; then
+            # TODO: checking `x author` == Edwin.JH.Lee & LTeam
+            if command -v x 1>/dev/null 2>&1; then
+                eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
+            elif curl --version 1>/dev/null 2>&1; then
+                eval '@src.http.get(){ curl --fail "${1:?Provide target URL}"; }' # If fail, return code is 28
+            elif wget --help 1>/dev/null 2>&1; then
+                # busybox and alpine is with wget but without curl. But both are without bash and tls by default
+                eval '@src.http.get(){ wget -qO - "${1:?Provide target URL}"; }' # If fail, return code is 8
+            else
+                echo "No other Command for HTTP-GET" >&2
+                return 127
+            fi
         fi
 
-        if curl --version 1>/dev/null 2>&1; then
-            curl --fail "$webfile" 2>/dev/null   # If fail, return code is 28
-            return
-        fi
-
-        # busybox and alpine is with wget but without curl. But both are without bash and tls by default
-        if wget --help 1>/dev/null 2>&1; then
-            wget -qO - "$webfile"   # If fail, return code is 8
-            return
-        fi
-
-        echo "No other Command for HTTP-GET" >&2
-        return 1
-    }
-
-    # rename http.cat.with_cache
-    @src.curl_with_cache(){
-        local URL=${1:?Provide original url} TGT=${2:?Provide cache path}
-        if [ ! -e "$TGT" ]; then
-            mkdir -p "$(dirname "$TGT")"
-            local CONTENT
-            CONTENT=$(@src.curl "$URL" 2>/dev/null) && echo "$CONTENT" > "$TGT"
+        if @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null; then   
+            if [ -n "$CACHE" ]; then
+                mkdir -p "$(dirname "$CACHE")"
+                mv "$REDIRECT" "$CACHE"
+            fi
         fi
     }
 
-    @src(){
+    @src.one(){
         local RESOURCE_NAME=${1:?Provide resource name}; shift
 
         local URL TGT
@@ -87,7 +79,7 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
                 # Trigger update even if index file not modified more than one hour
                 if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then
                     echo "INFO: Rebuilding $index_file" >&2
-                    @src.curl_with_cache "$X_BASH_SRC_PATH_WEB_URL/index" "$index_file"
+                    CACHE="$index_file" @src.curl "$X_BASH_SRC_PATH_WEB_URL/index"
                 fi
 
                 module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
@@ -102,7 +94,7 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
             TGT="$X_BASH_SRC_PATH/$module"
         fi
 
-        if ! @src.curl_with_cache "$URL" "$TGT"; then
+        if ! CACHE="$TGT" @src.curl "$URL"; then
             echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
             return 1
         fi
