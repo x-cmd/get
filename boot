@@ -6,13 +6,36 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
 
     echo "Initialize the boot enviroment"
     X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+    # Judge whether in China. So we could choose using github or gitee
     X_BASH_SRC_PATH_WEB_URL="https://x-bash.github.io"
+    # "https://x-bash.gitee.io"
 
     @src.reload(){
         # shellcheck disable=SC1090
         RELOAD=1 source "${1:?Please provide boot file path}"
     }
 
+    @src.clear-cache(){
+        rm -rf "$X_BASH_SRC_PATH"
+    }
+
+    @src(){
+        # shellcheck disable=SC1090
+        source "$(@src.get_resource_filepath "$1")" "$@"
+        echo "INFO: Module from $TGT" >&2
+    }
+
+    @srcs(){
+        for i in "$@"; do @src "$i"; done
+    }
+
+    # Consider removing this function, @x will be much better
+    @src.bash(){
+        bash "$(@src.get_resource_filepath "$1")" "$@"
+    }
+
+    # rename http.cat
     @src.curl(){
         # TODO: using variable to optimize
         # if [ -n "$CURL" ]; then
@@ -20,11 +43,12 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         # fi
 
         if curl --version 1>/dev/null 2>&1; then
-            curl "$1" 2>/dev/null
+            curl --fail "$1" 2>/dev/null
             return
         fi
 
         if wget --help 1>/dev/null 2>&1; then
+            # TODO: provide.
             wget -qO - "$1"
             return
         fi
@@ -39,80 +63,66 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         return 1
     }
 
-    @src(){
-        while [ $# -gt 0 ]; do
-            local RESOURCE_NAME=$1
+    # rename http.cat.with_cache
+    @src.curl_with_cache(){
+        local URL=${1:?Provide original url}
+        local TGT=${2:?Provide cache path}
+        if [ ! -e "$TGT" ]; then
+            mkdir -p "$(dirname "$TGT")"
+            src.curl "$URL" 2>/dev/null >"$TGT"
+        fi
+    }
 
-            if [[ "$RESOURCE_NAME" =~ ^http:// ]] || [[ "$RESOURCE_NAME" =~ ^https:// ]]; then
-                local URL="$RESOURCE_NAME"
-                local TGT
-                TGT="$X_BASH_SRC_PATH/$(echo -n "$URL" | base64)"
-            else
-                local module=$RESOURCE_NAME
+    @src.get_resource_filepath(){
+        local RESOURCE_NAME=${1:?Provide resource name}
+        shift
 
-                if [[ ! $module =~ \/ ]]; then
-                    # Strategy: if there is local file in cache. Use it.
-                    # Bug...
-                    local LOCAL_FILE
-                    # shellcheck disable=SC2086
-                    LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
-                    [ -r "$LOCAL_FILE" ] && {
-                        echo "INFO: Using local file $LOCAL_FILE" >&2
-                        ${X_CMD_COM_PARAM_CMD:-source} "$LOCAL_FILE"
-                        return 0
-                    }
+        local URL TGT
 
-                    local index_file="$X_BASH_SRC_PATH/index"
-                    # File not exists or file is not modified more than one hour
-                    # If not found
-                    if [ ! -r "$index_file" ] || [[ $(find "$index_file" -mtime +1h -print) ]]; then
-                        echo "INFO: Rebuilding $index_file" >&2
-                        mkdir -p "$(dirname "$index_file")"
-                        local content
-                        content="$(src.curl "$X_BASH_SRC_PATH_WEB_URL/index" 2>/dev/null)"
-                        (echo "$content" | grep "std/str" 1>/dev/null) && echo "$content" >"$index_file"
-                    fi
-                    module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-                    [ -z "$module" ] && {
-                        echo "ERROR: $RESOURCE_NAME not found" >&2
-                        return 1
-                    }
-                    echo "INFO: Using $module" >&2
+        if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
+            URL="$RESOURCE_NAME"
+            TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
+        else
+            local module=$RESOURCE_NAME
+
+            URL="$X_BASH_SRC_PATH_WEB_URL/$module"
+            TGT="$X_BASH_SRC_PATH/$module"
+
+            # Is it an alias, which contains no / ?
+            if [[ ! $module =~ \/ ]]; then
+                # If exists in cache.
+                local LOCAL_FILE
+                # shellcheck disable=SC2086
+                LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
+                echo "!!!" $LOCAL_FILE
+                if [ -r "$LOCAL_FILE" ]; then
+                    echo "INFO: Using local file $LOCAL_FILE" >&2
+                    echo "$LOCAL_FILE"
+                    return 0
                 fi
 
-                local URL="$X_BASH_SRC_PATH_WEB_URL/$module"
-                local TGT="$X_BASH_SRC_PATH/$module"
-            fi
+                local index_file="$X_BASH_SRC_PATH/index"
+                # Trigger update even if index file not modified more than one hour
+                if [[ $(find "$index_file" -mtime +1h -print) ]]; then
+                    echo "INFO: Rebuilding $index_file" >&2
+                    @src.curl_with_cache "$X_BASH_SRC_PATH_WEB_URL/index" "$index_file"
+                fi
 
-            if [ ! -e "$TGT" ]; then
-                mkdir -p "$(dirname "$TGT")"
-
-                local content
-                content="$(src.curl "$URL" 2>/dev/null)"
-
-                (echo "$content" | grep "shellcheck" 1>/dev/null) || {
-                    echo "ERROR: Failed to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
-                    echo "Content contains no 'shellcheck': $URL" >&2
+                module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+                [ -z "$module" ] && {
+                    echo "ERROR: $RESOURCE_NAME NOT found" >&2
                     return 1
                 }
-
-                echo "$content" >"$TGT"
+                echo "INFO: Using $module" >&2
             fi
-            
-            ${X_CMD_COM_PARAM_CMD:-source} "$TGT"
-            echo "INFO: Module from $TGT" >&2
-            shift
-        done
+        fi
+
+        if @src.curl_with_cache "$URL" "$TGT"; then
+            echo "$TGT"
+        else
+            echo "ERROR: Failed to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
+        fi
+
     } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
-
-    @src.clear-cache(){
-        rm -rf "$X_BASH_SRC_PATH"
-    }
-
-    # Consider removing this function, @x will be much better
-    @run(){
-        X_CMD_COM_PARAM_CMD=bash @src "$*"
-    }
-
 fi
