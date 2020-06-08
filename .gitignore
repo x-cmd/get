@@ -1,1 +1,7 @@
-git
+**/*
+!.vscode
+!dev
+
+!cmd
+!el
+!net
