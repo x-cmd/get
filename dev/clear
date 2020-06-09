@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+rm !(el)
+rm !(dev)
+rm !(.vscode)
+
+for i in */; do
+    case "$i" in
+    el/)        continue;;
+    dev/)       continue;;
+    .vscode/)   continue;;
+    */)         rm -rf "$i";;
+    esac
+done
