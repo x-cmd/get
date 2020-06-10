@@ -14,7 +14,7 @@ else
         echo "x-cmd is NOT available. Install x-cmd from https://x-cmder.github.io/install" >&2
         curl https://x-cmder.github.io/install | bash
         # shellcheck disable=SC2016
-        X_STR='eval "$(x @bash/boot)"'
+        X_STR='source "$(x which @bash/boot)"'
     fi
 fi
 
