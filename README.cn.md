@@ -6,10 +6,31 @@ x-cmd虽然是分离设计，但却能大大降低x-bash的复杂度，因此，
 
 安装`x-cmd`：`x || eval "$(curl https://x-cmd.github.io/install)"`
 
+## 先睹为快
+
+对于在本地安装场景：
+
+```bash
+x ready || (curl https://get.x-cmd.com | bash) && x @bash/install
+```
+
+对于编写可到处部署脚本的开发者：
+
+```bash
+x ready || eval "$(curl https://get.x-cmd.com)" && source $(x which @bash/boot)
+
+# 正常使用
+@src list set
+list.new alist
+alist.push a b c
+```
+
+首行的功效可以实现boot代码缓存之功效
+
 ## 安装
 
 ```bash
-curl https://x-bash.github.io/install 2>/dev/null | bash
+curl https://x-bash.github.io/install | bash
 ```
 
 这个命令将进行初次安装是基本初始化，x-bash将安装在你的用户空间内。
@@ -148,3 +169,8 @@ bash $(dirname ${BASH_SOURCE[0]})/main.sh "$@'
 1. 对于entry文件，进行boot文件引用
 2. 对于用于集成的库代码文件，不需要引入boot
 3. 对于脱离环境的用户，采用 `bash main.with-x-bash-lib.sh`
+
+## @src 与 source 区别很大
+
+1. 只有对于引用名称形如"./", "../", 或者 "/**"，`@src`采用本地模块模式，采用的是相对于引用文件的路径来进行搜索
+2. @src支持多个文件同时引入，而source只支持单个文件，第二以后的参数将作为文件参数处理
