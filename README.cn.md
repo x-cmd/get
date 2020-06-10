@@ -8,16 +8,16 @@ x-cmd虽然是分离设计，但却能大大降低x-bash的复杂度，因此，
 
 ## 先睹为快
 
-对于在本地安装场景：
+**对于在本地安装场景：**
 
 ```bash
 x ready || (curl https://get.x-cmd.com | bash) && x @bash/install
 ```
 
-对于编写可到处部署脚本的开发者：
+**对于编写可到处部署脚本的开发者：**
 
 ```bash
-x ready || eval "$(curl https://get.x-cmd.com)" && source $(x which @bash/boot)
+x ready 2>/dev/null || eval "$(curl https://get.x-cmd.com)" && source $(x which @bash/boot)
 
 # 正常使用
 @src list set
@@ -25,7 +25,7 @@ list.new alist
 alist.push a b c
 ```
 
-首行的功效可以实现boot代码缓存之功效
+首行代码可以采用x从而实现boot代码缓存之功效
 
 ## 安装
 
@@ -121,7 +121,6 @@ D="$HOME/.x-cmd.com/x-bash/boot" eval '[ -f $D ] || (mkdir -p $(dirname $D) && c
 1. 检测本地`"$HOME/.x-cmd.com/x-bash/boot"`是否存在
     - 如果该文件不存在，创建文件夹，并从`https://x-bash.github.io/boot`下载
 2. 本地加载`"$HOME/.x-cmd.com/x-bash/boot"`
-
 
 ## 开发者指南
 
