@@ -17,7 +17,14 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         RELOAD=1 source "${1:?Please provide boot file path}"
     }
 
-    @src.cache.clear(){ rm -rf "$X_BASH_SRC_PATH"; }
+    @src.clear(){ 
+        if [ -f "$X_BASH_SRC_PATH/boot" ]; then
+            rm -rf "$X_BASH_SRC_PATH";
+        else
+            echo "'$X_BASH_SRC_PATH/boot' NOT found."
+        fi
+    }
+
     @src.cache(){ echo "$X_BASH_SRC_PATH"; }
     @src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
 
