@@ -138,8 +138,8 @@ A
                 CACHE="$index_file" @src.curl.gitx "index"
             fi
 
-            if [ -f "$index_file" ]; then
-                echo "Exist because file failed to download: $index_file"
+            if [ ! -f "$index_file" ]; then
+                echo "Exit because file fail to download: $index_file"
                 return 1
             fi
 
