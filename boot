@@ -59,13 +59,15 @@ A
             fi
         fi
 
-        if @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null; then 
+        @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
+        local code=$?
+        if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
                 mkdir -p "$(dirname "$CACHE")"
                 mv "$REDIRECT" "$CACHE"
             fi
         fi
-        return 1
+        return $code
     }
 
     @src.curl.gitx(){   # Simple strategy
