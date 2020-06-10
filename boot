@@ -1,10 +1,7 @@
 # shellcheck shell=bash
 
-# [ -z "$RELOAD" ] && [ -n "$X_BASH_SRC_PATH" ] && return 0 
-# Cannot use return or exit. This seems to be the only way.
 if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
-    echo "Initialize the boot enviroment"
-    X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]:-$HOME/.x-cmd.com/x-bash/boot}")" && pwd)
     # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
     X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
 
@@ -13,9 +10,9 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         RELOAD=1 source "${1:?Please provide boot file path}"
     }
 
-    @src.clear-cache(){
-        rm -rf "$X_BASH_SRC_PATH"
-    }
+    @src.cache.clear(){ rm -rf "$X_BASH_SRC_PATH"; }
+    @src.cache(){ echo "$X_BASH_SRC_PATH"; }
+    @src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
 
     @src(){
         [ $# -eq 0 ] && cat >&1 <<A
@@ -26,9 +23,6 @@ A
         for i in "$@"; do @src.one "$i"; done
     }
 
-    # Consider using x.
-    @src.bash(){ SRC_LOADER=bash @src "$@"; }
-
     @src.curl(){
         local REDIRECT=/dev/stdout
         if [ -n "$CACHE" ]; then
@@ -37,7 +31,7 @@ A
         fi
 
         if ! command -v @src.http.get 1>/dev/null 2>&1; then
-            # TODO: checking `x author` == Edwin.JH.Lee & LTeam
+            # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
             if command -v x 1>/dev/null 2>&1; then
                 eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
             elif curl --version 1>/dev/null 2>&1; then
@@ -56,36 +50,39 @@ A
                 mkdir -p "$(dirname "$CACHE")"
                 mv "$REDIRECT" "$CACHE"
             fi
-        else
-            return 1
         fi
+        return 1
     }
 
-    # Simple strategy
-    @src.curl.gitx(){
-        local i tmp code ELEM URL="${1:?Provide location like std/str }"
-        (( i = 0 ))
-        for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-
+    @src.curl.gitx(){   # Simple strategy
+        local i URL="${1:?Provide location like std/str}"
+        for i in $(seq ${#X_BASH_SRC_PATH_WEB_URL[@]}); do
+            local ELEM=${X_BASH_SRC_PATH_WEB_URL[i]}
             @src.curl "$ELEM/$1"
-            code=$?
-
-            if [ $code -eq 0 ]; then
-                tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
+            case $? in
+            0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
                 X_BASH_SRC_PATH_WEB_URL[0]="$ELEM"
                 eval "X_BASH_SRC_PATH_WEB_URL[$i]=$tmp"
-                return
-            fi
-
-            [ "$code" -eq 4 ] && return 4
-            (( i = i + 1 ))
+                return 0;;
+            4)  return 4;;
+            esac
         done
+        return 1
     }
 
     @src.one(){
         local RESOURCE_NAME=${1:?Provide resource name}; shift
 
         local TGT
+        if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
+            # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
+            TGT="$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
+            # shellcheck disable=SC1090
+            source "$TGT"
+            return
+        fi
+
+
         if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
             TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
             if ! CACHE="$TGT" @src.curl "$RESOURCE_NAME"; then
@@ -133,7 +130,11 @@ A
         fi
         
         ${SRC_LOADER:-source} "$TGT" "$@"
-    # }
     } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
+
+    export -f @src
+    export -f @src.one
+    export -f @src.curl
+    export -f @src.bash
 fi
