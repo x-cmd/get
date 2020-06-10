@@ -34,7 +34,11 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         Uasge:  @src <lib> [<lib>...]
         Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
-        for i in "$@"; do @src.one "$i"; done
+        for i in "$@"; do 
+            @src.one "$i";
+            local code=$?
+            [ $code -ne 0 ] && return $code
+        done
     }
 
     @src.curl(){
@@ -46,9 +50,10 @@ A
 
         if ! command -v @src.http.get 1>/dev/null 2>&1; then
             # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
-            if command -v x 1>/dev/null 2>&1; then
-                eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
-            elif curl --version 1>/dev/null 2>&1; then
+            # if command -v x 1>/dev/null 2>&1; then
+            #     eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
+            # el
+            if curl --version 1>/dev/null 2>&1; then
                 eval '@src.http.get(){ curl --fail "${1:?Provide target URL}"; local code=$?; [ $code -eq 28 ] && return 4; return $code; }' # If fail, return code is 28
             elif wget --help 1>/dev/null 2>&1; then
                 # busybox and alpine is with wget but without curl. But both are without bash and tls by default
@@ -61,6 +66,7 @@ A
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
         local code=$?
+        echo -e "@src.http.get $1 \t code is $code" >&2
         if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
                 mkdir -p "$(dirname "$CACHE")"
@@ -72,8 +78,9 @@ A
 
     @src.curl.gitx(){   # Simple strategy
         local i URL="${1:?Provide location like std/str}"
-        for i in $(seq ${#X_BASH_SRC_PATH_WEB_URL[@]}); do
-            local ELEM=${X_BASH_SRC_PATH_WEB_URL[i]}
+        (( i = 0 ))
+        for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
+            echo "@src.curl $ELEM/$1" >&2
             @src.curl "$ELEM/$1"
             case $? in
             0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
@@ -82,6 +89,7 @@ A
                 return 0;;
             4)  return 4;;
             esac
+            (( i = i + 1 ))
         done
         return 1
     }
@@ -130,6 +138,11 @@ A
                 CACHE="$index_file" @src.curl.gitx "index"
             fi
 
+            if [ -f "$index_file" ]; then
+                echo "Exist because file failed to download: $index_file"
+                return 1
+            fi
+
             module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
             [ -z "$module" ] && {
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
@@ -146,8 +159,8 @@ A
         fi
         
         ${SRC_LOADER:-source} "$TGT" "$@"
-    }
-    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+    # }
+    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
     export -f @src
