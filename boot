@@ -1,7 +1,14 @@
 # shellcheck shell=bash
 
 if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
-    X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]:-$HOME/.x-cmd.com/x-bash/boot}")" && pwd)
+    # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
+    X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
+    if grep "@src.one(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
+        X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    else
+        echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
+    fi
+
     # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
     X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
 
@@ -26,8 +33,8 @@ A
     @src.curl(){
         local REDIRECT=/dev/stdout
         if [ -n "$CACHE" ]; then
-            REDIRECT=$TMPDIR/.x-bash-temp-download
             [ -z "$UPDATE" ] && [ -f "$CACHE" ] && return
+            REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
         fi
 
         if ! command -v @src.http.get 1>/dev/null 2>&1; then
@@ -130,7 +137,8 @@ A
         fi
         
         ${SRC_LOADER:-source} "$TGT" "$@"
-    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+    }
+    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
     export -f @src
