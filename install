@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-if command -v x && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
+if command -v x 2>/dev/null && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
     echo "X is detected." >&2
     echo "First we have to check whether x-cmd is available." >&2
     # shellcheck disable=SC2016

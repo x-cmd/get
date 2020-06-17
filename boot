@@ -80,7 +80,7 @@ A
         local i URL="${1:?Provide location like std/str}"
         (( i = 0 ))
         for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-            echo "@src.curl $ELEM/$1" >&2
+            # echo "@src.curl $ELEM/$1" >&2
             @src.curl "$ELEM/$1"
             case $? in
             0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
