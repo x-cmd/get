@@ -17,6 +17,7 @@ x ready || (curl https://get.x-cmd.com | bash) && x @bash/install
 **对于编写可到处部署脚本的开发者：**
 
 ```bash
+# 首行代码安装并采用x-cmd来管理x-bash远程获取与缓存
 x ready 2>/dev/null || eval "$(curl https://get.x-cmd.com)" && source $(x which @bash/boot)
 
 # 正常使用
@@ -25,7 +26,6 @@ list.new alist
 alist.push a b c
 ```
 
-首行代码可以采用x从而实现boot代码缓存之功效
 
 ## 安装
 
