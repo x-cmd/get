@@ -29,11 +29,15 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     @src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
 
     @src(){
-        [ $# -eq 0 ] && cat >&1 <<A
+        if [ $# -eq 0 ]; then
+            cat <<A
 @src    x-bash core function.
         Uasge:  @src <lib> [<lib>...]
         Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
+            return 1
+        fi
+        
         for i in "$@"; do 
             @src.one "$i";
             local code=$?
