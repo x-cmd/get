@@ -28,12 +28,12 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     @src.cache(){ echo "$X_BASH_SRC_PATH"; }
     @src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
 
-    @src(){
+    @src.multi(){
         if [ $# -eq 0 ]; then
             cat <<A
-@src    x-bash core function.
-        Uasge:  @src <lib> [<lib>...]
-        Notice, builtin command 'source' format is 'source <lib> [argument...]'"
+@src.multi  x-bash core function.
+            Uasge:  @src <lib> [<lib>...]
+            Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
             return 1
         fi
@@ -98,8 +98,17 @@ A
         return 1
     }
 
-    @src.one(){
+    @src(){
         local RESOURCE_NAME=${1:?Provide resource name}; shift
+
+        local filename method
+        method=${RESOURCE_NAME##*\#}
+        RESOURCE_NAME=${RESOURCE_NAME%\#*} 
+
+        filename=${RESOURCE_NAME##*/}
+        echo "$RESOURCE_NAME"
+        echo "$method"
+        echo "$filename.$method"
 
         local TGT
         if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
@@ -123,6 +132,7 @@ A
         fi
 
         local module=$RESOURCE_NAME
+        # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
         if [[ ! $module =~ \/ ]]; then
 
             if [ -z "$UPDATE" ]; then # Exists in cache.
@@ -161,14 +171,38 @@ A
             echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
             return 1
         fi
-        
-        ${SRC_LOADER:-source} "$TGT" "$@"
-    # }
-    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+
+        local RUN="${SRC_LOADER:-source}"
+
+        case "$RUN" in
+        source) 
+            # shellcheck disable=SC1090
+            source "$TGT" "$@" ;;
+        bash) 
+            if [ -z "$method" ]; then
+                bash "$TGT" "$@"
+            else
+                echo "bash $TGT"
+                bash <<A
+                echo "run $TGT"
+                source "$TGT"
+
+                if typeset -f "$filename.$method" 1>/dev/null; then
+                    echo "$filename.$method" "$@"
+                    "$filename.$method" "$@"
+                else
+                    "$method" "$@"
+                fi
+A
+            fi ;;
+        *) "$RUN" "$TGT" "$@";;
+        esac
+    }
+    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
     export -f @src
-    export -f @src.one
+    export -f @src.multi
     export -f @src.curl
     export -f @src.bash
 fi
