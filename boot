@@ -99,6 +99,38 @@ A
     }
 
     @src(){
+        eval "$(@src.__print_code "$@")"
+    }
+
+    @src.__print_eval_code_by_loader(){
+        local TGT=$1
+        shift
+        local RUN="${SRC_LOADER:-source}"
+
+        case "$RUN" in
+        bash)
+            if [ -z "$method" ]; then
+                echo bash "$TGT" "$@"
+            else
+                local final_code
+                final_code="$(cat <<A
+source "$TGT"
+
+if typeset -f "$filename.$method" 1>/dev/null; then
+    $filename.$method $@
+else
+    $method $@
+fi
+A
+)"
+            echo "echo \"$final_code\" | bash"
+            fi ;;
+        *) 
+            echo "$RUN" "$TGT" "$@";;
+        esac
+    }
+
+    @src.__print_code(){
         local RESOURCE_NAME=${1:?Provide resource name}; shift
 
         local filename method
@@ -106,19 +138,20 @@ A
         RESOURCE_NAME=${RESOURCE_NAME%\#*} 
 
         filename=${RESOURCE_NAME##*/}
-        echo "$RESOURCE_NAME"
-        echo "$method"
-        echo "$filename.$method"
+        # {
+        #     echo "$RESOURCE_NAME"
+        #     echo "$method"
+        #     echo "$filename.$method"
+        # } >&2
 
         local TGT
         if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
             # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
             TGT="$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
             # shellcheck disable=SC1090
-            source "$TGT"
+            @src.__print_eval_code_by_loader "$TGT" "$@"
             return
         fi
-
 
         if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
             TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
@@ -127,7 +160,7 @@ A
                 return 1
             fi
             
-            ${SRC_LOADER:-source} "$TGT" "$@"
+            @src.__print_eval_code_by_loader "$TGT" "$@"
             return 
         fi
 
@@ -141,7 +174,7 @@ A
                 LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
                 if [ -r "$LOCAL_FILE" ]; then
                     echo "INFO: Using local file $LOCAL_FILE" >&2
-                    ${SRC_LOADER:-source} "$LOCAL_FILE" "$@"
+                    @src.__print_eval_code_by_loader "$LOCAL_FILE" "$@"
                     return 0
                 fi
             fi
@@ -172,31 +205,7 @@ A
             return 1
         fi
 
-        local RUN="${SRC_LOADER:-source}"
-
-        case "$RUN" in
-        source) 
-            # shellcheck disable=SC1090
-            source "$TGT" "$@" ;;
-        bash) 
-            if [ -z "$method" ]; then
-                bash "$TGT" "$@"
-            else
-                echo "bash $TGT"
-                bash <<A
-                echo "run $TGT"
-                source "$TGT"
-
-                if typeset -f "$filename.$method" 1>/dev/null; then
-                    echo "$filename.$method" "$@"
-                    "$filename.$method" "$@"
-                else
-                    "$method" "$@"
-                fi
-A
-            fi ;;
-        *) "$RUN" "$TGT" "$@";;
-        esac
+        @src.__print_eval_code_by_loader "$TGT" "$@"
     }
     # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
