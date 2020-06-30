@@ -27,11 +27,12 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
 
     @src.cache(){ echo "$X_BASH_SRC_PATH"; }
     @src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
+    @src.which(){ SRC_LOADER=which @src "$@"; }
 
-    @src.multi(){
+    @src(){
         if [ $# -eq 0 ]; then
             cat <<A
-@src.multi  x-bash core function.
+@src    x-bash core function.
             Uasge:  @src <lib> [<lib>...]
             Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
@@ -70,7 +71,7 @@ A
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
         local code=$?
-        echo -e "@src.http.get $1 \t code is $code" >&2
+        # echo -e "@src.http.get $1 \t code is $code" >&2
         if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
                 mkdir -p "$(dirname "$CACHE")"
@@ -98,7 +99,7 @@ A
         return 1
     }
 
-    @src(){
+    @src.one(){
         eval "$(@src.__print_code "$@")"
     }
 
@@ -125,6 +126,8 @@ A
 )"
             echo "echo \"$final_code\" | bash"
             fi ;;
+        which)
+            echo "echo" "$TGT" ;;
         *) 
             echo "$RUN" "$TGT" "$@";;
         esac
@@ -135,7 +138,7 @@ A
 
         local filename method
         method=${RESOURCE_NAME##*\#}
-        RESOURCE_NAME=${RESOURCE_NAME%\#*} 
+        RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
         filename=${RESOURCE_NAME##*/}
         # {
@@ -210,8 +213,9 @@ A
     # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
+    export -f @src.one
     export -f @src
-    export -f @src.multi
+    export -f @src.which
     export -f @src.curl
     export -f @src.bash
 fi
