@@ -99,13 +99,119 @@ A
         return 1
     }
 
+    @src.which(){
+        local i code
+        for i in "$@"; do
+            @src.which.one "$i"
+            code=$?
+            if [ $code -ne 0 ]; then
+                return $code
+            fi
+        done
+    }
+
+    @src.which.one(){
+        local RESOURCE_NAME=${1:?Provide resource name};
+
+        local filename method
+        method=${RESOURCE_NAME##*\#}
+        RESOURCE_NAME=${RESOURCE_NAME%\#*}
+
+        filename=${RESOURCE_NAME##*/}
+        # {
+        #     echo "$RESOURCE_NAME"
+        #     echo "$method"
+        #     echo "$filename.$method"
+        # } >&2
+
+        local TGT
+        if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
+            # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
+            echo "$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
+            return
+        fi
+
+        if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
+            TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
+            if ! CACHE="$TGT" @src.curl "$RESOURCE_NAME"; then
+                echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
+                return 1
+            fi
+
+            echo "$TGT"
+            return 
+        fi
+
+        local module=$RESOURCE_NAME
+        # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
+        if [[ ! $module =~ \/ ]]; then
+
+            if [ -z "$UPDATE" ]; then # Exists in cache.
+                local LOCAL_FILE
+                # shellcheck disable=SC2086
+                LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
+                if [ -r "$LOCAL_FILE" ]; then
+                    echo "INFO: Using local file $LOCAL_FILE" >&2
+                    echo "$LOCAL_FILE"
+                    return 0
+                fi
+            fi
+
+            local index_file="$X_BASH_SRC_PATH/index"
+            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
+                echo "INFO: Rebuilding $index_file" >&2
+                CACHE="$index_file" @src.curl.gitx "index"
+            fi
+
+            if [ ! -f "$index_file" ]; then
+                echo "Exit because file fail to download: $index_file" >&2
+                return 1
+            fi
+
+            module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+            [ -z "$module" ] && {
+                echo "ERROR: $RESOURCE_NAME NOT found" >&2
+                return 1
+            }
+            echo "INFO: Using $module" >&2
+        fi
+
+        TGT="$X_BASH_SRC_PATH/$module"
+
+        if ! CACHE="$TGT" @src.curl.gitx "$module"; then
+            echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
+            return 1
+        fi
+
+        echo "$TGT"
+    }
+
     @src.one(){
         eval "$(@src.__print_code "$@")"
     }
+    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+    # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
-    @src.__print_eval_code_by_loader(){
-        local TGT=$1
-        shift
+    @src.__print_code(){
+        local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
+
+        local filename method
+        method=${RESOURCE_NAME##*\#}
+        RESOURCE_NAME=${RESOURCE_NAME%\#*}
+
+        filename=${RESOURCE_NAME##*/}
+
+        # {
+        #     echo "$RESOURCE_NAME"
+        #     echo "method name: $method"
+        #     echo "$filename.$method"
+        # } >&2
+
+        TGT="$(@src.which.one "$RESOURCE_NAME")"
+
+        local code=$?
+        [ $code -ne 0 ] && return $code
+    
         local RUN="${SRC_LOADER:-source}"
 
         case "$RUN" in
@@ -126,92 +232,10 @@ A
 )"
             echo "echo \"$final_code\" | bash"
             fi ;;
-        which)
-            echo "echo" "$TGT" ;;
-        *) 
+        *)
             echo "$RUN" "$TGT" "$@";;
         esac
     }
-
-    @src.__print_code(){
-        local RESOURCE_NAME=${1:?Provide resource name}; shift
-
-        local filename method
-        method=${RESOURCE_NAME##*\#}
-        RESOURCE_NAME=${RESOURCE_NAME%\#*}
-
-        filename=${RESOURCE_NAME##*/}
-        # {
-        #     echo "$RESOURCE_NAME"
-        #     echo "$method"
-        #     echo "$filename.$method"
-        # } >&2
-
-        local TGT
-        if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
-            # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
-            TGT="$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
-            # shellcheck disable=SC1090
-            @src.__print_eval_code_by_loader "$TGT" "$@"
-            return
-        fi
-
-        if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
-            TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
-            if ! CACHE="$TGT" @src.curl "$RESOURCE_NAME"; then
-                echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
-                return 1
-            fi
-            
-            @src.__print_eval_code_by_loader "$TGT" "$@"
-            return 
-        fi
-
-        local module=$RESOURCE_NAME
-        # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
-        if [[ ! $module =~ \/ ]]; then
-
-            if [ -z "$UPDATE" ]; then # Exists in cache.
-                local LOCAL_FILE
-                # shellcheck disable=SC2086
-                LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
-                if [ -r "$LOCAL_FILE" ]; then
-                    echo "INFO: Using local file $LOCAL_FILE" >&2
-                    @src.__print_eval_code_by_loader "$LOCAL_FILE" "$@"
-                    return 0
-                fi
-            fi
-
-            local index_file="$X_BASH_SRC_PATH/index"
-            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-                echo "INFO: Rebuilding $index_file" >&2
-                CACHE="$index_file" @src.curl.gitx "index"
-            fi
-
-            if [ ! -f "$index_file" ]; then
-                echo "Exit because file fail to download: $index_file"
-                return 1
-            fi
-
-            module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-            [ -z "$module" ] && {
-                echo "ERROR: $RESOURCE_NAME NOT found" >&2
-                return 1
-            }
-            echo "INFO: Using $module" >&2
-        fi
-
-        TGT="$X_BASH_SRC_PATH/$module"
-
-        if ! CACHE="$TGT" @src.curl.gitx "$module"; then
-            echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
-            return 1
-        fi
-
-        @src.__print_eval_code_by_loader "$TGT" "$@"
-    }
-    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
-    # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
     export -f @src.one
     export -f @src
