@@ -82,7 +82,7 @@ A
     }
 
     @src.curl.gitx(){   # Simple strategy
-        local i URL="${1:?Provide location like std/str}"
+        local i ELEM URL="${1:?Provide location like std/str}"
         (( i = 0 ))
         for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
             # echo "@src.curl $ELEM/$1" >&2
@@ -100,6 +100,14 @@ A
     }
 
     @src.which(){
+        if [ $# -eq 0 ]; then
+            cat <<A
+@src.which  Download lib files and print the local path.
+            Uasge:  @src.which <lib> [<lib>...]
+            Example: source "$(@src.which std/str)"
+A
+            return 1
+        fi
         local i code
         for i in "$@"; do
             @src.which.one "$i"
