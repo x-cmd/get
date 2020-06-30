@@ -104,9 +104,7 @@ A
         for i in "$@"; do
             @src.which.one "$i"
             code=$?
-            if [ $code -ne 0 ]; then
-                return $code
-            fi
+            [ $code -ne 0 ] && return $code
         done
     }
 
@@ -188,8 +186,8 @@ A
 
     @src.one(){
         eval "$(@src.__print_code "$@")"
-    }
-    # } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
+    # }
+    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
     # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
 
     @src.__print_code(){
@@ -200,12 +198,6 @@ A
         RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
         filename=${RESOURCE_NAME##*/}
-
-        # {
-        #     echo "$RESOURCE_NAME"
-        #     echo "method name: $method"
-        #     echo "$filename.$method"
-        # } >&2
 
         TGT="$(@src.which.one "$RESOURCE_NAME")"
 
