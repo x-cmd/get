@@ -19,3 +19,6 @@ cmd/k
 cloud/ali
 cloud/aws
 cloud/az
+git/gitee
+git/github
+git/gitlab
