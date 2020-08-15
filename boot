@@ -9,8 +9,8 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
     fi
 
-    # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
-    X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
+    X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
+    # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
 
     @src.reload(){
         # shellcheck disable=SC1090
