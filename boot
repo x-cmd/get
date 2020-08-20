@@ -175,6 +175,7 @@ A
             fi
 
             # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+            echo "Using index file: $index_file" >&2
             local name full_name module=""
             while read -r name full_name; do
                 if [ "$name" = "$RESOURCE_NAME" ]; then
@@ -187,7 +188,7 @@ A
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1
             }
-            echo "INFO: Using $module" >&2
+            echo "INFO: Using module $module" >&2
         fi
 
         TGT="$X_BASH_SRC_PATH/$module"
