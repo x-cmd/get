@@ -174,7 +174,15 @@ A
                 return 1
             fi
 
-            module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+            # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
+            local name full_name module=""
+            while read -r name full_name; do
+                if [ "$name" = "$RESOURCE_NAME" ]; then
+                    module="$full_name"
+                    break
+                fi
+            done <"$index_file"
+
             [ -z "$module" ] && {
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1

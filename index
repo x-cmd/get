@@ -1,24 +1,26 @@
-std/dict
-std/file
-std/job
-std/list
-std/net
-std/path
-std/set
-std/str
-std/test
-std/assert
-std/timer
-std/ui
-std/utils
-net/nmap
-net/openvas
-cmd/docker
-cmd/git
-cmd/k
-cloud/ali
-cloud/aws
-cloud/az
-git/gitee
-git/github
-git/gitlab
+dict std/dict
+file std/file
+job std/job
+list std/list
+net std/net
+path std/path
+set std/set
+str std/str
+test std/test
+assert std/assert
+timer std/timer
+ui std/ui
+utils std/utils
+
+nmap net/nmap
+openvas net/openvas
+docker cmd/docker
+k cmd/k
+ali cloud/ali
+aws cloud/aws
+az cloud/az
+
+git scm/git
+github scm/github
+gitee scm/gitee
+gitlab scm/gitlab
