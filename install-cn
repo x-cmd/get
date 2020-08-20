@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
-X_CMD_URL="https://x-cmder.github.io"
-X_BASH_URL="https://x-bash.github.io"
+X_CMD_URL="https://x-cmder.gitee.io"
+X_BASH_URL="https://x-bash.gitee.io"
 
 if command -v x 2>/dev/null && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
     echo "X is detected." >&2
