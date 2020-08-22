@@ -22,5 +22,5 @@ az cloud/az
 
 git scm/git
 github scm/github
-gitee scm/gitee
+gitee gitee/index
 gitlab scm/gitlab

@@ -17,11 +17,15 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         RELOAD=1 source "${1:?Please provide boot file path}"
     }
 
-    @src.clear(){ 
-        if [ -f "$X_BASH_SRC_PATH/boot" ]; then
-            rm -rf "$X_BASH_SRC_PATH";
+    @src.clear(){
+        if [ -f "${X_BASH_SRC_PATH:?Env X_BASH_SRC_PATH should not be empty.}/boot" ]; then
+            if [ "$X_BASH_SRC_PATH" == "/" ]; then
+                echo "Env X_BASH_SRC_PATH should not be /" >&2
+            else
+                rm -rf "$X_BASH_SRC_PATH";
+            fi
         else
-            echo "'$X_BASH_SRC_PATH/boot' NOT found."
+            echo "'$X_BASH_SRC_PATH/boot' NOT found." >&2
         fi
     }
 
