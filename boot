@@ -49,8 +49,23 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     fi
     @src.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
-    X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
-    # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
+    cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
+https://x-bash.github.io
+https://x-bash.gitee.io
+A
+
+    @src.mirrors(){
+        cat "$X_BASH_SRC_PATH/.source.mirror.list"
+    }
+
+    @src.mirrors.write(){
+        if [ $# -ne 0 ]; then
+            local IFS=$'\n'
+            echo "$*" >"$X_BASH_SRC_PATH/.source.mirror.list"
+            return 0
+        fi
+        return 1
+    }
 
     @src.reload(){
         # shellcheck disable=SC1090
@@ -86,8 +101,11 @@ A
         for i in "$@"; do 
             @src.one "$i"
             local code=$?
-            [ $code -ne 0 ] && return $code
+            if [ $code -ne 0 ]; then 
+                return $code
+            fi
         done
+        return 0
     }
 
     @src.curl(){
@@ -114,15 +132,19 @@ A
     }
 
     @src.curl.gitx(){   # Simple strategy
-        local i ELEM URL="${1:?Provide location like std/str}"
-        (( i = 0 ))
-        for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-            @src.debug "Trying @src.curl $ELEM/$1" >&2
+        local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
+        read -r -d '\n' -a CANS <<<"$(@src.mirrors)"
+        for ELEM in "${CANS[@]}"; do
+            @src.debug "Trying @src.curl $ELEM/$1"
             @src.curl "$ELEM/$1"
             case $? in
-            0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
-                X_BASH_SRC_PATH_WEB_URL[0]="$ELEM"
-                eval "X_BASH_SRC_PATH_WEB_URL[$i]=$tmp"
+            0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
+                    local tmp=${CANS[0]}
+                    CANS[0]="$ELEM"
+                    eval "CANS[$i]=$tmp"
+                    @src.debug "First guess NOW is ${CANS[0]}"
+                    @src.mirrors.write "${CANS[@]}"
+                fi
                 return 0;;
             4)  return 4;;
             esac
@@ -238,9 +260,12 @@ A
         filename=${RESOURCE_NAME##*/}
 
         TGT="$(@src.which.one "$RESOURCE_NAME")"
-
+        
         local code=$?
-        [ $code -ne 0 ] && return $code
+        if [ $code -ne 0 ]; then
+            @src.debug "Aborted. Because @src.which.one return Code is Non-Zero: $code"
+            return $code
+        fi
     
         local RUN="${SRC_LOADER:-source}"
 
