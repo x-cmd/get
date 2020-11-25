@@ -24,7 +24,7 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     else
         # If fail, boot init process PANIC.
         echo "Curl, wget or X command NOT found in the system." >&2
-        return 127
+        return 127 2>/dev/null || exit 127
     fi
 
     # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
