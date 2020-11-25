@@ -225,6 +225,7 @@ A
     }
 
     @src.one(){
+        # Notice: Using @src.__print_code to make sure we have a clean environment for script sourced or execution
         eval "$(@src.__print_code "$@")"
     }
 
