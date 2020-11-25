@@ -175,25 +175,19 @@ A
         # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
         if [[ ! $module =~ \/ ]]; then
 
-            if [ -z "$UPDATE" ]; then # Exists in cache.
-                local LOCAL_FILE
-                # shellcheck disable=SC2086
-                LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
-                if [ -r "$LOCAL_FILE" ]; then
-                    @src.debug "Using local file $LOCAL_FILE"
-                    echo "$LOCAL_FILE"
-                    return 0
+            local index_file="$X_BASH_SRC_PATH/index"
+            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
+                @src.debug "Rebuilding $index_file with best effort."
+                if ! CACHE="$index_file" @src.curl.gitx "index"; then
+                    if [ -r "$index_file" ]; then
+                        @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
+                        touch "$index_file" # To avoid frequently update if failure.
+                    fi
                 fi
             fi
 
-            local index_file="$X_BASH_SRC_PATH/index"
-            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-                @src.debug "Rebuilding $index_file"
-                CACHE="$index_file" @src.curl.gitx "index"
-            fi
-
             if [ ! -f "$index_file" ]; then
-                @src.debug "Exit because file fail to download: $index_file"
+                @src.debug "Exit because index file fail to download: $index_file"
                 return 1
             fi
 
