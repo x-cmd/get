@@ -1,6 +1,32 @@
 # shellcheck shell=bash
 
 if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
+
+    # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
+    # if command -v x 1>/dev/null 2>&1; then
+    #     eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
+    # el
+    if curl --version 1>/dev/null 2>&1; then
+        @src.http.get(){ 
+            curl --fail "${1:?Provide target URL}"; 
+            local code=$?
+            [ $code -eq 28 ] && return 4
+            return $code; 
+        } # If fail, return code is 28
+    elif wget --help 1>/dev/null 2>&1; then
+        # busybox and alpine is with wget but without curl. But both are without bash and tls by default
+        @src.http.get(){ 
+            wget -qO - "${1:?Provide target URL}"
+            local code=$?; 
+            [ $code -eq 8 ] && return 4; 
+            return $code;  
+        } # If fail, return code is 8
+    else
+        # If fail, boot init process PANIC.
+        echo "Curl, wget or X command NOT found in the system." >&2
+        return 127
+    fi
+
     # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
     X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
     if grep "@src.one(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
@@ -55,22 +81,6 @@ A
         if [ -n "$CACHE" ]; then
             [ -z "$UPDATE" ] && [ -f "$CACHE" ] && return
             REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
-        fi
-
-        if ! command -v @src.http.get 1>/dev/null 2>&1; then
-            # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
-            # if command -v x 1>/dev/null 2>&1; then
-            #     eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
-            # el
-            if curl --version 1>/dev/null 2>&1; then
-                eval '@src.http.get(){ curl --fail "${1:?Provide target URL}"; local code=$?; [ $code -eq 28 ] && return 4; return $code; }' # If fail, return code is 28
-            elif wget --help 1>/dev/null 2>&1; then
-                # busybox and alpine is with wget but without curl. But both are without bash and tls by default
-                eval '@src.http.get(){ wget -qO - "${1:?Provide target URL}"; local code=$?; [ $code -eq 8 ] && return 4; return $code;  }' # If fail, return code is 8
-            else
-                echo "No other Command for HTTP-GET" >&2
-                return 127
-            fi
         fi
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
