@@ -61,7 +61,7 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
 
     @src(){
         if [ $# -eq 0 ]; then
-            cat <<A
+            cat >&2 <<A
 @src    x-bash core function.
             Uasge:  @src <lib> [<lib>...]
             Notice, builtin command 'source' format is 'source <lib> [argument...]'"
@@ -115,7 +115,7 @@ A
 
     @src.which(){
         if [ $# -eq 0 ]; then
-            cat <<A
+            cat >&2 <<A
 @src.which  Download lib files and print the local path.
             Uasge:  @src.which <lib> [<lib>...]
             Example: source "$(@src.which std/str)"
@@ -262,6 +262,7 @@ A
 
     export -f @src.one
     export -f @src
+    export -f @src.http.get
     export -f @src.which
     export -f @src.curl
     export -f @src.bash
