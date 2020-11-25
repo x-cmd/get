@@ -38,6 +38,11 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
     # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
 
+    @src.debug(){
+        local IFS=
+        [[ "$X_BASH_DEUBG" =~ (^|,)boot($|,) ]] && printf "DBG: %s\n" "$@" >&2
+    }
+
     @src.reload(){
         # shellcheck disable=SC1090
         RELOAD=1 source "${1:?Please provide boot file path}"
@@ -79,15 +84,19 @@ A
     @src.curl(){
         local REDIRECT=/dev/stdout
         if [ -n "$CACHE" ]; then
-            [ -z "$UPDATE" ] && [ -f "$CACHE" ] && return
+            if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
+                @src.debug "@src.curl() exits. Because it is NOT forced update and cache file existed in disk: \n $CACHE"
+                return
+            fi
             REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
         fi
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
         local code=$?
-        # echo -e "@src.http.get $1 \t code is $code" >&2
+        @src.debug "@src.http.get $1 \t return code: $code"
         if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
+                @src.debug "Copy the temp file to CACHE file: $CACHE"
                 mkdir -p "$(dirname "$CACHE")"
                 mv "$REDIRECT" "$CACHE"
             fi
@@ -99,7 +108,7 @@ A
         local i ELEM URL="${1:?Provide location like std/str}"
         (( i = 0 ))
         for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-            # echo "@src.curl $ELEM/$1" >&2
+            @src.debug "Trying: @src.curl $ELEM/$1" >&2
             @src.curl "$ELEM/$1"
             case $? in
             0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
@@ -171,7 +180,7 @@ A
                 # shellcheck disable=SC2086
                 LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
                 if [ -r "$LOCAL_FILE" ]; then
-                    echo "INFO: Using local file $LOCAL_FILE" >&2
+                    @src.debug "Using local file $LOCAL_FILE"
                     echo "$LOCAL_FILE"
                     return 0
                 fi
@@ -179,17 +188,17 @@ A
 
             local index_file="$X_BASH_SRC_PATH/index"
             if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-                echo "INFO: Rebuilding $index_file" >&2
+                @src.debug "Rebuilding $index_file"
                 CACHE="$index_file" @src.curl.gitx "index"
             fi
 
             if [ ! -f "$index_file" ]; then
-                echo "Exit because file fail to download: $index_file" >&2
+                @src.debug "Exit because file fail to download: $index_file"
                 return 1
             fi
 
             # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-            echo "Using index file: $index_file" >&2
+            @src.debug "Using index file: $index_file" >&2
             local name full_name module=""
             while read -r name full_name; do
                 if [ "$name" = "$RESOURCE_NAME" ]; then
@@ -202,7 +211,7 @@ A
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1
             }
-            echo "INFO: Using module $module" >&2
+            @src.debug "Using module $module" >&2
         fi
 
         TGT="$X_BASH_SRC_PATH/$module"
@@ -217,9 +226,7 @@ A
 
     @src.one(){
         eval "$(@src.__print_code "$@")"
-    # }
-    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
-    # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
+    }
 
     @src.__print_code(){
         local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
