@@ -2,25 +2,25 @@
 
 if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
 
-    # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
-    # if command -v x 1>/dev/null 2>&1; then
-    #     eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
-    # el
     if curl --version 1>/dev/null 2>&1; then
-        @src.http.get(){ 
+        @src.http.get(){
             curl --fail "${1:?Provide target URL}"; 
             local code=$?
             [ $code -eq 28 ] && return 4
-            return $code; 
-        } # If fail, return code is 28
+            return $code
+        }
     elif wget --help 1>/dev/null 2>&1; then
         # busybox and alpine is with wget but without curl. But both are without bash and tls by default
-        @src.http.get(){ 
+        @src.http.get(){
             wget -qO - "${1:?Provide target URL}"
             local code=$?; 
             [ $code -eq 8 ] && return 4; 
-            return $code;  
-        } # If fail, return code is 8
+            return $code
+        }
+    elif x author | grep "Edwin.JH.Lee & LTeam" 1>/dev/null 2>/dev/null; then
+        @src.http.get(){
+            x cat "${1:?Provide target URL}"
+        }
     else
         # If fail, boot init process PANIC.
         echo "Curl, wget or X command NOT found in the system." >&2
