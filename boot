@@ -220,8 +220,14 @@ A
 
             # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
             @src.debug "Using index file: $index_file"
-            local name full_name module=""
-            while read -r name full_name; do
+            local line name full_name module=""
+            while read -r line; do
+                if [ "$line" = "" ]; then
+                    continue
+                fi
+                name=${line%\ *}
+                full_name=${line#*\ }
+                @src.debug "Looking up: $name => $full_name"
                 if [ "$name" = "$RESOURCE_NAME" ]; then
                     module="$full_name"
                     break
