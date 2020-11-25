@@ -75,7 +75,7 @@ A
         fi
         
         for i in "$@"; do 
-            @src.one "$i";
+            @src.one "$i"
             local code=$?
             [ $code -ne 0 ] && return $code
         done
@@ -147,15 +147,11 @@ A
         RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
         filename=${RESOURCE_NAME##*/}
-        # {
-        #     echo "$RESOURCE_NAME"
-        #     echo "$method"
-        #     echo "$filename.$method"
-        # } >&2
+        @src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
         local TGT
         if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
-            # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
+            # We don't know why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
             echo "$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
             return
         fi
@@ -192,7 +188,7 @@ A
             fi
 
             # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-            @src.debug "Using index file: $index_file" >&2
+            @src.debug "Using index file: $index_file"
             local name full_name module=""
             while read -r name full_name; do
                 if [ "$name" = "$RESOURCE_NAME" ]; then
@@ -205,7 +201,7 @@ A
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1
             }
-            @src.debug "Using module $module" >&2
+            @src.debug "Using module $module"
         fi
 
         TGT="$X_BASH_SRC_PATH/$module"
@@ -262,10 +258,5 @@ A
         esac
     }
 
-    export -f @src.one
-    export -f @src
-    export -f @src.http.get
-    export -f @src.which
-    export -f @src.curl
-    export -f @src.bash
+    export -f @src @src.one @src.http.get @src.which @src.curl @src.bash
 fi
