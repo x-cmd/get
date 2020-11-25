@@ -27,6 +27,19 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
         return 127 2>/dev/null || exit 127
     fi
 
+    @src.debug(){
+        local IFS=
+        [[ "$X_BASH_DEBUG" =~ (^|,)boot($|,) ]] || return
+        if [ $# -eq 0 ]; then
+            printf "DBG: "
+            cat >&2
+        else
+            printf "DBG: %s\n" "$@" >&2
+        fi
+    }
+
+    @src.debug "Start initializing."
+
     # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
     X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
     if grep "@src.one(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
@@ -34,14 +47,10 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     else
         echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
     fi
+    @src.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
     X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
     # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
-
-    @src.debug(){
-        local IFS=
-        [[ "$X_BASH_DEUBG" =~ (^|,)boot($|,) ]] && printf "DBG: %s\n" "$@" >&2
-    }
 
     @src.reload(){
         # shellcheck disable=SC1090
@@ -85,7 +94,7 @@ A
         local REDIRECT=/dev/stdout
         if [ -n "$CACHE" ]; then
             if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
-                @src.debug "@src.curl() exits. Because it is NOT forced update and cache file existed in disk: \n $CACHE"
+                @src.debug "@src.curl() aborted. Because update is NOT forced and file existed: $CACHE"
                 return
             fi
             REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
@@ -93,7 +102,7 @@ A
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
         local code=$?
-        @src.debug "@src.http.get $1 \t return code: $code"
+        @src.debug "@src.http.get $1 return code: $code"
         if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
                 @src.debug "Copy the temp file to CACHE file: $CACHE"
@@ -108,7 +117,7 @@ A
         local i ELEM URL="${1:?Provide location like std/str}"
         (( i = 0 ))
         for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-            @src.debug "Trying: @src.curl $ELEM/$1" >&2
+            @src.debug "Trying @src.curl $ELEM/$1" >&2
             @src.curl "$ELEM/$1"
             case $? in
             0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
@@ -197,10 +206,10 @@ A
                 fi
             done <"$index_file"
 
-            [ -z "$module" ] && {
+            if [ -z "$module" ]; then
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1
-            }
+            fi
             @src.debug "Using module $module"
         fi
 
@@ -215,7 +224,7 @@ A
     }
 
     @src.one(){
-        # Notice: Using @src.__print_code to make sure we have a clean environment for script sourced or execution
+        # Notice: Using @src.__print_code to make sure of a clean environment for script execution
         eval "$(@src.__print_code "$@")"
     }
 
