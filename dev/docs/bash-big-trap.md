@@ -19,3 +19,13 @@ w(){
 ```
 
 Expect w return code to be 0, NO! It is 0
+
+```bash
+w(){
+    local a=3
+    [ $a -eq 1 ] && return 1
+    return
+}
+```
+
+This won't help either.

@@ -30,14 +30,15 @@ else
 fi
 
 @src.debug(){
+    [[ "$X_BASH_DEBUG" =~ (^|,)boot($|,) ]] || return 0
     local IFS=
-    [[ "$X_BASH_DEBUG" =~ (^|,)boot($|,) ]] || return
     if [ $# -eq 0 ]; then
         printf "DBG: "
         cat >&2
     else
         printf "DBG: %s\n" "$@" >&2
     fi
+    return 0
 }
 
 @src.debug "Start initializing."
@@ -87,7 +88,10 @@ A
 }
 
 @src.cache(){ echo "$X_BASH_SRC_PATH"; }
-@src.bash(){ SRC_LOADER=bash @src "$@"; } # Consider using x.
+@src.bash(){ SRC_LOADER=bash @src.one "$@"; } # Consider using x.
+@src.enable.xrc(){
+    alias xrc=@src.bash
+}
 @src.which(){ SRC_LOADER=which @src "$@"; }
 
 @src(){
@@ -115,7 +119,7 @@ A
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
             @src.debug "@src.curl() aborted. Because update is NOT forced and file existed: $CACHE"
-            return
+            return 0
         fi
         REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
     fi
@@ -192,12 +196,12 @@ A
     if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
         TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
         if ! CACHE="$TGT" @src.curl "$RESOURCE_NAME"; then
-            echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
+            echo "ERROR: Fail to load http resource due to network error or other: $RESOURCE_NAME " >&2
             return 1
         fi
 
         echo "$TGT"
-        return 
+        return 0
     fi
 
     local module=$RESOURCE_NAME
@@ -271,7 +275,7 @@ A
     
     local code=$?
     if [ $code -ne 0 ]; then
-        @src.debug "Aborted. Because @src.which.one return Code is Non-Zero: $code"
+        @src.debug "Aborted. Because '@src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
