@@ -89,9 +89,23 @@ A
 
 @src.cache(){ echo "$X_BASH_SRC_PATH"; }
 @src.bash(){ SRC_LOADER=bash @src.one "$@"; } # Consider using x.
-@src.enable.xrc(){
-    alias xrc=@src.bash
+@src.enable.xrc(){ alias xrc=@src.bash; }
+@src.enable.x(){
+    X_BASH_X_CMD_PATH="$(command -v x)"
+    x(){
+        case "$1" in
+            rc|src) @src.bash "$@" ;;
+            # java | jar);;
+            # python | py);;
+            # javascript | js);;
+            # typescript | ts);;
+            # ruby | rb);;
+            # lua);;
+            *) "$X_BASH_X_CMD_PATH" "$@" ;;
+        esac
+    }
 }
+
 @src.which(){ SRC_LOADER=which @src "$@"; }
 
 @src(){
