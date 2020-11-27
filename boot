@@ -29,8 +29,8 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-@src.debug(){
-    [[ "$X_BASH_DEBUG" =~ (^|,)boot($|,) ]] || return 0
+@src_.debug(){
+    [ -z "$X_BASH_DEBUG_boot" ] && return 0
     local IFS=
     if [ $# -eq 0 ]; then
         printf "DBG: "
@@ -41,7 +41,7 @@ fi
     return 0
 }
 
-@src.debug "Start initializing."
+@src_.debug "Start initializing."
 
 # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
 X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
@@ -50,7 +50,7 @@ if grep "@src.one(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
 else
     echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
 fi
-@src.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
+@src_.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
 https://x-bash.github.io
@@ -61,7 +61,7 @@ A
     cat "$X_BASH_SRC_PATH/.source.mirror.list"
 }
 
-@src.mirrors.write(){
+@src_.mirrors.write(){
     if [ $# -ne 0 ]; then
         local IFS=$'\n'
         echo "$*" >"$X_BASH_SRC_PATH/.source.mirror.list"
@@ -88,13 +88,12 @@ A
 }
 
 @src.cache(){ echo "$X_BASH_SRC_PATH"; }
-@src.bash(){ SRC_LOADER=bash @src.one "$@"; } # Consider using x.
-@src.enable.xrc(){ alias xrc=@src.bash; }
+@src.enable.xrc(){ alias xrc='SRC_LOADER=bash @src.one'; }
 @src.enable.x(){
     X_BASH_X_CMD_PATH="$(command -v x)"
     x(){
         case "$1" in
-            rc|src) @src.bash "$@" ;;
+            rc|src) SRC_LOADER=bash @src.one "$@" ;;
             # java | jar);;
             # python | py);;
             # javascript | js);;
@@ -111,7 +110,9 @@ A
 @src(){
     if [ $# -eq 0 ]; then
         cat >&2 <<A
-@src    x-bash core function.
+@src    x-bash core fu
+
+nction.
         Uasge:  @src <lib> [<lib>...]
         Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
@@ -132,7 +133,7 @@ A
     local REDIRECT=/dev/stdout
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
-            @src.debug "@src.curl() aborted. Because update is NOT forced and file existed: $CACHE"
+            @src_.debug "@src.curl() aborted. Because update is NOT forced and file existed: $CACHE"
             return 0
         fi
         REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
@@ -140,10 +141,10 @@ A
 
     @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
     local code=$?
-    @src.debug "@src.http.get $1 return code: $code"
+    @src_.debug "@src.http.get $1 return code: $code"
     if [ $code -eq 0 ]; then 
         if [ -n "$CACHE" ]; then
-            @src.debug "Copy the temp file to CACHE file: $CACHE"
+            @src_.debug "Copy the temp file to CACHE file: $CACHE"
             mkdir -p "$(dirname "$CACHE")"
             mv "$REDIRECT" "$CACHE"
         fi
@@ -155,15 +156,15 @@ A
     local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
     read -r -d '\n' -a CANS <<<"$(@src.mirrors)"
     for ELEM in "${CANS[@]}"; do
-        @src.debug "Trying @src.curl $ELEM/$1"
+        @src_.debug "Trying @src.curl $ELEM/$1"
         @src.curl "$ELEM/$1"
         case $? in
         0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
                 local tmp=${CANS[0]}
                 CANS[0]="$ELEM"
                 eval "CANS[$i]=$tmp"
-                @src.debug "First guess NOW is ${CANS[0]}"
-                @src.mirrors.write "${CANS[@]}"
+                @src_.debug "First guess NOW is ${CANS[0]}"
+                @src_.mirrors.write "${CANS[@]}"
             fi
             return 0;;
         4)  return 4;;
@@ -198,7 +199,7 @@ A
     RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
     filename=${RESOURCE_NAME##*/}
-    @src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
+    @src_.debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
     local TGT
     if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
@@ -224,22 +225,22 @@ A
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-            @src.debug "Rebuilding $index_file with best effort."
+            @src_.debug "Rebuilding $index_file with best effort."
             if ! CACHE="$index_file" @src.curl.gitx "index"; then
                 if [ -r "$index_file" ]; then
-                    @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
+                    @src_.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
                     touch "$index_file" # To avoid frequently update if failure.
                 fi
             fi
         fi
 
         if [ ! -f "$index_file" ]; then
-            @src.debug "Exit because index file fail to download: $index_file"
+            @src_.debug "Exit because index file fail to download: $index_file"
             return 1
         fi
 
         # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-        @src.debug "Using index file: $index_file"
+        @src_.debug "Using index file: $index_file"
         local line name full_name module=""
         while read -r line; do
             if [ "$line" = "" ]; then
@@ -247,7 +248,7 @@ A
             fi
             name=${line%\ *}
             full_name=${line#*\ }
-            @src.debug "Looking up: $name => $full_name"
+            @src_.debug "Looking up: $name => $full_name"
             if [ "$name" = "$RESOURCE_NAME" ]; then
                 module="$full_name"
                 break
@@ -258,7 +259,7 @@ A
             echo "ERROR: $RESOURCE_NAME NOT found" >&2
             return 1
         fi
-        @src.debug "Using module $module"
+        @src_.debug "Using module $module"
     fi
 
     TGT="$X_BASH_SRC_PATH/$module"
@@ -272,11 +273,11 @@ A
 }
 
 @src.one(){
-    # Notice: Using @src.__print_code to make sure of a clean environment for script execution
-    eval "$(@src.__print_code "$@")"
+    # Notice: Using @src_.print_code to make sure of a clean environment for script execution
+    eval "$(@src_.print_code "$@")"
 }
 
-@src.__print_code(){
+@src_.print_code(){
     local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
 
     local filename method
@@ -289,7 +290,7 @@ A
     
     local code=$?
     if [ $code -ne 0 ]; then
-        @src.debug "Aborted. Because '@src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
+        @src_.debug "Aborted. Because '@src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
@@ -318,4 +319,22 @@ A
     esac
 }
 
-export -f @src @src.one @src.http.get @src.which @src.curl @src.bash
+@src.debug.list(){
+    for i in ${!X_BASH_DEBUG@}; do
+        echo "${i:13}"
+    done
+}
+
+@src.debug.enable(){
+    for i in "$@"; do
+        eval "X_BASH_DEBUG_$i=1"
+    done
+}
+
+@src.debug.disable(){
+    for i in "$@"; do
+        eval "unset X_BASH_DEBUG_$i"
+    done
+}
+
+export -f @src @src.one @src.http.get @src.which @src.curl
