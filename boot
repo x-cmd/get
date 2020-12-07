@@ -43,17 +43,33 @@ x-bash.debug.is_enable(){
     [ "$(declare -f "$i.debug" | wc -l)" -gt 4 ]
 }
 
+export X_BASH_COLOR_LOG=1
+x-bash.logger(){
+    local logger=$1 level=$2
+    shift 2
+    if [ $# -eq 0 ]; then
+        if [ -n "$X_BASH_COLOR_LOG" ]; then
+            printf "\e[31m%s[%s]: " "$logger" "$level" 
+            cat
+            printf "\e[0m\n"
+        else
+            printf "%s[%s]: " "$logger" "$level"
+            cat
+            printf "\n"
+        fi
+    else
+        if [ -n "$X_BASH_COLOR_LOG" ]; then
+            printf "\e[;2m%s[%s]: %s\e[0m\n" "$logger" "$level" "$@"
+        else
+            printf "%s[%s]: %s\n" "$logger" "$level" "$@"
+        fi
+    fi >&2
+    return 0
+}
+
 x-bash.debug.enable(){
     for i in "$@"; do
-        eval "$i.debug() { 
-            if [ $# -eq 0 ]; then
-                printf \"DBG: \"
-                cat >&2
-            else
-                printf \"DBG-$i: %s\n\" \"\$@\" >&2
-            fi
-            return 0
-        }"
+        eval "$i.debug() { x-bash.logger \"$i\" DBG \"\$@\"; }"
         # eval "X_BASH_DEBUG_$i=1"
     done
 }
