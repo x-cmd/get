@@ -1,3 +1,4 @@
+str std/str
 dict std/dict
 file std/file
 job std/job
@@ -5,7 +6,6 @@ list std/list
 net std/net
 path std/path
 set std/set
-str std/str
 test std/test
 assert std/assert
 timer std/timer
