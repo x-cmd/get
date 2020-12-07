@@ -30,7 +30,7 @@ else
 fi
 
 x-bash.src.debug(){
-    [ -z "$X_BASH_DEBUG_boot" ] && return 0
+    x-bash.debug.is_enable boot && return 0
     local IFS=
     if [ $# -eq 0 ]; then
         printf "DBG: "
@@ -328,7 +328,7 @@ x-bash.debug.list(){
     done
 }
 
-x-bash.debug.enable?(){
+x-bash.debug.is_enable(){
     [ -n "$X_BASH_DEBUG_$i" ]
 }
 
