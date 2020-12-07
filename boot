@@ -29,28 +29,52 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-x-bash.src.debug(){
-    x-bash.debug.is_enable boot && return 0
-    local IFS=
-    if [ $# -eq 0 ]; then
-        printf "DBG: "
-        cat >&2
-    else
-        printf "DBG: %s\n" "$@" >&2
-    fi
-    return 0
+x-bash.debug.list(){
+    declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
 }
 
-x-bash.src.debug "Start initializing."
+x-bash.debug.init(){
+    for i in "$@"; do
+        eval "$i.debug() { :; }"
+    done
+}
+
+x-bash.debug.is_enable(){
+    [ "$(declare -f "$i.debug" | wc -l)" -gt 4 ]
+}
+
+x-bash.debug.enable(){
+    for i in "$@"; do
+        eval "$i.debug() { 
+            if [ $# -eq 0 ]; then
+                printf \"DBG: \"
+                cat >&2
+            else
+                printf \"DBG-$i: %s\n\" \"\$@\" >&2
+            fi
+            return 0
+        }"
+        # eval "X_BASH_DEBUG_$i=1"
+    done
+}
+
+x-bash.debug.disable(){
+    x-bash.debug.init "$@"
+}
+
+x-bash.debug.enable boot
+x-bash.debug.enable @src
+
+boot.debug "Start initializing."
 
 # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
 X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
-if grep "x-bash.src.debug(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
+if grep "boot.debug" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
     X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 else
     echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
 fi
-x-bash.src.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
+boot.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
 https://x-bash.github.io
@@ -136,7 +160,7 @@ x-bash.curl(){
     local REDIRECT=/dev/stdout
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
-            x-bash.src.debug "x-bash.curl() aborted. Because update is NOT forced and file existed: $CACHE"
+            @src.debug "x-bash.curl() aborted. Because update is NOT forced and file existed: $CACHE"
             return 0
         fi
         REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
@@ -144,10 +168,10 @@ x-bash.curl(){
 
     x.http.get "$1" 1>"$REDIRECT" 2>/dev/null
     local code=$?
-    x-bash.src.debug "x.http.get $1 return code: $code"
+    @src.debug "x.http.get $1 return code: $code"
     if [ $code -eq 0 ]; then 
         if [ -n "$CACHE" ]; then
-            x-bash.src.debug "Copy the temp file to CACHE file: $CACHE"
+            @src.debug "Copy the temp file to CACHE file: $CACHE"
             mkdir -p "$(dirname "$CACHE")"
             mv "$REDIRECT" "$CACHE"
         fi
@@ -159,14 +183,14 @@ x-bash.curl.gitx(){   # Simple strategy
     local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
     read -r -d '\n' -a CANS <<<"$(x-bash.mirrors)"
     for ELEM in "${CANS[@]}"; do
-        x-bash.src.debug "Trying x-bash.curl $ELEM/$1"
+        @src.debug "Trying x-bash.curl $ELEM/$1"
         x-bash.curl "$ELEM/$1"
         case $? in
         0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
                 local tmp=${CANS[0]}
                 CANS[0]="$ELEM"
                 eval "CANS[$i]=$tmp"
-                x-bash.src.debug "First guess NOW is ${CANS[0]}"
+                @src.debug "First guess NOW is ${CANS[0]}"
                 x-bash.mirrors.write "${CANS[@]}"
             fi
             return 0;;
@@ -202,7 +226,7 @@ x-bash.src.which.one(){
     RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
     filename=${RESOURCE_NAME##*/}
-    x-bash.src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
+    @src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
     local TGT
     if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
@@ -228,22 +252,22 @@ x-bash.src.which.one(){
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-            x-bash.src.debug "Rebuilding $index_file with best effort."
+            @src.debug "Rebuilding $index_file with best effort."
             if ! CACHE="$index_file" x-bash.curl.gitx "index"; then
                 if [ -r "$index_file" ]; then
-                    x-bash.src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
+                    @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
                     touch "$index_file" # To avoid frequently update if failure.
                 fi
             fi
         fi
 
         if [ ! -f "$index_file" ]; then
-            x-bash.src.debug "Exit because index file fail to download: $index_file"
+            @src.debug "Exit because index file fail to download: $index_file"
             return 1
         fi
 
         # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-        x-bash.src.debug "Using index file: $index_file"
+        @src.debug "Using index file: $index_file"
         local line name full_name module=""
         while read -r line; do
             if [ "$line" = "" ]; then
@@ -251,7 +275,7 @@ x-bash.src.which.one(){
             fi
             name=${line%\ *}
             full_name=${line#*\ }
-            x-bash.src.debug "Looking up: $name => $full_name"
+            @src.debug "Looking up: $name => $full_name"
             if [ "$name" = "$RESOURCE_NAME" ]; then
                 module="$full_name"
                 break
@@ -262,7 +286,7 @@ x-bash.src.which.one(){
             echo "ERROR: $RESOURCE_NAME NOT found" >&2
             return 1
         fi
-        x-bash.src.debug "Using module $module"
+        @src.debug "Using module $module"
     fi
 
     TGT="$X_BASH_SRC_PATH/$module"
@@ -293,7 +317,7 @@ x-bash.print_code(){
     
     local code=$?
     if [ $code -ne 0 ]; then
-        x-bash.src.debug "Aborted. Because 'x-bash.src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
+        @src.debug "Aborted. Because 'x-bash.src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
@@ -320,28 +344,6 @@ A
     *)
         echo "$RUN" "$TGT" "$@";;
     esac
-}
-
-x-bash.debug.list(){
-    for i in ${!X_BASH_DEBUG@}; do
-        echo "${i:13}"
-    done
-}
-
-x-bash.debug.is_enable(){
-    [ -n "$X_BASH_DEBUG_$i" ]
-}
-
-x-bash.debug.enable(){
-    for i in "$@"; do
-        eval "X_BASH_DEBUG_$i=1"
-    done
-}
-
-x-bash.debug.disable(){
-    for i in "$@"; do
-        eval "unset X_BASH_DEBUG_$i"
-    done
 }
 
 export -f x-bash.src.one x.http.get x-bash.src.which x-bash.curl
