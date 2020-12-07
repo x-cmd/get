@@ -1,6 +1,45 @@
 # shellcheck shell=bash
 
 if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
+
+    if curl --version 1>/dev/null 2>&1; then
+        @src.http.get(){
+            curl --fail "${1:?Provide target URL}"; 
+            local code=$?
+            [ $code -eq 28 ] && return 4
+            return $code
+        }
+    elif wget --help 1>/dev/null 2>&1; then
+        # busybox and alpine is with wget but without curl. But both are without bash and tls by default
+        @src.http.get(){
+            wget -qO - "${1:?Provide target URL}"
+            local code=$?; 
+            [ $code -eq 8 ] && return 4; 
+            return $code
+        }
+    elif x author | grep "Edwin.JH.Lee & LTeam" 1>/dev/null 2>/dev/null; then
+        @src.http.get(){
+            x cat "${1:?Provide target URL}"
+        }
+    else
+        # If fail, boot init process PANIC.
+        echo "Curl, wget or X command NOT found in the system." >&2
+        return 127 2>/dev/null || exit 127
+    fi
+
+    @src.debug(){
+        local IFS=
+        [[ "$X_BASH_DEBUG" =~ (^|,)boot($|,) ]] || return
+        if [ $# -eq 0 ]; then
+            printf "DBG: "
+            cat >&2
+        else
+            printf "DBG: %s\n" "$@" >&2
+        fi
+    }
+
+    @src.debug "Start initializing."
+
     # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
     X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
     if grep "@src.one(){" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
@@ -8,9 +47,25 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
     else
         echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
     fi
+    @src.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
-    X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io https://x-bash.gitee.io )
-    # X_BASH_SRC_PATH_WEB_URL=( https://x-bash.github.io )
+    cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
+https://x-bash.github.io
+https://x-bash.gitee.io
+A
+
+    @src.mirrors(){
+        cat "$X_BASH_SRC_PATH/.source.mirror.list"
+    }
+
+    @src.mirrors.write(){
+        if [ $# -ne 0 ]; then
+            local IFS=$'\n'
+            echo "$*" >"$X_BASH_SRC_PATH/.source.mirror.list"
+            return 0
+        fi
+        return 1
+    }
 
     @src.reload(){
         # shellcheck disable=SC1090
@@ -35,7 +90,7 @@ if [ -n "$RELOAD" ] || [ -z "$X_BASH_SRC_PATH" ]; then
 
     @src(){
         if [ $# -eq 0 ]; then
-            cat <<A
+            cat >&2 <<A
 @src    x-bash core function.
             Uasge:  @src <lib> [<lib>...]
             Notice, builtin command 'source' format is 'source <lib> [argument...]'"
@@ -44,40 +99,31 @@ A
         fi
         
         for i in "$@"; do 
-            @src.one "$i";
+            @src.one "$i"
             local code=$?
-            [ $code -ne 0 ] && return $code
+            if [ $code -ne 0 ]; then 
+                return $code
+            fi
         done
+        return 0
     }
 
     @src.curl(){
         local REDIRECT=/dev/stdout
         if [ -n "$CACHE" ]; then
-            [ -z "$UPDATE" ] && [ -f "$CACHE" ] && return
-            REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
-        fi
-
-        if ! command -v @src.http.get 1>/dev/null 2>&1; then
-            # TODO: checking `x author` == "Edwin.JH.Lee & LTeam"
-            # if command -v x 1>/dev/null 2>&1; then
-            #     eval '@src.http.get(){ x cat "${1:?Provide target URL}"; }' # If fail, return code is 1
-            # el
-            if curl --version 1>/dev/null 2>&1; then
-                eval '@src.http.get(){ curl --fail "${1:?Provide target URL}"; local code=$?; [ $code -eq 28 ] && return 4; return $code; }' # If fail, return code is 28
-            elif wget --help 1>/dev/null 2>&1; then
-                # busybox and alpine is with wget but without curl. But both are without bash and tls by default
-                eval '@src.http.get(){ wget -qO - "${1:?Provide target URL}"; local code=$?; [ $code -eq 8 ] && return 4; return $code;  }' # If fail, return code is 8
-            else
-                echo "No other Command for HTTP-GET" >&2
-                return 127
+            if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
+                @src.debug "@src.curl() aborted. Because update is NOT forced and file existed: $CACHE"
+                return
             fi
+            REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
         fi
 
         @src.http.get "$1" 1>"$REDIRECT" 2>/dev/null
         local code=$?
-        # echo -e "@src.http.get $1 \t code is $code" >&2
+        @src.debug "@src.http.get $1 return code: $code"
         if [ $code -eq 0 ]; then 
             if [ -n "$CACHE" ]; then
+                @src.debug "Copy the temp file to CACHE file: $CACHE"
                 mkdir -p "$(dirname "$CACHE")"
                 mv "$REDIRECT" "$CACHE"
             fi
@@ -86,15 +132,19 @@ A
     }
 
     @src.curl.gitx(){   # Simple strategy
-        local i ELEM URL="${1:?Provide location like std/str}"
-        (( i = 0 ))
-        for ELEM in "${X_BASH_SRC_PATH_WEB_URL[@]}"; do
-            # echo "@src.curl $ELEM/$1" >&2
+        local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
+        read -r -d '\n' -a CANS <<<"$(@src.mirrors)"
+        for ELEM in "${CANS[@]}"; do
+            @src.debug "Trying @src.curl $ELEM/$1"
             @src.curl "$ELEM/$1"
             case $? in
-            0)  local tmp=${X_BASH_SRC_PATH_WEB_URL[0]}
-                X_BASH_SRC_PATH_WEB_URL[0]="$ELEM"
-                eval "X_BASH_SRC_PATH_WEB_URL[$i]=$tmp"
+            0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
+                    local tmp=${CANS[0]}
+                    CANS[0]="$ELEM"
+                    eval "CANS[$i]=$tmp"
+                    @src.debug "First guess NOW is ${CANS[0]}"
+                    @src.mirrors.write "${CANS[@]}"
+                fi
                 return 0;;
             4)  return 4;;
             esac
@@ -105,7 +155,7 @@ A
 
     @src.which(){
         if [ $# -eq 0 ]; then
-            cat <<A
+            cat >&2 <<A
 @src.which  Download lib files and print the local path.
             Uasge:  @src.which <lib> [<lib>...]
             Example: source "$(@src.which std/str)"
@@ -128,15 +178,11 @@ A
         RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
         filename=${RESOURCE_NAME##*/}
-        # {
-        #     echo "$RESOURCE_NAME"
-        #     echo "$method"
-        #     echo "$filename.$method"
-        # } >&2
+        @src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
         local TGT
         if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
-            # We don't why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
+            # We don't know why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
             echo "$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
             return
         fi
@@ -156,43 +202,43 @@ A
         # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
         if [[ ! $module =~ \/ ]]; then
 
-            if [ -z "$UPDATE" ]; then # Exists in cache.
-                local LOCAL_FILE
-                # shellcheck disable=SC2086
-                LOCAL_FILE="$(find $X_BASH_SRC_PATH/*/$RESOURCE_NAME 2>/dev/null | head -n 1)"
-                if [ -r "$LOCAL_FILE" ]; then
-                    echo "INFO: Using local file $LOCAL_FILE" >&2
-                    echo "$LOCAL_FILE"
-                    return 0
+            local index_file="$X_BASH_SRC_PATH/index"
+            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
+                @src.debug "Rebuilding $index_file with best effort."
+                if ! CACHE="$index_file" @src.curl.gitx "index"; then
+                    if [ -r "$index_file" ]; then
+                        @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
+                        touch "$index_file" # To avoid frequently update if failure.
+                    fi
                 fi
             fi
 
-            local index_file="$X_BASH_SRC_PATH/index"
-            if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
-                echo "INFO: Rebuilding $index_file" >&2
-                CACHE="$index_file" @src.curl.gitx "index"
-            fi
-
             if [ ! -f "$index_file" ]; then
-                echo "Exit because file fail to download: $index_file" >&2
+                @src.debug "Exit because index file fail to download: $index_file"
                 return 1
             fi
 
             # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-            echo "Using index file: $index_file" >&2
-            local name full_name module=""
-            while read -r name full_name; do
+            @src.debug "Using index file: $index_file"
+            local line name full_name module=""
+            while read -r line; do
+                if [ "$line" = "" ]; then
+                    continue
+                fi
+                name=${line%\ *}
+                full_name=${line#*\ }
+                @src.debug "Looking up: $name => $full_name"
                 if [ "$name" = "$RESOURCE_NAME" ]; then
                     module="$full_name"
                     break
                 fi
             done <"$index_file"
 
-            [ -z "$module" ] && {
+            if [ -z "$module" ]; then
                 echo "ERROR: $RESOURCE_NAME NOT found" >&2
                 return 1
-            }
-            echo "INFO: Using module $module" >&2
+            fi
+            @src.debug "Using module $module"
         fi
 
         TGT="$X_BASH_SRC_PATH/$module"
@@ -206,10 +252,9 @@ A
     }
 
     @src.one(){
+        # Notice: Using @src.__print_code to make sure of a clean environment for script execution
         eval "$(@src.__print_code "$@")"
-    # }
-    } 2> >(grep -E "${LOG_FILTER:-^ERROR}" >&2)
-    # } 2> >(grep -E "${LOG_FILTER:-^(ERROR)|(INFO)}" >&2)
+    }
 
     @src.__print_code(){
         local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
@@ -221,9 +266,12 @@ A
         filename=${RESOURCE_NAME##*/}
 
         TGT="$(@src.which.one "$RESOURCE_NAME")"
-
+        
         local code=$?
-        [ $code -ne 0 ] && return $code
+        if [ $code -ne 0 ]; then
+            @src.debug "Aborted. Because @src.which.one return Code is Non-Zero: $code"
+            return $code
+        fi
     
         local RUN="${SRC_LOADER:-source}"
 
@@ -250,9 +298,5 @@ A
         esac
     }
 
-    export -f @src.one
-    export -f @src
-    export -f @src.which
-    export -f @src.curl
-    export -f @src.bash
+    export -f @src @src.one @src.http.get @src.which @src.curl @src.bash
 fi
