@@ -63,7 +63,7 @@ x-bash.debug.disable(){
 }
 
 x-bash.debug.enable boot
-x-bash.debug.enable @src
+x-bash.debug.init @src
 
 boot.debug "Start initializing."
 
@@ -94,11 +94,6 @@ x-bash.mirrors.write(){
     return 1
 }
 
-x-bash.reload(){
-    # shellcheck disable=SC1090
-    RELOAD=1 source "${1:?Please provide boot file path}"
-}
-
 x-bash.clear(){
     if [ -f "${X_BASH_SRC_PATH:?Env X_BASH_SRC_PATH should not be empty.}/boot" ]; then
         if [ "$X_BASH_SRC_PATH" == "/" ]; then
@@ -117,7 +112,7 @@ x.enable.x(){
     X_BASH_X_CMD_PATH="$(command -v x)"
     x(){
         case "$1" in
-            rc|src) SRC_LOADER=bash x-bash.src.one "$@" ;;
+            rc|src) SRC_LOADER=bash x-bash_.src.one "$@" ;;
             # java | jar);;
             # python | py);;
             # javascript | js);;
@@ -128,8 +123,6 @@ x.enable.x(){
         esac
     }
 }
-
-x-bash.src.which(){ SRC_LOADER=which x. "$@"; }
 
 x+(){ x-bash.src "$@"; }
 x?(){ x-bash.src.which "$@"; }
@@ -147,7 +140,7 @@ A
     fi
     
     for i in "$@"; do 
-        x-bash.src.one "$i"
+        x-bash_.src.one "$i"
         local code=$?
         if [ $code -ne 0 ]; then 
             return $code
@@ -212,13 +205,13 @@ A
     fi
     local i code
     for i in "$@"; do
-        x-bash.src.which.one "$i"
+        x-bash_.src.which.one "$i"
         code=$?
         [ $code -ne 0 ] && return $code
     done
 }
 
-x-bash.src.which.one(){
+x-bash_.src.which.one(){
     local RESOURCE_NAME=${1:?Provide resource name};
 
     local filename method
@@ -299,12 +292,12 @@ x-bash.src.which.one(){
     echo "$TGT"
 }
 
-x-bash.src.one(){
-    # Notice: Using x-bash.print_code to make sure of a clean environment for script execution
-    eval "$(x-bash.print_code "$@")"
+x-bash_.src.one(){
+    # Notice: Using x-bash_.print_code to make sure of a clean environment for script execution
+    eval "$(x-bash_.print_code "$@")"
 }
 
-x-bash.print_code(){
+x-bash_.print_code(){
     local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
 
     local filename method
@@ -313,11 +306,11 @@ x-bash.print_code(){
 
     filename=${RESOURCE_NAME##*/}
 
-    TGT="$(x-bash.src.which.one "$RESOURCE_NAME")"
+    TGT="$(x-bash_.src.which.one "$RESOURCE_NAME")"
     
     local code=$?
     if [ $code -ne 0 ]; then
-        @src.debug "Aborted. Because 'x-bash.src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
+        @src.debug "Aborted. Because 'x-bash_.src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
@@ -346,4 +339,4 @@ A
     esac
 }
 
-export -f x-bash.src.one x.http.get x-bash.src.which x-bash.curl
+export -f @src
