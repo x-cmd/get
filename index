@@ -1,4 +1,5 @@
 str std/str
+http std/http
 dict std/dict
 file std/file
 job std/job
