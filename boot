@@ -260,7 +260,7 @@ x-bash_.src.which.one(){
     if [[ ! $module =~ \/ ]]; then
 
         local index_file="$X_BASH_SRC_PATH/index"
-        if [[ ! $(find "$index_file" -mtime +1h -print) ]]; then # Trigger update even if index file is old
+        if [[ ! $(find "$index_file" -mmin 60 -print) ]]; then # Trigger update even if index file is old
             @src.debug "Rebuilding $index_file with best effort."
             if ! CACHE="$index_file" x-bash.curl.gitx "index"; then
                 if [ -r "$index_file" ]; then
