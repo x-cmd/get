@@ -140,10 +140,8 @@ x.enable.x(){
     }
 }
 
-x+(){ x-bash.src "$@"; }
-x?(){ x-bash.src.which "$@"; }
-
 @src(){ x-bash.src "$@"; }
+@src.which(){ x-bash.src.which "$@"; }
 
 x-bash.src(){
     if [ $# -eq 0 ]; then
