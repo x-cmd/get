@@ -39,7 +39,7 @@ x.debug.init(){
     done
 }
 
-xrc.debug.is_enable(){
+x.debug.is_enable(){
     [ "$(declare -f "$i.debug" | wc -l)" -gt 4 ]
 }
 
@@ -92,6 +92,7 @@ if grep "boot.debug" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
 else
     echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
 fi
+export X_BASH_SRC_PATH
 boot.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
@@ -99,17 +100,16 @@ https://x-bash.github.io
 https://x-bash.gitee.io
 A
 
+# shellcheck disable=SC2120
 xrc.mirrors(){
-    cat "$X_BASH_SRC_PATH/.source.mirror.list"
-}
-
-xrc.mirrors.write(){
+    local fp="$X_BASH_SRC_PATH/.source.mirror.list"
     if [ $# -ne 0 ]; then
         local IFS=$'\n'
-        echo "$*" >"$X_BASH_SRC_PATH/.source.mirror.list"
-        return 0
+        echo "$*" >"$fp"
+    else
+        cat "$fp"
     fi
-    return 1
+    return 0
 }
 
 xrc.clear(){
@@ -125,8 +125,7 @@ xrc.clear(){
 }
 
 xrc.cache(){ echo "$X_BASH_SRC_PATH"; }
-x.enable.xrc(){ alias xrc='SRC_LOADER=bash xrc.src'; }
-x.enable.x(){
+x.activate(){
     X_BASH_X_CMD_PATH="$(command -v x)"
     x(){
         case "$1" in
@@ -142,7 +141,7 @@ x.enable.x(){
     }
 }
 
-@src(){ xrc.src "$@"; }
+@src(){ xrc "$@"; }
 @src.which(){ xrc.which "$@"; }
 
 xrc(){
@@ -355,4 +354,13 @@ A
     esac
 }
 
-export -f @src
+export -f \
+    x.debug.disable x.debug.enable \
+    x.http.get \
+    @src @src.which \
+    xrc xrc.which \
+    xrc_.one xrc_.print_code \
+    xrc.curl xrc.curl.gitx \
+    xrc.mirrors
+
+
