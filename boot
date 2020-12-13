@@ -358,7 +358,7 @@ A
 }
 
 export -f \
-    xrc_.logger xrc_.logger.enable \
+    xrc_.logger \
     x.debug.disable x.debug.enable x.debug.init x.debug.is_enable x.debug.list \
     x.http.get x.activate \
     @src @src.which \
