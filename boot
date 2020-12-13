@@ -33,7 +33,7 @@ xrc.debug.list(){
     declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
 }
 
-xrc.debug.init(){
+x.debug.init(){
     for i in "$@"; do
         eval "$i.debug() { :; }"
     done
@@ -67,19 +67,21 @@ xrc.logger(){
     return 0
 }
 
-xrc.debug.enable(){
+x.debug.enable(){
+    local i
     for i in "$@"; do
+        [ "@src" = "$i" ] && i=xrc
         eval "$i.debug() { xrc.logger \"$i\" DBG \"\$@\"; }"
         # eval "X_BASH_DEBUG_$i=1"
     done
 }
 
-xrc.debug.disable(){
-    xrc.debug.init "$@"
+x.debug.disable(){
+    x.debug.init "$@"
 }
 
-xrc.debug.enable boot
-xrc.debug.init @src
+x.debug.enable boot
+x.debug.init xrc
 
 boot.debug "Start initializing."
 
@@ -167,7 +169,7 @@ xrc.curl(){
     local REDIRECT=/dev/stdout
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
-            @src.debug "xrc.curl() aborted. Because update is NOT forced and file existed: $CACHE"
+            xrc.debug "xrc.curl() terminated. Because update is NOT forced and file existed: $CACHE"
             return 0
         fi
         REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
@@ -175,10 +177,10 @@ xrc.curl(){
 
     x.http.get "$1" 1>"$REDIRECT" 2>/dev/null
     local code=$?
-    @src.debug "x.http.get $1 return code: $code"
+    xrc.debug "x.http.get $1 return code: $code"
     if [ $code -eq 0 ]; then 
         if [ -n "$CACHE" ]; then
-            @src.debug "Copy the temp file to CACHE file: $CACHE"
+            xrc.debug "Copy the temp file to CACHE file: $CACHE"
             mkdir -p "$(dirname "$CACHE")"
             mv "$REDIRECT" "$CACHE"
         fi
@@ -190,14 +192,14 @@ xrc.curl.gitx(){   # Simple strategy
     local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
     read -r -d '\n' -a CANS <<<"$(xrc.mirrors)"
     for ELEM in "${CANS[@]}"; do
-        @src.debug "Trying xrc.curl $ELEM/$1"
+        xrc.debug "Trying xrc.curl $ELEM/$1"
         xrc.curl "$ELEM/$1"
         case $? in
         0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
                 local tmp=${CANS[0]}
                 CANS[0]="$ELEM"
                 eval "CANS[$i]=$tmp"
-                @src.debug "First guess NOW is ${CANS[0]}"
+                xrc.debug "First guess NOW is ${CANS[0]}"
                 xrc.mirrors.write "${CANS[@]}"
             fi
             return 0;;
@@ -233,7 +235,7 @@ xrc_.which.one(){
     RESOURCE_NAME=${RESOURCE_NAME%\#*}
 
     filename=${RESOURCE_NAME##*/}
-    @src.debug "Parsed result: $RESOURCE_NAME $filename.$method"
+    xrc.debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
     local TGT
     if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
@@ -259,22 +261,22 @@ xrc_.which.one(){
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mmin 60 -print) ]]; then # Trigger update even if index file is old
-            @src.debug "Rebuilding $index_file with best effort."
+            xrc.debug "Rebuilding $index_file with best effort."
             if ! CACHE="$index_file" xrc.curl.gitx "index"; then
                 if [ -r "$index_file" ]; then
-                    @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
+                    xrc.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
                     touch "$index_file" # To avoid frequently update if failure.
                 fi
             fi
         fi
 
         if [ ! -f "$index_file" ]; then
-            @src.debug "Exit because index file fail to download: $index_file"
+            xrc.debug "Exit because index file fail to download: $index_file"
             return 1
         fi
 
         # module="$(grep "$RESOURCE_NAME" "$index_file" | head -n 1)"
-        @src.debug "Using index file: $index_file"
+        xrc.debug "Using index file: $index_file"
         local line name full_name module=""
         while read -r line; do
             if [ "$line" = "" ]; then
@@ -282,7 +284,7 @@ xrc_.which.one(){
             fi
             name=${line%\ *}
             full_name=${line#*\ }
-            @src.debug "Looking up: $name => $full_name"
+            xrc.debug "Looking up: $name => $full_name"
             if [ "$name" = "$RESOURCE_NAME" ]; then
                 module="$full_name"
                 break
@@ -293,7 +295,7 @@ xrc_.which.one(){
             echo "ERROR: $RESOURCE_NAME NOT found" >&2
             return 1
         fi
-        @src.debug "Using module $module"
+        xrc.debug "Using module $module"
     fi
 
     TGT="$X_BASH_SRC_PATH/$module"
@@ -324,7 +326,7 @@ xrc_.print_code(){
     
     local code=$?
     if [ $code -ne 0 ]; then
-        @src.debug "Aborted. Because 'xrc_.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
+        xrc.debug "Aborted. Because 'xrc_.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
