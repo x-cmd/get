@@ -36,14 +36,9 @@ x.debug.list(){
 x.debug.init(){
     for i in "$@"; do
         eval "$i.debug() { :; }"
-        eval "$i.debug.enable(){ xrc_.logger.enable $i; }"
+        eval "$i.debug.enable(){ x.debug.enable $i; }"
         eval "$i.debug.disable(){ $i.debug() { :; }; }"
     done
-}
-
-xrc_.logger.enable(){
-    local logger=$1
-    eval "$logger.debug() { xrc_.logger \"$logger\" DBG \"\$@\"; }"
 }
 
 x.debug.is_enable(){
@@ -87,8 +82,9 @@ x.debug.disable(){
     x.debug.init "$@"
 }
 
+x.debug.init boot xrc
 x.debug.enable boot
-x.debug.init xrc
+
 
 boot.debug "Start initializing."
 
