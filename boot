@@ -29,22 +29,22 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-x-bash.debug.list(){
+xrc.debug.list(){
     declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
 }
 
-x-bash.debug.init(){
+xrc.debug.init(){
     for i in "$@"; do
         eval "$i.debug() { :; }"
     done
 }
 
-x-bash.debug.is_enable(){
+xrc.debug.is_enable(){
     [ "$(declare -f "$i.debug" | wc -l)" -gt 4 ]
 }
 
 export X_BASH_COLOR_LOG=1
-x-bash.logger(){
+xrc.logger(){
     local logger=$1 level=$2
     shift 2
     if [ $# -eq 0 ]; then
@@ -67,19 +67,19 @@ x-bash.logger(){
     return 0
 }
 
-x-bash.debug.enable(){
+xrc.debug.enable(){
     for i in "$@"; do
-        eval "$i.debug() { x-bash.logger \"$i\" DBG \"\$@\"; }"
+        eval "$i.debug() { xrc.logger \"$i\" DBG \"\$@\"; }"
         # eval "X_BASH_DEBUG_$i=1"
     done
 }
 
-x-bash.debug.disable(){
-    x-bash.debug.init "$@"
+xrc.debug.disable(){
+    xrc.debug.init "$@"
 }
 
-x-bash.debug.enable boot
-x-bash.debug.init @src
+xrc.debug.enable boot
+xrc.debug.init @src
 
 boot.debug "Start initializing."
 
@@ -97,11 +97,11 @@ https://x-bash.github.io
 https://x-bash.gitee.io
 A
 
-x-bash.mirrors(){
+xrc.mirrors(){
     cat "$X_BASH_SRC_PATH/.source.mirror.list"
 }
 
-x-bash.mirrors.write(){
+xrc.mirrors.write(){
     if [ $# -ne 0 ]; then
         local IFS=$'\n'
         echo "$*" >"$X_BASH_SRC_PATH/.source.mirror.list"
@@ -110,7 +110,7 @@ x-bash.mirrors.write(){
     return 1
 }
 
-x-bash.clear(){
+xrc.clear(){
     if [ -f "${X_BASH_SRC_PATH:?Env X_BASH_SRC_PATH should not be empty.}/boot" ]; then
         if [ "$X_BASH_SRC_PATH" == "/" ]; then
             echo "Env X_BASH_SRC_PATH should not be /" >&2
@@ -122,13 +122,13 @@ x-bash.clear(){
     fi
 }
 
-x-bash.cache(){ echo "$X_BASH_SRC_PATH"; }
-x.enable.xrc(){ alias xrc='SRC_LOADER=bash x-bash.src'; }
+xrc.cache(){ echo "$X_BASH_SRC_PATH"; }
+x.enable.xrc(){ alias xrc='SRC_LOADER=bash xrc.src'; }
 x.enable.x(){
     X_BASH_X_CMD_PATH="$(command -v x)"
     x(){
         case "$1" in
-            rc|src) SRC_LOADER=bash x-bash_.src.one "$@" ;;
+            rc|src) SRC_LOADER=bash xrc_.one "$@" ;;
             # java | jar);;
             # python | py);;
             # javascript | js);;
@@ -140,13 +140,13 @@ x.enable.x(){
     }
 }
 
-@src(){ x-bash.src "$@"; }
-@src.which(){ x-bash.src.which "$@"; }
+@src(){ xrc.src "$@"; }
+@src.which(){ xrc.which "$@"; }
 
-x-bash.src(){
+xrc(){
     if [ $# -eq 0 ]; then
         cat >&2 <<A
-x-bash.src    x-bash core fun ction.
+xrc     x-bash core fun ction.
         Uasge:  x. <lib> [<lib>...]
         Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
@@ -154,7 +154,7 @@ A
     fi
     
     for i in "$@"; do 
-        x-bash_.src.one "$i"
+        xrc_.one "$i"
         local code=$?
         if [ $code -ne 0 ]; then 
             return $code
@@ -163,11 +163,11 @@ A
     return 0
 }
 
-x-bash.curl(){
+xrc.curl(){
     local REDIRECT=/dev/stdout
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
-            @src.debug "x-bash.curl() aborted. Because update is NOT forced and file existed: $CACHE"
+            @src.debug "xrc.curl() aborted. Because update is NOT forced and file existed: $CACHE"
             return 0
         fi
         REDIRECT=$TMPDIR.x-bash-temp-download.$RANDOM
@@ -186,19 +186,19 @@ x-bash.curl(){
     return $code
 }
 
-x-bash.curl.gitx(){   # Simple strategy
+xrc.curl.gitx(){   # Simple strategy
     local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
-    read -r -d '\n' -a CANS <<<"$(x-bash.mirrors)"
+    read -r -d '\n' -a CANS <<<"$(xrc.mirrors)"
     for ELEM in "${CANS[@]}"; do
-        @src.debug "Trying x-bash.curl $ELEM/$1"
-        x-bash.curl "$ELEM/$1"
+        @src.debug "Trying xrc.curl $ELEM/$1"
+        xrc.curl "$ELEM/$1"
         case $? in
         0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
                 local tmp=${CANS[0]}
                 CANS[0]="$ELEM"
                 eval "CANS[$i]=$tmp"
                 @src.debug "First guess NOW is ${CANS[0]}"
-                x-bash.mirrors.write "${CANS[@]}"
+                xrc.mirrors.write "${CANS[@]}"
             fi
             return 0;;
         4)  return 4;;
@@ -208,24 +208,24 @@ x-bash.curl.gitx(){   # Simple strategy
     return 1
 }
 
-x-bash.src.which(){
+xrc.which(){
     if [ $# -eq 0 ]; then
         cat >&2 <<A
-x-bash.src.which  Download lib files and print the local path.
-        Uasge:  x-bash.src.which <lib> [<lib>...]
-        Example: source "$(x-bash.src.which std/str)"
+xrc.which  Download lib files and print the local path.
+        Uasge:  xrc.which <lib> [<lib>...]
+        Example: source "$(xrc.which std/str)"
 A
         return 1
     fi
     local i code
     for i in "$@"; do
-        x-bash_.src.which.one "$i"
+        xrc_.which.one "$i"
         code=$?
         [ $code -ne 0 ] && return $code
     done
 }
 
-x-bash_.src.which.one(){
+xrc_.which.one(){
     local RESOURCE_NAME=${1:?Provide resource name};
 
     local filename method
@@ -244,7 +244,7 @@ x-bash_.src.which.one(){
 
     if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
         TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
-        if ! CACHE="$TGT" x-bash.curl "$RESOURCE_NAME"; then
+        if ! CACHE="$TGT" xrc.curl "$RESOURCE_NAME"; then
             echo "ERROR: Fail to load http resource due to network error or other: $RESOURCE_NAME " >&2
             return 1
         fi
@@ -254,13 +254,13 @@ x-bash_.src.which.one(){
     fi
 
     local module=$RESOURCE_NAME
-    # If it is short alias like str (short for std/str), then search the https://x-bash.github.io/index
+    # If it is short alias like str (short for std/str), then search the https://xrc.github.io/index
     if [[ ! $module =~ \/ ]]; then
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mmin 60 -print) ]]; then # Trigger update even if index file is old
             @src.debug "Rebuilding $index_file with best effort."
-            if ! CACHE="$index_file" x-bash.curl.gitx "index"; then
+            if ! CACHE="$index_file" xrc.curl.gitx "index"; then
                 if [ -r "$index_file" ]; then
                     @src.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
                     touch "$index_file" # To avoid frequently update if failure.
@@ -298,7 +298,7 @@ x-bash_.src.which.one(){
 
     TGT="$X_BASH_SRC_PATH/$module"
 
-    if ! CACHE="$TGT" x-bash.curl.gitx "$module"; then
+    if ! CACHE="$TGT" xrc.curl.gitx "$module"; then
         echo "ERROR: Fail to load $RESOURCE_NAME due to network error or other. Do you want to load std/$RESOURCE_NAME?" >&2
         return 1
     fi
@@ -306,12 +306,12 @@ x-bash_.src.which.one(){
     echo "$TGT"
 }
 
-x-bash_.src.one(){
-    # Notice: Using x-bash_.print_code to make sure of a clean environment for script execution
-    eval "$(x-bash_.print_code "$@")"
+xrc_.one(){
+    # Notice: Using xrc_.print_code to make sure of a clean environment for script execution
+    eval "$(xrc_.print_code "$@")"
 }
 
-x-bash_.print_code(){
+xrc_.print_code(){
     local TGT RESOURCE_NAME=${1:?Provide resource name}; shift
 
     local filename method
@@ -320,11 +320,11 @@ x-bash_.print_code(){
 
     filename=${RESOURCE_NAME##*/}
 
-    TGT="$(x-bash_.src.which.one "$RESOURCE_NAME")"
+    TGT="$(xrc_.which.one "$RESOURCE_NAME")"
     
     local code=$?
     if [ $code -ne 0 ]; then
-        @src.debug "Aborted. Because 'x-bash_.src.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
+        @src.debug "Aborted. Because 'xrc_.which.one $RESOURCE_NAME'return Code is Non-Zero: $code"
         return $code
     fi
 
