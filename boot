@@ -38,6 +38,7 @@ x.debug.init(){
         eval "$i.debug() { :; }"
         eval "$i.debug.enable(){ x.debug.enable $i; }"
         eval "$i.debug.disable(){ $i.debug() { :; }; }"
+        eval "export -f $i.debug $i.debug.enable $i.debug.disable"
     done
 }
 
@@ -74,6 +75,7 @@ x.debug.enable(){
     for i in "$@"; do
         [ "@src" = "$i" ] && i=xrc
         eval "$i.debug() { xrc_.logger \"$i\" DBG \"\$@\"; }"
+        eval "export -f $i.debug"
         # eval "X_BASH_DEBUG_$i=1"
     done
 }
@@ -361,6 +363,7 @@ export -f \
     xrc_.logger \
     x.debug.disable x.debug.enable x.debug.init x.debug.is_enable x.debug.list \
     x.http.get x.activate \
+    xrc_.which.one \
     @src @src.which \
     xrc xrc.which \
     xrc_.one xrc_.print_code \
