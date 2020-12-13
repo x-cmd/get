@@ -29,14 +29,21 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-xrc.debug.list(){
+x.debug.list(){
     declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
 }
 
 x.debug.init(){
     for i in "$@"; do
         eval "$i.debug() { :; }"
+        eval "$i.debug.enable(){ xrc_.logger.enable $i; }"
+        eval "$i.debug.disable(){ $i.debug() { :; }; }"
     done
+}
+
+xrc_.logger.enable(){
+    local logger=$1
+    eval "$logger.debug() { xrc_.logger \"$logger\" DBG \"\$@\"; }"
 }
 
 x.debug.is_enable(){
@@ -44,7 +51,7 @@ x.debug.is_enable(){
 }
 
 export X_BASH_COLOR_LOG=1
-xrc.logger(){
+xrc_.logger(){
     local logger=$1 level=$2
     shift 2
     if [ $# -eq 0 ]; then
@@ -71,7 +78,7 @@ x.debug.enable(){
     local i
     for i in "$@"; do
         [ "@src" = "$i" ] && i=xrc
-        eval "$i.debug() { xrc.logger \"$i\" DBG \"\$@\"; }"
+        eval "$i.debug() { xrc_.logger \"$i\" DBG \"\$@\"; }"
         # eval "X_BASH_DEBUG_$i=1"
     done
 }
@@ -355,7 +362,8 @@ A
 }
 
 export -f \
-    x.debug.disable x.debug.enable x.debug.init x.debug.is_enable\
+    xrc_.logger xrc_.logger.enable \
+    x.debug.disable x.debug.enable x.debug.init x.debug.is_enable x.debug.list \
     x.http.get x.activate \
     @src @src.which \
     xrc xrc.which \
