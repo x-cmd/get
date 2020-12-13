@@ -355,8 +355,8 @@ A
 }
 
 export -f \
-    x.debug.disable x.debug.enable \
-    x.http.get \
+    x.debug.disable x.debug.enable x.debug.init x.debug.is_enable\
+    x.http.get x.activate \
     @src @src.which \
     xrc xrc.which \
     xrc_.one xrc_.print_code \
