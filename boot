@@ -100,6 +100,7 @@ fi
 export X_BASH_SRC_PATH
 boot.debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
+mkdir -p "$X_BASH_SRC_PATH"
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
 https://x-bash.github.io
 https://x-bash.gitee.io
