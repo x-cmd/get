@@ -152,8 +152,8 @@ x.activate(){
 xrc(){
     if [ $# -eq 0 ]; then
         cat >&2 <<A
-xrc     x-bash core fun ction.
-        Uasge:  x. <lib> [<lib>...]
+xrc     x-bash core function.
+        Uasge:  xrc <lib> [<lib>...]
         Notice, builtin command 'source' format is 'source <lib> [argument...]'"
 A
         return 1
