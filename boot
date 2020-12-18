@@ -204,7 +204,7 @@ xrc.curl.gitx(){   # Simple strategy
                 CANS[0]="$ELEM"
                 eval "CANS[$i]=$tmp"
                 xrc.debug "First guess NOW is ${CANS[0]}"
-                xrc.mirrors.write "${CANS[@]}"
+                xrc.mirrors "${CANS[@]}"
             fi
             return 0;;
         4)  return 4;;
