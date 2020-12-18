@@ -1,41 +1,49 @@
 # shellcheck shell=bash
 
-if command -v x 2>/dev/null && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
-    echo "X is detected." >&2
-    echo "First we have to check whether x-cmd is available." >&2
-    # shellcheck disable=SC2016
-    X_STR='eval "$(x @bash/boot)"'
-else
-    # if [ -n "$LIGHT_MODE" ]; then
-    X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" >\$D) && source \$D'"
-    # else
-    #     echo "Setting up x-bash in normal mode." >&2
-    #     echo "x-cmd is NOT available. Install x-cmd from $X_CMD_URL/install" >&2
-    #     curl "https://x-cmder.github.io/install" | bash
-    #     # shellcheck disable=SC2016
-    #     X_STR='source "$(x which @bash/boot)"'
-    # fi
-fi
+# if command -v x 2>/dev/null 1>&2 && [ "$(x author 2>/dev/null)" = "edwinjhlee & lteam" ]; then
+#     echo "X is detected." >&2
+#     echo "First we have to check whether x-cmd is available." >&2
+#     # shellcheck disable=SC2016
+#     X_STR='eval "$(x @bash/boot)"'
+# else
+#     # if [ -n "$LIGHT_MODE" ]; then
+#     X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" >\$D) && source \$D'"
+#     # else
+#     #     echo "Setting up x-bash in normal mode." >&2
+#     #     echo "x-cmd is NOT available. Install x-cmd from $X_CMD_URL/install" >&2
+#     #     curl "https://x-cmder.github.io/install" | bash
+#     #     # shellcheck disable=SC2016
+#     #     X_STR='source "$(x which @bash/boot)"'
+#     # fi
+# fi
+
+X_STR="D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" >\$D) && source \$D'"
 
 if grep -F "$X_STR" "$HOME/.bashrc" >/dev/null; then
-    echo Already install >&2
+    echo "Already installed in $HOME/.bashrc" >&2
 else
     echo "$X_STR" >> "$HOME/.bashrc"
-    echo Installed in "$HOME/.bashrc" >&2
+    echo "Successfully Installed in: $HOME/.bashrc" >&2
 fi
 
 if grep -F "$X_STR" "$HOME/.bash_profile" >/dev/null; then
-    echo Already install >&2
+    echo "Already installed in $HOME/.bash_profile" >&2
 else
     echo "$X_STR" >> "$HOME/.bash_profile"
-    echo Installed in "$HOME/.bash_profile" >&2
+    echo "Successfully Installed in: $HOME/.bash_profile" >&2
 fi
 
 eval "$X_STR"
 
 if [ -n "$ALL" ]; then
-    # TODO: download release/tar/gz. So we donot need to download the files one by one
-    for i in $(curl https://x-bash.github.io/index); do
-        @src "$( echo "$i" | cut -d ' ' -f 2)"
-    done
+    (
+        xrc job # Release the concurrent power with job module
+        for i in $(curl https://x-bash.gitee.io/index 2>/dev/null); do
+            # src the module concurrently. Concurrent number is 5.
+            if [[ $i == */* ]]; then
+                job.put 6 xrc.which "$i" 1>/dev/null 2>/dev/null
+                # echo "$i"
+            fi
+        done
+    )
 fi
