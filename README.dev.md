@@ -4,9 +4,11 @@
 
 ## 步骤2: 执行install.local.sh
 
+```bash
 source install.local.sh
+```
 
-install.local.sh内容如下：
+*install.local.sh内容如下：*
 
 ```bash
 D="$HOME/.x-cmd.com/x-bash/boot"
