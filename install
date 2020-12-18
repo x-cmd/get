@@ -37,7 +37,7 @@ eval "$(
             fi
         done
 
-        eval "$X_STR"
+        eval "$X_STR" 2>/dev/null
 
         if [ -n "$ALL" ]; then
             xrc job # Release the concurrent power with job module
