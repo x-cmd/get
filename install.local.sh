@@ -8,4 +8,4 @@
 D="$HOME/.x-cmd.com/x-bash/boot"
 mkdir -p "$(dirname $D)"
 cp boot "$D"
-source "$D"
+RELOAD=1 source "$D"
