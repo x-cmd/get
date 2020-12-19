@@ -235,6 +235,19 @@ A
     done
 }
 
+xrc.update(){
+    local index_file="${1:-"$X_BASH_SRC_PATH/index"}"
+    xrc.debug "Rebuilding $index_file with best effort."
+    if UPDATE=1 CACHE="$index_file" xrc.curl.gitx "index"; then
+        return 0
+    fi
+    if [ -r "$index_file" ]; then
+        xrc.debug "To avoid useless retry under internet free situation, touch the index file so next retry will be an hour later."
+        touch "$index_file" # To avoid frequent update if failure. 
+    fi
+    return 1
+}
+
 xrc_.which.one(){
     local RESOURCE_NAME=${1:?Provide resource name};
 
@@ -269,17 +282,11 @@ xrc_.which.one(){
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mmin 60 -print 2>/dev/null 1>&2) ]]; then # Trigger update even if index file is old
-            xrc.debug "Rebuilding $index_file with best effort."
-            if ! CACHE="$index_file" xrc.curl.gitx "index"; then
-                if [ -r "$index_file" ]; then
-                    xrc.debug "To avoid useless retry in internet free situation, touch the index file so next retry will be an hour later."
-                    touch "$index_file" # To avoid frequently update if failure.
-                fi
-            fi
+            xrc.update "$index_file"
         fi
 
         if [ ! -f "$index_file" ]; then
-            xrc.debug "Exit because index file fail to download: $index_file"
+            xrc.debug "Exit because index file is inavailable: $index_file"
             return 1
         fi
 
