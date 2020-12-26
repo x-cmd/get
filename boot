@@ -35,7 +35,7 @@ x.debug.list(){
 
 x.debug.init(){
     for i in "$@"; do
-        eval "$i.debug() { :; }"
+        eval "command -v $1.debug 1>/dev/null || $i.debug() { :; }"
         eval "$i.debug.enable(){ x.debug.enable $i; }"
         eval "$i.debug.disable(){ $i.debug() { :; }; }"
         eval "export -f $i.debug $i.debug.enable $i.debug.disable"
@@ -377,8 +377,9 @@ export -f \
     xrc_.which.one \
     @src @src.which \
     xrc xrc.which \
-    xrc_.one xrc_.print_code \
+    xrc.update \
     xrc.curl xrc.curl.gitx \
+    xrc_.one xrc_.print_code \
     xrc.mirrors
 
 
