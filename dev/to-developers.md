@@ -17,3 +17,8 @@ RELOAD=1 . boot     # 用RELOAD变量，强制更新boot
 你打开另一个空白的bash进程，该bash下没有xrc函数。执行`code ~/abc`打开目录，此时code新建的terminal仍将有xrc函数。
 
 因为，此时打开的workspace仍然是code守护进程所记忆的上一次的bash命名空间。
+
+## 测试环境
+
+1. 采用docker创建干净linux容器，进行测试
+2. 编写测试脚本，采用bash运行，观察相关函数是否已经导入。
