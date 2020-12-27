@@ -12,6 +12,10 @@ assert std/assert
 timer std/timer
 ui std/ui
 utils std/utils
+assert std/assert
+
+dingtalk dingtalk/dingtalk
+
 
 nmap net/nmap
 openvas net/openvas
@@ -23,5 +27,5 @@ az cloud/az
 
 git scm/git
 github scm/github
-gitee gitee/index
+gitee gitee/gitee
 gitlab scm/gitlab
