@@ -42,7 +42,7 @@ debug.init(){
     for i in "$@"; do
         var="$(echo "XRC_DBG_$i" | tr "[a-z]" "[A-Z]")"
         eval "$var=\${$var:-\$$var}"
-        eval "$i.debug(){ [ \$$var ] && xrc_.logger \"\$@\"; }"
+        eval "$i.debug(){ [ \$$var ] && xrc_.logger $i DBG \"\$@\"; }"
         eval "$i.debug.enable(){ $var=true; }"
         eval "$i.debug.disable(){ $var=; }"
         eval "$i.debug.is_enable(){ [ \$var ]; }"
@@ -78,7 +78,8 @@ xrc_.logger(){
     shift 2
     if [ $# -eq 0 ]; then
         if [ -n "$XRC_COLOR_LOG" ]; then
-            printf "\e[31m%s[%s]: " "$logger" "$level" 
+            # printf "\e[31m%s[%s]: " "$logger" "$level" 
+            printf "\e[;2m%s[%s]: " "$logger" "$level"
             cat
             printf "\e[0m\n"
         else
@@ -383,7 +384,8 @@ A
 
 export -f \
     xrc_.logger \
-    xrc.debug.disable x.debug.enable x.debug.init xrc.debug.is_enable x.debug.list \
+    debug.enable debug.init debug.is_enable debug.list \
+    xrc.debug.disable \
     x.http.get x.activate \
     xrc_.which.one \
     @src @src.which \
