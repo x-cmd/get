@@ -394,7 +394,7 @@ export -f \
     x.http.get x.activate \
     xrc_.which.one \
     @src @src.which \
-    xrc xrc.which \
+    xrc xrc.cat xrc.which \
     xrc.update \
     xrc.curl xrc.curl.gitx \
     xrc_.one xrc_.print_code \
