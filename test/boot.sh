@@ -24,3 +24,8 @@ A
 [ $? -ne 0 ] && echo "ERROR"
 
 rm -rf ./std
+
+
+for i in "${env[@]}"; do
+   docker run --rm 
+done
