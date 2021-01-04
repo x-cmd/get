@@ -29,29 +29,55 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-x.debug.list(){
-    declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
-}
-
-x.debug.init(){
-    for i in "$@"; do
-        eval "command -v $i.debug 1>/dev/null || $i.debug() { :; }"
-        eval "$i.debug.enable(){ x.debug.enable $i; }"
-        eval "$i.debug.disable(){ $i.debug() { :; }; }"
-        eval "export -f $i.debug $i.debug.enable $i.debug.disable"
+debug.list(){
+    # declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
+    local i
+    for i in "${!XRC_DBG_@}"; do
+        echo "${i:8}" | tr "[A-Z]" "[a-z]"
     done
 }
 
-x.debug.is_enable(){
-    [ "$(declare -f "$i.debug" | wc -l)" -gt 4 ]
+debug.init(){
+    local i var
+    for i in "$@"; do
+        var="$(echo "XRC_DBG_$i" | tr "[a-z]" "[A-Z]")"
+        eval "$var=\${$var:-\$$var}"
+        eval "$i.debug(){ [ \$$var ] && xrc_.logger \"\$@\"; }"
+        eval "$i.debug.enable(){ $var=true; }"
+        eval "$i.debug.disable(){ $var=; }"
+        eval "$i.debug.is_enable(){ [ \$var ]; }"
+        # eval "export -f $i.debug $i.debug.enable $i.debug.disable"
+    done
 }
 
-export X_BASH_COLOR_LOG=1
+debug.enable(){
+    local i var
+    for i in "$@"; do
+        var="$(echo XRC_DBG_$i | tr "[a-z]" "[A-Z]")"
+        eval "$var=true"
+    done
+}
+
+debug.disable(){
+    local i var
+    for i in "$@"; do
+        var="$(echo XRC_DBG_$i | tr "[a-z]" "[A-Z]")"
+        eval "$var="
+    done
+}
+
+debug.is_enable(){
+    local var
+    var="$(echo XRC_DBG_${0:?Module} | tr "[a-z]" "[A-Z]")"
+    eval "[ \$var ]"
+}
+
+export XRC_COLOR_LOG=1
 xrc_.logger(){
     local logger=$1 level=$2 IFS=
     shift 2
     if [ $# -eq 0 ]; then
-        if [ -n "$X_BASH_COLOR_LOG" ]; then
+        if [ -n "$XRC_COLOR_LOG" ]; then
             printf "\e[31m%s[%s]: " "$logger" "$level" 
             cat
             printf "\e[0m\n"
@@ -61,7 +87,7 @@ xrc_.logger(){
             printf "\n"
         fi
     else
-        if [ -n "$X_BASH_COLOR_LOG" ]; then
+        if [ -n "$XRC_COLOR_LOG" ]; then
             printf "\e[;2m%s[%s]: %s\e[0m\n" "$logger" "$level" "$*"
         else
             printf "%s[%s]: %s\n" "$logger" "$level" "$*"
@@ -70,23 +96,8 @@ xrc_.logger(){
     return 0
 }
 
-x.debug.enable(){
-    local i
-    for i in "$@"; do
-        [ "@src" = "$i" ] && i=xrc
-        eval "$i.debug() { xrc_.logger \"$i\" DBG \"\$@\"; }"
-        eval "export -f $i.debug"
-        # eval "X_BASH_DEBUG_$i=1"
-    done
-}
-
-x.debug.disable(){
-    x.debug.init "$@"
-}
-
-x.debug.init boot xrc
-x.debug.enable boot
-
+debug.init boot xrc
+boot.debug.enable
 
 boot.debug "Start initializing."
 
@@ -372,7 +383,7 @@ A
 
 export -f \
     xrc_.logger \
-    x.debug.disable x.debug.enable x.debug.init x.debug.is_enable x.debug.list \
+    xrc.debug.disable x.debug.enable x.debug.init xrc.debug.is_enable x.debug.list \
     x.http.get x.activate \
     xrc_.which.one \
     @src @src.which \
