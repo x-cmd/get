@@ -185,6 +185,11 @@ A
     return 0
 }
 
+xrc.cat(){
+    # shellcheck disable=SC2046
+    cat $(xrc.which "$@")
+}
+
 xrc.curl(){
     local REDIRECT=/dev/stdout
     if [ -n "$CACHE" ]; then
