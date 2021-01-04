@@ -48,7 +48,7 @@ x.debug.is_enable(){
 
 export X_BASH_COLOR_LOG=1
 xrc_.logger(){
-    local logger=$1 level=$2
+    local logger=$1 level=$2 IFS=
     shift 2
     if [ $# -eq 0 ]; then
         if [ -n "$X_BASH_COLOR_LOG" ]; then
@@ -62,9 +62,9 @@ xrc_.logger(){
         fi
     else
         if [ -n "$X_BASH_COLOR_LOG" ]; then
-            printf "\e[;2m%s[%s]: %s\e[0m\n" "$logger" "$level" "$@"
+            printf "\e[;2m%s[%s]: %s\e[0m\n" "$logger" "$level" "$*"
         else
-            printf "%s[%s]: %s\n" "$logger" "$level" "$@"
+            printf "%s[%s]: %s\n" "$logger" "$level" "$*"
         fi
     fi >&2
     return 0
