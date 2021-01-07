@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 if [ -z "$RELOAD" ] && [ -n "$X_BASH_SRC_PATH" ]; then
-    return 0 || exit 0
+    return 0 2>/dev/null || exit 0
 fi
 
 if curl --version 1>/dev/null 2>&1; then
