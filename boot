@@ -390,7 +390,7 @@ A
 export -f \
     xrc_.logger \
     debug.enable debug.init debug.is_enable debug.list \
-    xrc.debug.disable \
+    xrc.debug xrc.debug.disable \
     x.http.get x.activate \
     xrc_.which.one \
     @src @src.which \
