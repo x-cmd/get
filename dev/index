@@ -13,3 +13,8 @@ dev.xbash.push(){
 
     git push origin
 }
+
+dev.xbash.publish(){
+    xrc std/http
+    http.browse https://gitee.com/x-bash/x-bash/pages
+}
