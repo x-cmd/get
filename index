@@ -15,6 +15,8 @@ utils std/utils
 assert std/assert
 
 dingtalk dingtalk/dingtalk
+git/git
+tmux/tmux
 
 
 nmap net/nmap
@@ -25,7 +27,6 @@ ali cloud/ali
 aws cloud/aws
 az cloud/az
 
-git scm/git
-github scm/github
+github github/github
 gitee gitee/gitee
-gitlab scm/gitlab
+gitlab gitlab/gitlab
