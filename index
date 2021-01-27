@@ -15,8 +15,8 @@ utils std/utils
 assert std/assert
 
 dingtalk dingtalk/dingtalk
-git/git
-tmux/tmux
+git git/git
+tmux tmux/tmux
 
 
 nmap net/nmap
