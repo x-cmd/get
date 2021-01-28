@@ -255,7 +255,7 @@ A
 xrc.update(){
     local index_file="${1:-"$X_BASH_SRC_PATH/index"}"
     xrc.debug "Rebuilding $index_file with best effort."
-    if UPDATE=1 CACHE="$index_file" xrc.curl.gitx "index"; then
+    if UPDATE=1 CACHE="$index_file" xrc.curl.gitx "index/main"; then
         return 0
     fi
     if [ -r "$index_file" ]; then
@@ -297,7 +297,7 @@ xrc_.which.one(){
     # If it is short alias like str (short for std/str), then search the https://xrc.github.io/index
     if [[ ! $module =~ \/ ]]; then
 
-        local index_file="$X_BASH_SRC_PATH/index/main"
+        local index_file="$X_BASH_SRC_PATH/index"
         if [[ ! $(find "$index_file" -mmin 60 -print 2>/dev/null 1>&2) ]]; then # Trigger update even if index file is old
             xrc.update "$index_file"
         fi
