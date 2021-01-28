@@ -297,7 +297,7 @@ xrc_.which.one(){
     # If it is short alias like str (short for std/str), then search the https://xrc.github.io/index
     if [[ ! $module =~ \/ ]]; then
 
-        local index_file="$X_BASH_SRC_PATH/index"
+        local index_file="$X_BASH_SRC_PATH/index/main"
         if [[ ! $(find "$index_file" -mmin 60 -print 2>/dev/null 1>&2) ]]; then # Trigger update even if index file is old
             xrc.update "$index_file"
         fi
