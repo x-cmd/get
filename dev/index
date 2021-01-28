@@ -18,3 +18,18 @@ dev.xbash.publish(){
     xrc std/http
     http.browse https://gitee.com/x-bash/x-bash/pages
 }
+
+dev.xbash.clear{
+    rm !(el)
+    rm !(dev)
+    rm !(.vscode)
+
+    for i in */; do
+        case "$i" in
+        el/)        continue;;
+        dev/)       continue;;
+        .vscode/)   continue;;
+        */)         rm -rf "$i";;
+        esac
+    done
+}
