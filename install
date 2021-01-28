@@ -23,12 +23,13 @@ eval "$(
     (
         read -r X_STR
         # MAC: both. Linux: .bashrc. Msys? Cygwin?
-        can=(
-            "$HOME/.bashrc"
-            "$HOME/.bash_profile"
-        )
+        # To supoort sh
+        can="
+            $HOME/.bashrc
+            $HOME/.bash_profile
+        "
 
-        for i in "${can[@]}"; do
+        for i in $can; do
             if grep -F "$X_STR" "$i" >/dev/null; then
                 echo "Already installed in $i" >&2
             else
