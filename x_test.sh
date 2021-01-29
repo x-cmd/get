@@ -1,6 +1,21 @@
 
+# Probably this is one way to support sh
+args(){
+    # local final=$(echo eval "\$$#");
+    local s=${1%:*}
+    local e=${1#*:}
+    local ss=""
+    local IFS="${IFS:-$'\n'}"
+    echo "$s/$e"
+    for i in $(seq "$s" "$e"); do
+        ss="$ss \"\$$i\""
+    done
+    echo "$ss"
+}
+
 # Support ash and dash
 [[ "abc" =~ ^ab ]] 2>/dev/null || {
+
     # boot.debug "[[ does NOT support regex."
     _psuedo_simple_double_square_bracket(){
         echo "Activate" >&2
@@ -11,7 +26,7 @@
         case "$op" in
         ==|=) pattern="${pattern//*/[[:print:]]+}";;
         =~ ) ;;
-        *)
+        *)  ${@:1:(($#-1))}
             local s="[ " i ss=$(($# - 1));
             for i in $(seq 1 $ss); do
                 s="$s \$$i"
