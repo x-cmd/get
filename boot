@@ -106,17 +106,67 @@ debug_enable boot
 
 boot_debug "Start initializing."
 
-# BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
-X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
-if grep "boot_debug" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
-    X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-else
-    echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
+X_BASH_SRC_SHELL=sh
+
+if [ "$0" = "zsh" ]; then
+    X_BASH_SRC_SHELL=zsh
+elif [ "$SHELL" = "/bin/bash" ]; then
+    X_BASH_SRC_SHELL=bash
 fi
+
+
+X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
+# TODO: What if zsh
+if [ $X_BASH_SRC_SHELL = bash ]; then
+    # BUG Notice, if we use eval instead of source to introduce the code, the BASH_SOURCE[0] will not be the location of this file.
+    if grep "boot_debug" "${BASH_SOURCE[0]}" 1>/dev/null 2>&1; then
+        X_BASH_SRC_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    else
+        echo "Script is NOT executed by source. So we have to guess $X_BASH_SRC_PATH as its path" >&2
+    fi
+fi
+
 export X_BASH_SRC_PATH
 boot_debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
 mkdir -p "$X_BASH_SRC_PATH"
+
+
+# Support ash and dash
+[[ "abc" =~ ^ab ]] 2>/dev/null || {
+
+    # boot.debug "[[ does NOT support regex."
+    _psuedo_simple_double_square_bracket(){
+        echo "Activate" >&2
+        local value="${1:?Provide value}"
+        local op="${2}"
+        local pattern="${3:?Provide pattern}"
+
+        case "$op" in
+        ==|=) pattern="${pattern//*/[[:print:]]+}";;
+        =~ ) ;;
+        *)
+            local s="[ " i ss=$(($# - 1));
+            for i in $(seq 1 $ss); do
+                s="$s \$$i"
+            done
+            eval "$s ]"
+            return
+        ;;
+        esac
+
+        echo "$value" | awk "{ 
+            if (\$0 ~ /$pattern/) { 
+                exit 0
+            } else { 
+                exit 1; 
+            }
+        }"
+    }
+
+    alias [[=_psuedo_simple_double_square_bracket
+}
+
 
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
 https://x-bash.github.io
@@ -215,18 +265,17 @@ xrc_curl(){
 }
 
 xrc_curl_gitx(){   # Simple strategy
-    local IFS i=0 ELEM CANS URL="${1:?Provide location like std/str}"
-    read -r -d '\n' -a CANS <<<"$(xrc_mirrors)"
-    for ELEM in "${CANS[@]}"; do
+    local IFS i=0 ELEM URL="${1:?Provide location like std/str}"
+    local mirror_list
+    mirror_list="$(xrc_mirrors)"
+    for ELEM in $mirror_list; do
         xrc_debug "Trying xrc_curl $ELEM/$1"
         xrc_curl "$ELEM/$1"
         case $? in
-        0)  if [ ! "${CANS[0]}" = "$ELEM" ]; then
-                local tmp=${CANS[0]}
-                CANS[0]="$ELEM"
-                eval "CANS[$i]=$tmp"
-                xrc_debug "First guess NOW is ${CANS[0]}"
-                xrc_mirrors "${CANS[@]}"
+        0)  if [ "$i" -ne 0 ]; then
+                xrc_debug "First guess NOW is $ELEM"
+                xrc_mirrors "$ELEM
+$(echo "$mirror_list" | awk "NR!=$i{ print \$0 }" )"
             fi
             return 0;;
         4)  return 4;;
@@ -399,12 +448,12 @@ alias xrc.update=xrc_update
 alias xrc.cat=xrc_cat
 alias xrcc=xrc_cat
 
-
 # debug +enable -xrc ?xrc # Too many functions.
 alias debug.disable=debug_disable
 alias debug.enable=debug_enable
 alias debug.init=debug_init
 
+# Notice, it will fail on ash and dash
 export -f \
     _debug_logger \
     debug_enable debug_init debug_is_enable debug_list \
@@ -414,6 +463,5 @@ export -f \
     xrc_update \
     xrc_curl xrc_curl_gitx \
     _xrc_one _xrc_print_code \
-    xrc_mirrors
-
+    xrc_mirrors 2>/dev/null
 
