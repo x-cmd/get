@@ -19,7 +19,7 @@ dev.xbash.publish(){
     http.browse https://gitee.com/x-bash/x-bash/pages
 }
 
-dev.xbash.clear{
+dev.xbash.clear(){
     rm !(el)
     rm !(dev)
     rm !(.vscode)
