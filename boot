@@ -44,13 +44,13 @@ debug_init(){
         var="$(echo "XRC_DBG_$i" | tr "[:lower:]" "[:upper:]")"
         eval "$var=\${$var:-\$$var}"
         eval "${i}_debug(){ [ \$$var ] && O=$i LEVEL=DBG _debug_logger \"\$@\"; }"
-        alias "${i}.debug"="$i_debug"
+        alias "${i}.debug"="${i}_debug"
         # alias $i_debug="[ \$$var ] && O=$i LEVEL=DBG _debug_logger"
         # alias $i_debug_enable="$var=true"
         # alias $i_debug_disable="$var=;"
         # alias $i_debug_is_enable="[ \$$var ]"
         eval "export $var"
-        eval "export -f $i_debug"   # "$i_debug_enable $i.debug_disable"
+        eval "export -f ${i}_debug"   # "$i_debug_enable $i.debug_disable"
     done
 }
 
@@ -438,7 +438,7 @@ alias @src=xrc
 alias @src.which=xrc_which
 
 alias xrc.which=xrc_which
-# alias xrcw=xrc_which
+alias xrcw=xrc_which
 
 alias xrc.update=xrc_update
 
