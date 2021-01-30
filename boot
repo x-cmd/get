@@ -252,16 +252,16 @@ xrc_curl(){
 }
 
 xrc_curl_gitx(){   # Simple strategy
-    local IFS i=1 ELEM URL="${1:?Provide location like std/str}"
+    local IFS i=1 mirror mod="${1:?Provide location like std/str}"
     local mirror_list
     mirror_list="$(xrc_mirrors)"
-    for ELEM in $mirror_list; do
-        xrc_debug "Trying xrc_curl $ELEM/$1"
-        xrc_curl "$ELEM/$1"
+    for mirror in $mirror_list; do
+        xrc_debug "Trying xrc_curl $mirror/$mod"
+        xrc_curl "$mirror/$mod"
         case $? in
         0)  if [ "$i" -ne 1 ]; then
-                xrc_debug "First guess NOW is $ELEM"
-                xrc_mirrors "$ELEM
+                xrc_debug "First guess NOW is $mirror"
+                xrc_mirrors "$mirror
 $(echo "$mirror_list" | awk "NR!=$i{ print \$0 }" )"
             fi
             return 0;;
