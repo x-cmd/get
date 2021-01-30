@@ -49,7 +49,8 @@ debug_init(){
         # alias $i_debug_enable="$var=true"
         # alias $i_debug_disable="$var=;"
         # alias $i_debug_is_enable="[ \$$var ]"
-        # eval "export -f $i.debug $i.debug_enable $i.debug_disable"
+        eval "export $var"
+        eval "export -f $i_debug"   # "$i_debug_enable $i.debug_disable"
     done
 }
 
