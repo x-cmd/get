@@ -108,12 +108,11 @@ boot_debug "Start initializing."
 
 X_BASH_SRC_SHELL=sh
 
-if [ "$0" = "zsh" ]; then
+if [ -n "$ZSH_VERSION" ]; then
     X_BASH_SRC_SHELL=zsh
-elif [ "$SHELL" = "/bin/bash" ]; then
+elif [ -n "$BASH_VERSION" ]; then
     X_BASH_SRC_SHELL=bash
 fi
-
 
 X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
 # TODO: What if zsh
@@ -132,40 +131,23 @@ boot_debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 mkdir -p "$X_BASH_SRC_PATH"
 
 
-# Support ash and dash
-[[ "abc" =~ ^ab ]] 2>/dev/null || {
+str_regex(){
+    local value="${1:?Provide value}"
+    local pattern="${2:?Provide pattern}"
 
-    # boot.debug "[[ does NOT support regex."
-    _psuedo_simple_double_square_bracket(){
-        echo "Activate" >&2
-        local value="${1:?Provide value}"
-        local op="${2}"
-        local pattern="${3:?Provide pattern}"
-
-        case "$op" in
-        ==|=) pattern="${pattern//*/[[:print:]]+}";;
-        =~ ) ;;
-        *)
-            local s="[ " i ss=$(($# - 1));
-            for i in $(seq 1 $ss); do
-                s="$s \$$i"
-            done
-            eval "$s ]"
-            return
-        ;;
-        esac
-
-        echo "$value" | awk "{ 
-            if (\$0 ~ /$pattern/) { 
-                exit 0
-            } else { 
-                exit 1; 
-            }
-        }"
-    }
-
-    alias [[=_psuedo_simple_double_square_bracket
+    echo "" | awk -v value="$value" -v pattern="${pattern//\\/\\\\}" 'END {
+        if (match(value, pattern)) { 
+            exit 0
+        } else {
+            exit 1;
+        }
+    }'
 }
+
+# TODO: After sh migration finished. We will apply following str_regex for bash runtime.
+# str_regex(){ [[ "${1:?Provide value}" =~ ${2:?Provide pattern} ]]; }
+# str_regex "../" "^\.\.?/" && echo yes
+# str_regex "aa/" "^\.\.?/" && echo yes
 
 
 cat >"$X_BASH_SRC_PATH/.source.mirror.list" <<A
@@ -326,14 +308,25 @@ _xrc_which_one(){
     xrc_debug "Parsed result: $RESOURCE_NAME $filename.$method"
 
     local TGT
-    if [[ "$RESOURCE_NAME" =~ ^\.\.?/ ]] || [[ "$RESOURCE_NAME" =~ ^/ ]]; then
-        # We don't know why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
-        echo "$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
-        return
+    if str_regex "$RESOURCE_NAME" "^/"; then
+        echo "$RESOURCE_NAME"; return 0
     fi
 
-    if [[ "$RESOURCE_NAME" =~ ^https?:// ]]; then
-        TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$URL" | base64)"
+    if str_regex "$RESOURCE_NAME" "^\.\.?/"; then
+        # We don't know why using ${BASH_SOURCE[2]}, we just test. The first two arguments is ./boot, ./boot, or "" ""
+        # echo "$(dirname "${BASH_SOURCE[2]}")/$RESOURCE_NAME"
+        local tmp
+        if tmp="$(cd "$(dirname "$RESOURCE_NAME")" || exit 1; pwd)"; then
+            echo "$tmp/$(basename "$RESOURCE_NAME")"
+            return 0
+        else
+            echo "local file not exists: $RESOURCE_NAME" >&2
+            return 1
+        fi
+    fi
+
+    if str_regex "$RESOURCE_NAME" "^https?://" ; then
+        TGT="$X_BASH_SRC_PATH/BASE64-URL-$(echo -n "$RESOURCE_NAME" | base64 | tr -d '\r\n')"
         if ! CACHE="$TGT" xrc_curl "$RESOURCE_NAME"; then
             echo "ERROR: Fail to load http resource due to network error or other: $RESOURCE_NAME " >&2
             return 1
@@ -345,7 +338,7 @@ _xrc_which_one(){
 
     local module=$RESOURCE_NAME
     # If it is short alias like str (short for std/str), then search the https://xrc_github.io/index
-    if [[ ! $module =~ \/ ]]; then
+    if ! str_regex "$module" "\/" ; then
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [ -z "$(find "$index_file" -mmin -60 -print 2>/dev/null)" ]; then # Trigger update even if index file is old
@@ -439,6 +432,9 @@ A
 
 # @src(){ xrc "$@"; }
 # @src.which(){ xrc_which "$@"; }
+
+alias @src=xrc
+alias @src.which=xrc_which
 
 alias xrc.which=xrc_which
 # alias xrcw=xrc_which
