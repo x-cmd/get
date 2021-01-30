@@ -30,6 +30,14 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
+X_BASH_SRC_SHELL=sh
+
+if [ -n "$ZSH_VERSION" ]; then
+    X_BASH_SRC_SHELL=zsh
+elif [ -n "$BASH_VERSION" ]; then
+    X_BASH_SRC_SHELL=bash
+fi
+
 debug_list(){
     # declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
     local i
@@ -49,9 +57,12 @@ debug_init(){
         # alias $i_debug_enable="$var=true"
         # alias $i_debug_disable="$var=;"
         # alias $i_debug_is_enable="[ \$$var ]"
-        eval "export $var"
-        eval "export -f ${i}_debug"   # "$i_debug_enable $i.debug_disable"
+        [ ! $X_BASH_SRC_SHELL = "sh" ] && {
+            eval "export $var" 2>/dev/null
+            eval "export -f ${i}_debug 2>/dev/null"  # "$i_debug_enable $i.debug_disable"
+        }
     done
+    
 }
 
 debug_enable(){
@@ -107,13 +118,6 @@ debug_enable boot
 
 boot_debug "Start initializing."
 
-X_BASH_SRC_SHELL=sh
-
-if [ -n "$ZSH_VERSION" ]; then
-    X_BASH_SRC_SHELL=zsh
-elif [ -n "$BASH_VERSION" ]; then
-    X_BASH_SRC_SHELL=bash
-fi
 
 X_BASH_SRC_PATH="$HOME/.x-cmd.com/x-bash"
 # TODO: What if zsh
@@ -248,14 +252,14 @@ xrc_curl(){
 }
 
 xrc_curl_gitx(){   # Simple strategy
-    local IFS i=0 ELEM URL="${1:?Provide location like std/str}"
+    local IFS i=1 ELEM URL="${1:?Provide location like std/str}"
     local mirror_list
     mirror_list="$(xrc_mirrors)"
     for ELEM in $mirror_list; do
         xrc_debug "Trying xrc_curl $ELEM/$1"
         xrc_curl "$ELEM/$1"
         case $? in
-        0)  if [ "$i" -ne 0 ]; then
+        0)  if [ "$i" -ne 1 ]; then
                 xrc_debug "First guess NOW is $ELEM"
                 xrc_mirrors "$ELEM
 $(echo "$mirror_list" | awk "NR!=$i{ print \$0 }" )"
@@ -450,15 +454,16 @@ alias debug.disable=debug_disable
 alias debug.enable=debug_enable
 alias debug.init=debug_init
 
-# Notice, it will fail on ash and dash
-export -f \
-    _debug_logger \
-    debug_enable debug_init debug_is_enable debug_list \
-    x_http_get x_activate \
-    _xrc_which_one \
-    xrc xrc_cat xrc_which \
-    xrc_update \
-    xrc_curl xrc_curl_gitx \
-    _xrc_one _xrc_print_code \
-    xrc_mirrors 2>/dev/null
-
+[ ! $X_BASH_SRC_SHELL = "sh" ] && {
+    # Notice, it will fail on ash and dash
+    export -f \
+        _debug_logger \
+        debug_enable debug_init debug_is_enable debug_list \
+        x_http_get x_activate \
+        _xrc_which_one \
+        xrc xrc_cat xrc_which \
+        xrc_update \
+        xrc_curl xrc_curl_gitx \
+        _xrc_one _xrc_print_code \
+        xrc_mirrors 2>/dev/null
+}
