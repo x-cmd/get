@@ -416,7 +416,7 @@ _xrc_print_code(){
         return $code
     fi
 
-    local RUN="${SRC_LOADER:-source}"
+    local RUN="${SRC_LOADER:-.}"
 
     case "$RUN" in
     bash)
@@ -424,8 +424,9 @@ _xrc_print_code(){
             echo bash "$TGT" "$@"
         else
             local final_code
+            # dash does not support 'source'. Using dot instead
             final_code="$(cat <<A
-source "$TGT"
+. "$TGT"
 
 if typeset -f "$filename.$method" 1>/dev/null; then
     $filename.$method $@
