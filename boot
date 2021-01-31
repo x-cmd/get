@@ -38,6 +38,10 @@ elif [ -n "$BASH_VERSION" ]; then
     X_BASH_SRC_SHELL=bash
 fi
 
+# It is NOT set in some cases.
+TMPDIR=${TMPDIR:-$(dirname "$(mktemp -u)")}
+export TMPDIR
+
 debug_list(){
     # declare -f | grep "()" | grep "\.debug" | cut -d ' ' -f 1
     local i
@@ -454,7 +458,7 @@ alias debug.disable=debug_disable
 alias debug.enable=debug_enable
 alias debug.init=debug_init
 
-[ ! $X_BASH_SRC_SHELL = "sh" ] && {
+if [ ! $X_BASH_SRC_SHELL = "sh" ]; then
     # Notice, it will fail on ash and dash
     export -f \
         _debug_logger \
@@ -466,4 +470,4 @@ alias debug.init=debug_init
         xrc_curl xrc_curl_gitx \
         _xrc_one _xrc_print_code \
         xrc_mirrors 2>/dev/null
-}
+fi
