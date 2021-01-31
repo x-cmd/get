@@ -141,8 +141,8 @@ mkdir -p "$X_BASH_SRC_PATH"
 
 
 str_regex(){
-    local value="${1:?Provide value}"
-    local pattern="${2:?Provide pattern}"
+    local value="${1}"
+    local pattern="${2:?str_regex(): Provide pattern}"
 
     echo "" | awk -v value="$value" -v pattern="${pattern//\\/\\\\}" 'END {
         if (match(value, pattern)) { 
