@@ -144,8 +144,10 @@ str_regex(){
     local value="${1}"
     local pattern="${2:?str_regex(): Provide pattern}"
 
-    echo "" | awk -v value="$value" -v pattern="${pattern//\\/\\\\}" 'END {
-        if (match(value, pattern)) { 
+    # Only dash does not support pattern="${pattern//\\/\\\\}"
+    echo "" | awk -v value="$value" -v pattern="$pattern" 'END {
+        gsub("\\", "\\\\", pattern)
+        if (match(value, pattern)) {
             exit 0
         } else {
             exit 1;

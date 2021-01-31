@@ -18,13 +18,15 @@ eval "$(
     #     #     echo 'source "$(x which @bash/boot)"'
     #     # fi
     # fi
-    echo "D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" 2>/dev/null >\$D) && source \$D'" | 
+    echo "D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" 2>/dev/null >\$D) && . \$D'" | 
     
     (
         read -r X_STR
         # MAC: both. Linux: .bashrc. Msys? Cygwin?
         # To supoort sh
         can="
+            $HOME/.rc
+            $HOME/.zshrc
             $HOME/.bashrc
             $HOME/.bash_profile
         "
