@@ -145,14 +145,14 @@ str_regex(){
     local pattern="${2:?str_regex(): Provide pattern}"
 
     # Only dash does not support pattern="${pattern//\\/\\\\}"
-    echo "" | awk -v value="$value" -v pattern="$pattern" 'END {
-        gsub("\\", "\\\\", pattern)
-        if (match(value, pattern)) {
+
+    echo "" | awk -v value="$value" "END {
+        if (match(value, /$pattern/)) {
             exit 0
         } else {
             exit 1;
         }
-    }'
+    }"
 }
 
 # TODO: After sh migration finished. We will apply following str_regex for bash runtime.
@@ -465,6 +465,7 @@ if [ ! $X_BASH_SRC_SHELL = "sh" ]; then
     # Notice, it will fail on ash and dash
     export -f \
         _debug_logger \
+        str_regex \
         debug_enable debug_init debug_is_enable debug_list \
         x_http_get x_activate \
         _xrc_which_one \
