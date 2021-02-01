@@ -30,13 +30,13 @@ else
     return 127 2>/dev/null || exit 127
 fi
 
-X_BASH_SRC_SHELL=sh
-
+X_BASH_SRC_SHELL="sh"
 if [ -n "$ZSH_VERSION" ]; then
-    X_BASH_SRC_SHELL=zsh
+    X_BASH_SRC_SHELL="zsh"
 elif [ -n "$BASH_VERSION" ]; then
-    X_BASH_SRC_SHELL=bash
+    X_BASH_SRC_SHELL="bash"
 fi
+export X_BASH_SRC_SHELL
 
 # It is NOT set in some cases.
 TMPDIR=${TMPDIR:-$(dirname "$(mktemp -u)")}
