@@ -39,7 +39,7 @@ fi
 export X_BASH_SRC_SHELL
 
 # It is NOT set in some cases.
-TMPDIR=${TMPDIR:-$(dirname "$(mktemp -u)")}
+TMPDIR=${TMPDIR:-$(dirname "$(mktemp -u)")/}
 export TMPDIR
 
 debug_list(){
@@ -139,20 +139,32 @@ boot_debug "Setting env X_BASH_SRC_PATH: $X_BASH_SRC_PATH"
 
 mkdir -p "$X_BASH_SRC_PATH"
 
-
+# Hardcore problem:
+# str_regex "../abc" "^\.\./" && echo hi
+# str_regex "/abc" "^/" && echo hi
+# str_regex "\"/abc" "^\"/"
 str_regex(){
     local value="${1}"
     local pattern="${2:?str_regex(): Provide pattern}"
 
     # Only dash does not support pattern="${pattern//\\/\\\\}"
 
-    echo "" | awk -v value="$value" "END {
-        if (match(value, /$pattern/)) {
+    value=$(echo "$value" | tr '"\\' "\001\002")
+    pattern=$(echo "$pattern" | tr '"\\' "\001\002")
+
+    echo "" | awk -v value="$value" -v pattern="$pattern" 'END {
+        
+        gsub("\001", "\"", value)
+        gsub("\002", "\\", value)
+        gsub("\001", "\"", pattern)
+        gsub("\002", "\\", pattern)
+
+        if (match(value, pattern)) {
             exit 0
         } else {
             exit 1;
         }
-    }"
+    }'
 }
 
 # TODO: After sh migration finished. We will apply following str_regex for bash runtime.
@@ -182,7 +194,7 @@ xrc_mirrors(){
 
 xrc_clear(){
     if [ -f "${X_BASH_SRC_PATH:?Env X_BASH_SRC_PATH should not be empty.}/boot" ]; then
-        if [ "$X_BASH_SRC_PATH" == "/" ]; then
+        if [ "$X_BASH_SRC_PATH" = "/" ]; then
             echo "Env X_BASH_SRC_PATH should not be /" >&2
         else
             rm -rf "$X_BASH_SRC_PATH";
@@ -349,7 +361,7 @@ _xrc_which_one(){
 
     local module=$RESOURCE_NAME
     # If it is short alias like str (short for std/str), then search the https://xrc_github.io/index
-    if ! str_regex "$module" "\/" ; then
+    if ! str_regex "$module" "/" ; then
 
         local index_file="$X_BASH_SRC_PATH/index"
         if [ -z "$(find "$index_file" -mmin -60 -print 2>/dev/null)" ]; then # Trigger update even if index file is old
