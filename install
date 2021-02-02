@@ -9,7 +9,7 @@ eval "$(
     #     echo 'eval "$(x @bash/boot)"'
     # else
     #     # if [ -n "$LIGHT_MODE" ]; then
-    #     echo "D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" >\$D) && source \$D'"
+    #     echo "D=\"\$HOME/.x-cmd.com/x-bash/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" >\$D) && . \$D'"
     #     # else
     #     #     echo "Setting up x-bash in normal mode." >&2
     #     #     echo "x-cmd is NOT available. Install x-cmd from $X_CMD_URL/install" >&2
@@ -46,8 +46,9 @@ eval "$(
             xrc job # Release the concurrent power with job module
             for i in $(curl https://x-bash.gitee.io/index 2>/dev/null); do
                 # src the module concurrently. Concurrent number is 6.
-                if [[ $i == */* ]]; then
-                    job.put 6 xrc.which "$i" 1>/dev/null 2>/dev/null
+                # if [[ $i == */* ]]; thens
+                if str_regex "$i" "[^/]+/[^/]+"; then
+                    job_put 6 xrc.which "$i" 1>/dev/null 2>/dev/null
                 fi
             done
         fi
