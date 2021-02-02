@@ -1,3 +1,4 @@
+#! /usr/bin/env bash
 
 docker build --no-cache -t xcmd/debian:latest -f debian.Dockerfile .
 docker push xcmd/debian:latest
