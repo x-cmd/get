@@ -1,0 +1,14 @@
+#! /usr/bin/env sh
+
+cross_shell_test(){
+    docker run -it -v $(pwd):/pd debian sh -c "$@"
+    docker run -it -v $(pwd):/pd alpine sh -c "$@"
+
+    # bash
+    docker run -it -v $(pwd):/pd debian bash -c "$@"
+    docker run -it -v $(pwd):/pd ubuntu bash -c "$@"
+    docker run -it -v $(pwd):/pd centos bash -c "$@"
+
+    # Test it in windows/mac
+    evel "$@"
+}
