@@ -1,6 +1,8 @@
 # shellcheck shell=sh
 # shellcheck disable=SC2039
 
+{
+
 if [ -z "$RELOAD" ] && [ -n "$X_BASH_SRC_PATH" ]; then
     return 0 2>/dev/null || exit 0
 fi
@@ -470,3 +472,5 @@ if [ ! $X_BASH_SRC_SHELL = "sh" ]; then
         _xrc_one _xrc_print_code \
         xrc_mirrors 2>/dev/null
 fi
+
+}
