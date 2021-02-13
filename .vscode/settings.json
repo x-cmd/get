@@ -1,6 +1,7 @@
 {
     "files.defaultLanguage": "shellscript",
     "files.associations": {
+        "index.html": "shellscript",
         "**/std/**": "shellscript",
         "**/tools/*": "shellscript",
         "**/cloud/*": "shellscript",
