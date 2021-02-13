@@ -11,6 +11,10 @@ dev.xbash.push(){
     git remote add gitee-mirror git@gitee.com:x-bash/x-bash-boot-mirror.git
     git push gitee-mirror
 
+    git remote remove github-mirror 2>/dev/null
+    git remote add github-mirror git@github.com:x-bash/x-bash-boot-mirror.git
+    git push github-mirror
+
     git push origin
 }
 

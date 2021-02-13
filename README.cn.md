@@ -2,6 +2,19 @@
 
 A light-weight handy bash library to make life easier.
 
+# 安装
+
+```bash
+eval "$(curl https://sh.x-cmd.com/install)"
+```
+
+# 对于代码使用者
+
+```bash
+D="$HOME/.x-cmd.com/x-bash/boot" eval '[ -f $D ] || (mkdir -p $(dirname $D) && curl "https://sh.x-cmd.com/boot" >$D) && source $D'
+```
+
+
 x-cmd虽然是分离设计，但却能大大降低x-bash的复杂度，因此，在x-bash中，与x-cmd交互是第一选择。然而，我们仍然提供了轻便模式，从而满足部分想使用x-bash，但又不愿意使用x-cmd的用户。
 
 安装`x-cmd`：`x || eval "$(curl https://x-cmd.github.io/install)"`
@@ -13,6 +26,7 @@ x-cmd虽然是分离设计，但却能大大降低x-bash的复杂度，因此，
 ```bash
 x ready || (curl https://get.x-cmd.com | bash) && x @bash/install
 ```
+
 
 **对于编写可到处部署脚本的开发者：**
 
