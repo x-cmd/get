@@ -4,5 +4,6 @@
         "index.html": "shellscript",
         "*.json": "json",
         "local": "shellscript",
+        "global": "shellscript"
     }
 }
