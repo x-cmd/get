@@ -1,25 +1,27 @@
 # shellcheck shell=sh
+
 eval "$(
-    X_STR="D=\"\$HOME/.x-cmd/boot\" eval '[ -f \$D ] || (mkdir -p \$(dirname \$D) && curl \"https://x-bash.gitee.io/boot\" 2>/dev/null >\$D) && eval \"$(cat \$D)\"'"
-    if eval "$X_STR" 2>/dev/null; then
-        for i in $HOME/.shinit $HOME/.zshrc $HOME/.kshrc $HOME/.bashrc $HOME/.bash_profile; do
-            if grep -F "$X_STR" "$i" >/dev/null; then
-                echo "[x-cmd]: Already installed in $i" >&2
-            else
-                echo "$X_STR" >> "$i"
-                echo "[x-cmd]: Successfully Installed in: $i" >&2
-            fi
-        done
-
-        if [ -n "$ALL" ]; then
-            xrc job         
-            for i in $(curl https://x-bash.gitee.io/index); do
-                if str_regex "$i" "[^/]+/[^/]+"; then
-                    job_put 6 xrc.which "$i" # src the module concurrently. Concurrent number is 6.
-                fi
-            done 1>/dev/null 2>/dev/null
-        fi
-
-        echo "$X_STR"
+    D="$HOME/.x-cmd/boot"
+    if ! [ ! -f "$D" ] && mkdir -p "$HOME/.x-cmd" && curl --fail https://x-cmd.com/boot >"$D" 2>/dev/null; then
+        echo "Fail to download boot to local home directory." >&2;  
+        return 1
     fi
+    cat "$D"
+
+    if [ "$BASH_VERSION" ]; then        CAN="$HOME/.bashrc"
+       [ "$(uname)" = "Darwin" ]  &&    CAN="$CAN $HOME/.bash_profile"
+    elif [ "$ZSH_VERSION" ]; then       CAN="$HOME/.zshrc"
+    elif [ "$KSH_VERSION" ]; then       CAN="$HOME/.bashrc"
+    else                                CAN="$HOME/.shinit"
+    fi
+
+    IFS=" "
+    for i in $CAN; do
+        if grep -F "$X_STR" "$i" >/dev/null; then
+            echo "[x-cmd]: Already installed in $i" >&2
+        else
+            echo "$X_STR" >> "$i"
+            echo "[x-cmd]: Successfully Installed in: $i" >&2
+        fi
+    done
 )"
