@@ -3,7 +3,7 @@
     "files.associations": {
         "index.html": "shellscript",
         "*.json": "json",
-        "local": "shellscript",
-        "global": "shellscript"
+        "script": "shellscript",
+        "local": "shellscript"
     }
 }
