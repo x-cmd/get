@@ -11,7 +11,7 @@ PATH=$HOME/.x-cmd/$PATH
 eval "$(curl https://get.x-cmd.com)"
 
 # script
-eval "$(cat $HOME/.x-cmd/boot 2>/dev/null)" || eval "$(curl https://get.x-cmd.com/script)"
+. $HOME/.x-cmd/boot 2>/dev/null || eval "$(curl https://get.x-cmd.com/script)"
 ```
 
 # 有待设计的全局模式
@@ -23,8 +23,8 @@ eval "$(cat $HOME/.x-cmd/boot 2>/dev/null)" || eval "$(curl https://get.x-cmd.co
 
 cat >/bin/xrc <<A
 if [ -z "$X_CMD_PATH" ]; then
-    if [ -f "$HOME/.x-cmd/boot" ]; then
-        eval "$(cat "$HOME/.x-cmd/boot")"
+    if [ ! -f "$HOME/.x-cmd/boot" ]; then
+        . "$HOME/.x-cmd/boot"
     else
         eval "$(curl https://get.x-cmd.com)"
     fi
