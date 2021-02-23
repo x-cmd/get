@@ -15,6 +15,7 @@ eval "$(
     else                                CAN="$HOME/.shinit"
     fi
 
+    X_STR=". \"\$HOME/.x-cmd/boot\" 2>/dev/null || eval \"\$(curl https://get.x-cmd.com/script)\""
     IFS=" "
     for i in $CAN; do
         if grep -F "$X_STR" "$i" >/dev/null; then
