@@ -5,7 +5,7 @@ ___X_CMD_PATH="$HOME/.x-cmd" && (
         return 0
     fi
 
-    URL="https://gitee.com/x-cmd/x-cmd/raw/main/dist/core.tgz"
+    URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/core.tgz"
 
     D="$___X_CMD_PATH/.tgz"
     mkdir -p "$D"
