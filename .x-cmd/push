@@ -1,0 +1,7 @@
+git remote remove gitee 2>/dev/null
+git remote add gitee git@gitee.com:x-bash/get.git
+git push --set-upstream gitee master
+
+git remote remove github 2>/dev/null
+git remote add github git@github.com:x-bash/get.git
+git push --set-upstream github master
