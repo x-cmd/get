@@ -16,6 +16,6 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     fi
     tar xf "all.tgz"
 ) && {
-    . "${___X_CMD_ROOT}/xrc/v0"
+    . "${___X_CMD_ROOT}/xrc/latest"
     x boot setup
 }
