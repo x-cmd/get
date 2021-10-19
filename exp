@@ -5,7 +5,7 @@ ___X_CMD_PATH="$HOME/.x-cmd" && (
         return 0
     fi
 
-    URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/all.tgz"
+    URL="https://gitee.com/x-cmd/x-cmd/raw/main/dist/all.tgz"
 
     D="$___X_CMD_PATH/.tgz"
     mkdir -p "$D"
@@ -14,6 +14,7 @@ ___X_CMD_PATH="$HOME/.x-cmd" && (
         return 1
     fi
 ) && {
+    ___X_CMD_IN_CHINA_NET=1
     . "${___X_CMD_PATH}/xrc/v0"
     eval "$(tar Oxf "$___X_CMD_PATH/.tgz/core.tgz" xrc/v0)"
     x boot setup
