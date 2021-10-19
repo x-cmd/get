@@ -1,4 +1,4 @@
-___X_CMD_PATH="$HOME/.x-cmd" && (
+___X_CMD_ROOT="$HOME/.x-cmd" && (
     BOOT="$HOME/.x-cmd/.rc/boot"
     if [ ! -f "$BOOT" ]; then
         . "$BOOT"
@@ -7,14 +7,15 @@ ___X_CMD_PATH="$HOME/.x-cmd" && (
 
     URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/all.tgz"
 
-    D="$___X_CMD_PATH/.tgz"
+    D="$___X_CMD_ROOT"
     mkdir -p "$D"
-    if ! curl --fail "$URL" >"$D/core.tgz" 2>/dev/null; then
+    cd "$D"
+    if ! curl --fail "$URL" >"all.tgz" 2>/dev/null; then
         printf "Fail to download." >&2
         return 1
     fi
+    tar xf "all.tgz"
 ) && {
-    . "${___X_CMD_PATH}/xrc/v0"
-    eval "$(tar Oxf "$___X_CMD_PATH/.tgz/core.tgz" xrc/v0)"
+    . "${___X_CMD_ROOT}/xrc/v0"
     x boot setup
 }
