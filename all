@@ -16,6 +16,7 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
         printf "Fail to download: %s\n" "$URL" >&2
     fi
 ) && {
+    ___X_CMD_IN_CHINA_NET=
     . "${___X_CMD_ROOT}/xrc/latest"
     x boot setup
 }
