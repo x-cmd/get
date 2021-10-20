@@ -1,8 +1,8 @@
 ___X_CMD_ROOT="$HOME/.x-cmd" && (
-    BOOT="$HOME/.x-cmd/.rc/boot"
-    if [ ! -f "$BOOT" ]; then
+    BOOT="$HOME/.x-cmd/.boot/boot"
+    if [ -f "$BOOT" ]; then
         . "$BOOT"
-        return 0
+        exit 0
     fi
 
     URL="https://gitee.com/x-cmd/x-cmd/raw/main/dist/all.tgz"
