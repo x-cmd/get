@@ -10,11 +10,11 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     D="$___X_CMD_ROOT"
     mkdir -p "$D"
     cd "$D"
-    if ! curl --fail "$URL" >"all.tgz" 2>/dev/null; then
-        printf "Fail to download." >&2
-        return 1
+    if curl --fail "$URL" >"all.tgz" 2>/dev/null; then
+        tar xf "all.tgz"
+    else
+        printf "Fail to download: %s\n" "$URL" >&2
     fi
-    tar xf "all.tgz"
 ) && {
     . "${___X_CMD_ROOT}/xrc/latest"
     x boot setup
