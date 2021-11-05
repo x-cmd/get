@@ -1,10 +1,22 @@
-# shellcheck shell=sh
-eval "$(
-    D="$HOME/.x-cmd/boot"
-    if [ ! -f "$D" ] && ! ( mkdir -p "$HOME/.x-cmd" && curl --fail https://sh.x-cmd.com/boot >"$D" 2>/dev/null ); then
-        echo "Fail to download boot to local home directory." >&2;  
-        return 1
-    fi
-    cat "$D"
-)"
+___X_CMD_ROOT="$HOME/.x-cmd" && (
+    BOOT="$HOME/.x-cmd/.boot/boot";
+    if [ -f "$BOOT" ]; then
+        . "$BOOT";
+        exit 0;
+    fi;
 
+    URL="https://gitee.com/x-cmd/x-cmd/raw/main/dist/all.tgz";
+
+    D="$___X_CMD_ROOT";
+    mkdir -p "$D";
+    cd "$D";
+    if curl --fail "$URL" >"all.tgz" 2>/dev/null; then
+        tar xf "all.tgz";
+    else
+        printf "Fail to download: %s\n" "$URL" >&2;
+        exit 1;
+    fi;
+) && {
+    ___X_CMD_IN_CHINA_NET= ;
+    . "${___X_CMD_ROOT}/xrc/latest";
+}

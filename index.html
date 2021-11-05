@@ -1,28 +1,23 @@
-# shellcheck shell=sh
+___X_CMD_ROOT="$HOME/.x-cmd" && (
+    BOOT="$HOME/.x-cmd/.boot/boot";
+    if [ -f "$BOOT" ]; then
+        . "$BOOT";
+        exit 0;
+    fi;
 
-eval "$(
-    D="$HOME/.x-cmd/boot"
-    if [ ! -f "$D" ] && ! ( mkdir -p "$HOME/.x-cmd" && curl --fail https://sh.x-cmd.com/boot >"$D" 2>/dev/null ); then
-        echo "Fail to download boot to local home directory." >&2;  
-        return 1
-    fi
-    cat "$D"
+    URL="https://gitee.com/x-cmd/x-cmd/raw/main/dist/all.tgz";
 
-    if [ "$BASH_VERSION" ]; then        CAN="$HOME/.bashrc"
-       [ "$(uname)" = "Darwin" ]  &&    CAN="$CAN $HOME/.bash_profile"
-    elif [ "$ZSH_VERSION" ]; then       CAN="$HOME/.zshrc"
-    elif [ "$KSH_VERSION" ]; then       CAN="$HOME/.kshrc"
-    else                                CAN="$HOME/.shinit"
-    fi
-
-    X_STR=". \"\$HOME/.x-cmd/boot\" 2>/dev/null || eval \"\$(curl https://get.x-cmd.com/script)\""
-    IFS=" "
-    for i in $CAN; do
-        if grep -F "$X_STR" "$i" >/dev/null; then
-            echo "[x-cmd]: Already installed in $i" >&2
-        else
-            echo "$X_STR" >> "$i"
-            echo "[x-cmd]: Successfully Installed in: $i" >&2
-        fi
-    done
-)"
+    D="$___X_CMD_ROOT";
+    mkdir -p "$D";
+    cd "$D";
+    if curl --fail "$URL" >"all.tgz" 2>/dev/null; then
+        tar xf "all.tgz";
+    else
+        printf "Fail to download: %s\n" "$URL" >&2;
+        exit 1;
+    fi;
+) && {
+    ___X_CMD_IN_CHINA_NET= ;
+    . "${___X_CMD_ROOT}/xrc/latest";
+    x boot setup;
+}
