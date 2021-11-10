@@ -232,7 +232,7 @@ xrc_cat(){
 }
 
 xrc_curl(){
-    local REDIRECT=/dev/stdout
+    local REDIRECT=&1
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
             xrc_debug "xrc_curl() terminated. Because update is NOT forced and file existed: $CACHE"

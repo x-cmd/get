@@ -191,7 +191,7 @@ xrc.cat(){
 }
 
 xrc.curl(){
-    local REDIRECT=/dev/stdout
+    local REDIRECT=&1
     if [ -n "$CACHE" ]; then
         if [ -z "$UPDATE" ] && [ -f "$CACHE" ]; then
             xrc.debug "xrc.curl() terminated. Because update is NOT forced and file existed: $CACHE"
