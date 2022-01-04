@@ -5,13 +5,14 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
         exit 0;
     fi;
 
-    URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/all.tgz";
+    PKG=all;
+    URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/$PKG.tgz";
 
     D="$___X_CMD_ROOT";
     mkdir -p "$D";
     cd "$D";
-    if curl --fail "$URL" >"all.tgz" 2>/dev/null; then
-        tar xf "all.tgz";
+    if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
+        tar xf "$PKG.tgz";
     else
         printf "Fail to download: %s\n" "$URL" >&2;
         exit 1;
