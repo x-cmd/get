@@ -6,7 +6,7 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     fi;
 
     PKG=all;
-    URL="https://raw.githubusercontent.com/x-cmd/x-cmd/main/dist/$PKG.tgz";
+    URL="https://raw.githubusercontent.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/main/dist/$PKG.tgz";
 
     D="$___X_CMD_ROOT";
     mkdir -p "$D";
