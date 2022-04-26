@@ -15,7 +15,7 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
 
     printf "Download script archieve from %s\n" "$URL" | tee "$D/setup.log" >&2 ;
     if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
-        printf "Download SUCCESS: %s(SIZE=%s KB)\n" "$PKG.tgz" "$(( ($(wc -m LICENSE | tr -dc '0-9') + 1023) / 1024 ))" | tee "$D/setup.log" >&2 ;
+        printf "Download SUCCESS: %s(SIZE=%s KB)\n" "$PKG.tgz" "$(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 ))" | tee "$D/setup.log" >&2 ;
         tar xf "$PKG.tgz";
     else
         printf "Fail to download from: %s\n" "$URL" | tee "$D/setup.log" >&2 ;
