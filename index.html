@@ -21,7 +21,7 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     log "Download script archieve from $URL" ;
     if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
         log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
-        tar vxf "$PKG.tgz" 2>>"$D/setup.log";
+        tar vxf "$PKG.tgz" 1>&2 2>>"$D/setup.log";
         log "Deflation SUCCESS: $PKG.tgz" ;
     else
         log "Fail to download from: $URL" ;
