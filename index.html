@@ -9,16 +9,16 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     PKG=all;
     URL="https://raw.githubusercontent.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/main/dist/$PKG.tgz";
 
-    printf "Download script archieve from %s\n" "$URL" >&2;
-
     D="$___X_CMD_ROOT";
     mkdir -p "$D";
     cd "$D";
+
+    printf "Download script archieve from %s\n" "$URL" | tee "$D/setup.log" >&2 ;
     if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
-        printf "Download SUCCESS: %s(SIZE=%s KB)\n" "$PKG.tgz" "$(( ($(wc -m LICENSE | tr -dc '0-9') + 1023) / 1024 ))";
+        printf "Download SUCCESS: %s(SIZE=%s KB)\n" "$PKG.tgz" "$(( ($(wc -m LICENSE | tr -dc '0-9') + 1023) / 1024 ))" | tee "$D/setup.log" >&2 ;
         tar xf "$PKG.tgz";
     else
-        printf "Fail to download: %s\n" "$URL" >&2;
+        printf "Fail to download from: %s\n" "$URL" | tee "$D/setup.log" >&2 ;
         exit 1;
     fi;
 ) && {
