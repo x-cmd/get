@@ -1,10 +1,10 @@
 {
+log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+}
+
 ___X_CMD_ROOT="$HOME/.x-cmd" && (
     D="$___X_CMD_ROOT";
-
-    log(){
-        printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$D/setup.log" >&2 ;
-    }
 
     BOOT="$HOME/.x-cmd/.boot/boot";
     if [ -f "$BOOT" ]; then
@@ -29,7 +29,10 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     fi;
 ) && {
     ___X_CMD_IN_CHINA_NET=1 ;
+    log "Source: ${___X_CMD_ROOT}/xrc/latest"
     . "${___X_CMD_ROOT}/xrc/latest";
+    log "Running: x boot setup"
     x boot setup;
+    log "Initialization SUCCESS"
 }
 }
