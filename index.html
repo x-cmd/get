@@ -32,7 +32,7 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
     log "Source: ${___X_CMD_ROOT}/xrc/latest"
     . "${___X_CMD_ROOT}/xrc/latest";
     log "Running: x boot setup"
-    x boot setup;
+    x boot setup 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
     log "Initialization SUCCESS"
 }
 }
