@@ -4,35 +4,41 @@ log(){
 }
 
 ___X_CMD_ROOT="$HOME/.x-cmd" && (
-    D="$___X_CMD_ROOT";
+    D="$___X_CMD_ROOT/v/";
 
-    BOOT="$HOME/.x-cmd/.boot/boot";
-    if [ -f "$BOOT" ]; then
-        . "$BOOT";
-        exit 0;
-    fi;
+    PKG="$___X_CMD_VERSION";
+    URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/main/dist/$___X_CMD_VERSION.tgz";
 
-    PKG=all;
-    URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/main/dist/$PKG.tgz";
+    mkdir -p "$D/$PKG";
+    cd "$D/$PKG";
 
-    mkdir -p "$D";
-    cd "$D";
-
-    log "Download script archieve from $URL" ;
-    if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
-        log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
-        tar vxf "$PKG.tgz" 2>>"$D/setup.log" 1>&2;
-        log "Deflation SUCCESS: $PKG.tgz" ;
-    else
-        log "Fail to download from: $URL" ;
-        return 1;
-    fi;
+    [ -f "$D/$PKG/X" ] || {
+        log "Download script archieve from $URL" ;
+        if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
+            log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
+            tar vxf "$PKG.tgz" 2>>"$D/setup.log" 1>&2;
+            log "Deflation SUCCESS: $PKG.tgz" ;
+        else
+            log "Fail to download from: $URL" ;
+            return 1;
+        fi;
+    }
 ) && {
-    ___X_CMD_IN_CHINA_NET=1 ;
-    log "Source: ${___X_CMD_ROOT}/xrc/latest"
-    . "${___X_CMD_ROOT}/xrc/latest";
-    log "Running: x boot setup"
-    x boot setup 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
-    log "Initialization SUCCESS"
+    if command -v ___x_cmd_xrc 1>/dev/null 2>&1; then
+        log "Installation successed: Using x boot to alter default version."
+    else
+        # No X-CMD prepared.
+        ___X_CMD_IN_CHINA_NET=1 ;
+        ___X_CMD_ROOT_MOD="${___X_CMD_ROOT/v/$___X_CMD_VERSION}"
+        log "Source: ${___X_CMD_ROOT}/X"
+        . "${___X_CMD_ROOT}/X";
+
+        if ___x_cmd_is_interative_tty; then
+            # Not A Script Environment
+            log "Running: x boot setup"
+            x boot setup 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+        fi
+        log "Initialization SUCCESS"
+    fi
 }
 }
