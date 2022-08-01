@@ -30,8 +30,8 @@ ___X_CMD_ROOT="$HOME/.x-cmd" && (
         # No X-CMD prepared.
         ___X_CMD_IN_CHINA_NET=1 ;
         ___X_CMD_ROOT_MOD="${___X_CMD_ROOT/v/$___X_CMD_VERSION}"
-        log "Source: ${___X_CMD_ROOT}/X"
-        . "${___X_CMD_ROOT}/X";
+        log "Source: ${___X_CMD_ROOT_MOD}/X"
+        . "${___X_CMD_ROOT_MOD}/X";
 
         if ___x_cmd_is_interative_tty; then
             # Not A Script Environment
