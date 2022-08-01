@@ -1,0 +1,38 @@
+{
+log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+}
+
+___X_CMD_ROOT="$HOME/.x-cmd" && (
+    D="$___X_CMD_ROOT";
+
+    BOOT="$HOME/.x-cmd/.boot/boot";
+    if [ -f "$BOOT" ]; then
+        . "$BOOT";
+        exit 0;
+    fi;
+
+    PKG=all;
+    URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/main/dist/$PKG.tgz";
+
+    mkdir -p "$D";
+    cd "$D";
+
+    log "Download script archieve from $URL" ;
+    if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
+        log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
+        tar vxf "$PKG.tgz" 2>>"$D/setup.log" 1>&2;
+        log "Deflation SUCCESS: $PKG.tgz" ;
+    else
+        log "Fail to download from: $URL" ;
+        return 1;
+    fi;
+) && {
+    ___X_CMD_IN_CHINA_NET=1 ;
+    log "Source: ${___X_CMD_ROOT}/xrc/latest"
+    . "${___X_CMD_ROOT}/xrc/latest";
+    log "Running: x boot setup"
+    x boot setup 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    log "Initialization SUCCESS"
+}
+}
