@@ -3,7 +3,7 @@ ___x_cmd_get_setupscript(){
     local ___X_CMD_ROOT=$HOME/.x-cmd
     mkdir -p $___X_CMD_ROOT/v
 
-    ___X_CMD_VERSION=${___X_CMD_VERSION:-x1}
+    ___X_CMD_VERSION="${1:?Provide version}"
 
     (
         cd $___X_CMD_ROOT/v
@@ -13,7 +13,7 @@ ___x_cmd_get_setupscript(){
             return 1
         }
         
-        git clone git@gitee.com:x-cmd/x1.git
+        git clone "git@gitee.com:x-cmd/$___X_CMD_VERSION.git"
     )
 
     ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
@@ -22,4 +22,4 @@ ___x_cmd_get_setupscript(){
     x boot init
 }
 
-___x_cmd_get_setupscript
+___x_cmd_get_setupscript x1
