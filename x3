@@ -1,0 +1,4 @@
+
+XX=x3 eval "$(curl https://get.x-cmd.com/xx)"
+
+

@@ -1,0 +1,25 @@
+
+___x_cmd_get_setupscript(){
+    local ___X_CMD_ROOT=$HOME/.x-cmd
+    mkdir -p $___X_CMD_ROOT/v
+
+    ___X_CMD_VERSION="${1:?Provide version}"
+
+    (
+        cd $___X_CMD_ROOT/v
+
+        [ ! -d "$___X_CMD_VERSION" ] || {
+            echo "Already exists: $PWD/$___X_CMD_VERSION"
+            return 1
+        }
+        
+        git clone "git@gitee.com:x-cmd/$___X_CMD_VERSION.git"
+    )
+
+    ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
+    . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X"
+    echo "Here: $___X_CMD_VERSION"
+    x boot init
+}
+
+___x_cmd_get_setupscript "${XX:-x2}"
