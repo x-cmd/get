@@ -16,6 +16,7 @@ ___x_cmd_get_setupscript(){
         git clone "git@gitee.com:x-cmd/$___X_CMD_VERSION.git"
     )
 
+    ___X_CMD_IN_CHINA_NET=1
     ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
     . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X"
     echo "Here: $___X_CMD_VERSION"
