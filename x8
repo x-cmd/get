@@ -1,4 +1,2 @@
 
 XX=x8 eval "$(curl https://get.x-cmd.com/xx)"
-
-
