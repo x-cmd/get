@@ -1,12 +1,12 @@
 
 ___x_cmd_get_setupscript(){
-    local ___X_CMD_ROOT=$HOME/.x-cmd
-    mkdir -p $___X_CMD_ROOT/v
+    ___X_CMD_ROOT=$HOME/.x-cmd
+    mkdir -p "$___X_CMD_ROOT/v"
 
     ___X_CMD_VERSION="${1:?Provide version}"
 
     (
-        cd $___X_CMD_ROOT/v
+        cd "$___X_CMD_ROOT/v"
 
         [ ! -d "$___X_CMD_VERSION" ] || {
             echo "Already exists: $PWD/$___X_CMD_VERSION"
@@ -19,7 +19,6 @@ ___x_cmd_get_setupscript(){
     ___X_CMD_IN_CHINA_NET=1
     ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
     . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X"
-    echo "Here: $___X_CMD_VERSION"
     x boot init
 }
 
