@@ -3,14 +3,14 @@ log(){
     printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 }
 
-___X_CMD_VERSION=x-cmd
-___X_CMD_ROOT="$HOME/.x-cmd/v/$___X_CMD_VERSION" && (
+___X_CMD_ROOT="$HOME/.x-cmd" && (
     D="$___X_CMD_ROOT";
 
-    if [ -f "$D/X" ]; then
-        . "$D/X"
+    BOOT="$HOME/.x-cmd/.boot/boot";
+    if [ -f "$BOOT" ]; then
+        . "$BOOT";
         exit 0;
-    fi
+    fi;
 
     PKG=all;
     URL="https://raw.githubusercontent.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/main/dist/$PKG.tgz";
@@ -22,17 +22,17 @@ ___X_CMD_ROOT="$HOME/.x-cmd/v/$___X_CMD_VERSION" && (
     if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
         log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
         tar vxf "$PKG.tgz" 2>>"$D/setup.log" 1>&2;
-        log "Deflation SUCCESS: $PKG.tgz" 
+        log "Deflation SUCCESS: $PKG.tgz" ;
     else
         log "Fail to download from: $URL" ;
-        exit 1;
+        return 1;
     fi;
 ) && {
     ___X_CMD_IN_CHINA_NET="" ;
-    log "Source: ${___X_CMD_ROOT}/X"
-    . "${___X_CMD_ROOT}/X";
-    log "Running: x boot init"
-    x boot init 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    log "Source: ${___X_CMD_ROOT}/xrc/latest"
+    . "${___X_CMD_ROOT}/xrc/latest";
+    log "Running: x boot setup"
+    x boot setup 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
     log "Initialization SUCCESS"
 }
 }
