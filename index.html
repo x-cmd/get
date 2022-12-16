@@ -12,25 +12,23 @@ else (
     PKG=all;
     URL="https://raw.githubusercontent.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/main/dist/$PKG.tgz";
 
-    mkdir -p "${___X_CMD_PATH_VERSION}";
-    cd "${___X_CMD_PATH_VERSION}";
+    mkdir -p "${___X_CMD_PATH_VERSION}"; cd "${___X_CMD_PATH_VERSION}";
 
     log "Download script archieve from $URL";
-    if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null ; then
-        log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
-        tar vxf "$PKG.tgz" 2>>"$___X_CMD_PATH_VERSION/setup.log" 1>&2;
-        log "Deflation SUCCESS: $PKG.tgz";
-    else
+    curl --fail "$URL" >"$PKG.tgz" 2>/dev/null || {
         log "Fail to download from: $URL";
         exit 1;
-    fi;
+    };
+
+    log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
+    tar vxf "$PKG.tgz" 2>>"$___X_CMD_PATH_VERSION/setup.log" 1>&2;
+    log "Deflation SUCCESS: $PKG.tgz";
 ) && {
     ___X_CMD_IN_CHINA_NET="" ;
     log "Source: ${___X_CMD_PATH_VERSION}/X";
     . "$___X_CMD_PATH_VERSION/X";
-    log "Running: x boot init";
-    x boot init 2>&1 | tee -a "$___X_CMD_PATH_VERSION/setup.log" >&2;
-    log "Initialization SUCCESS";
 };
 fi;
+
+x boot init 2>&1 | tee -a "$___X_CMD_PATH_VERSION/setup.log" >&2;
 }
