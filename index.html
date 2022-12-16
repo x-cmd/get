@@ -1,20 +1,16 @@
 {
 log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_PATH_V/setup.log" >&2 ;
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_PATH_VERSION/setup.log" >&2 ;
 }
 
 # Just Using X cmd setup helper.
 
-{
-    ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} ;
-    ___X_CMD_PATH_VERSION="$HOME/.x-cmd/v/${___X_CMD_VERSION}" ;
-} && (
+___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} ;
+___X_CMD_PATH_VERSION="$HOME/.x-cmd/v/${___X_CMD_VERSION}" ;
 
-    if [ -f "$___X_CMD_PATH_VERSION" ]; then
-        . "$___X_CMD_PATH_VERSION/X" ;
-        exit 0;
-    fi
-
+if [ -f "$___X_CMD_PATH_VERSION/X" ]; then
+    . "$___X_CMD_PATH_VERSION/X" ;
+else (
     PKG=all;
     URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/main/dist/$PKG.tgz";
 
@@ -38,4 +34,5 @@ log(){
     x boot init 2>&1 | tee -a "$___X_CMD_PATH_VERSION/setup.log" >&2 ;
     log "Initialization SUCCESS" ;
 }
+fi
 }
