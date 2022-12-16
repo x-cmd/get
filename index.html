@@ -1,31 +1,30 @@
 {
 log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_PATH_V/setup.log" >&2 ;
 }
 
 # Just Using X cmd setup helper.
 
 {
     ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} ;
-    ___X_CMD_ROOT="$HOME/.x-cmd/v/${___X_CMD_VERSION}"
-    ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/X" ;
+    ___X_CMD_PATH_VERSION="$HOME/.x-cmd/v/${___X_CMD_VERSION}" ;
 } && (
 
     if [ -f "$___X_CMD_PATH_VERSION" ]; then
-        . "$___X_CMD_PATH_VERSION" ;
+        . "$___X_CMD_PATH_VERSION/X" ;
         exit 0;
     fi
 
     PKG=all;
-    URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/${___X_CMD_VERSION}/dist/$PKG.tgz";
+    URL="https://gitee.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/raw/main/dist/$PKG.tgz";
 
-    mkdir -p "${___X_CMD_ROOT}";
-    cd "${___X_CMD_ROOT}";
+    mkdir -p "${___X_CMD_PATH_VERSION}";
+    cd "${___X_CMD_PATH_VERSION}";
 
     log "Download script archieve from $URL" ;
     if curl --fail "$URL" >"$PKG.tgz" 2>/dev/null; then
         log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )" ;
-        tar vxf "$PKG.tgz" 2>>"$___X_CMD_ROOT/setup.log" 1>&2 ;
+        tar vxf "$PKG.tgz" 2>>"$___X_CMD_PATH_VERSION/setup.log" 1>&2 ;
         log "Deflation SUCCESS: $PKG.tgz"  ;
     else
         log "Fail to download from: $URL" ;
@@ -33,10 +32,10 @@ log(){
     fi;
 ) && {
     ___X_CMD_IN_CHINA_NET="" ;
-    log "Source: ${___X_CMD_ROOT}/X" ;
-    . "$___X_CMD_PATH_VERSION" ;
+    log "Source: ${___X_CMD_PATH_VERSION}/X" ;
+    . "$___X_CMD_PATH_VERSION/X" ;
     log "Running: x boot init" ;
-    x boot init 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    x boot init 2>&1 | tee -a "$___X_CMD_PATH_VERSION/setup.log" >&2 ;
     log "Initialization SUCCESS" ;
 }
 }
