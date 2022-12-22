@@ -1,6 +1,6 @@
 
 ___x_cmd_get_setupscript(){
-    ___X_CMD_ROOT=$HOME/.x-cmd
+    ___X_CMD_ROOT=$HOME/.x-cmd.root
     mkdir -p "$___X_CMD_ROOT/v"
 
     ___X_CMD_VERSION="${1:?Provide version}"
@@ -17,8 +17,8 @@ ___x_cmd_get_setupscript(){
     )
 
     ___X_CMD_IN_CHINA_NET=1
-    ___X_CMD_PATH_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
-    . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X"
+    ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
+    . "$___X_CMD_ROOT_V_VERSION/X"
     x boot init
 }
 
