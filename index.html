@@ -11,7 +11,7 @@ if [ -f "$___X_CMD_ROOT_V_VERSION/X" ]; then
     . "$___X_CMD_ROOT_V_VERSION/X";
 else (
     PKG=all;
-    URL="https://raw.githubusercontent.com/x-cmd/${___X_CMD_CODESORUCE_REPO:-x-cmd}/${___X_CMD_VERSION}/dist/$PKG.tgz";
+    URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
 
     mkdir -p "${___X_CMD_ROOT_V_VERSION}"; cd "${___X_CMD_ROOT_V_VERSION}";
 
