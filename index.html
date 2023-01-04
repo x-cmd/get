@@ -25,7 +25,7 @@ else (
     tar vxf "$PKG.tgz" 2>>"$___X_CMD_ROOT_V_VERSION/setup.log" 1>&2;
     log "Deflation SUCCESS: $PKG.tgz";
 ) && {
-    ___X_CMD_IN_CHINA_NET="" ;
+    ___X_CMD_IN_CHINA_NET=1 ;
     log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
     . "$___X_CMD_ROOT_V_VERSION/X";
 };
