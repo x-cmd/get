@@ -13,7 +13,7 @@ ___x_cmd_get_setupscript(){
             return 1
         }
         
-        git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git"
+        git clone "git@gitee.com:x-cmd/$___X_CMD_VERSION.git"
     )
 
     ___X_CMD_IN_CHINA_NET=1
