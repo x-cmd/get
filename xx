@@ -16,8 +16,6 @@ ___x_cmd_get_setupscript(){
         git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git"
     )
 
-    ___X_CMD_IN_CHINA_NET=1
-    ___X_CMD_WEBSRC_REGION=cn
     ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
     . "$___X_CMD_ROOT_V_VERSION/X"
     x boot init
