@@ -1,0 +1,2 @@
+# shellcheck shell=dash #source
+x rclone copy ./ oss2:x-cmd-get/ --include "x?" --include "/index.html" --s3-acl public-read
