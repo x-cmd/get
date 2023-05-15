@@ -25,7 +25,7 @@ ___x_cmd_get_setupscript(){
             return 1
         }
         
-        git clone "git@github.com:x-cmd/$___X_CMD___GET_REPO.git" -b "$___X_CMD___GET_BRANCH"
+        git clone "https://github.com:x-cmd/$___X_CMD___GET_REPO.git" -b "$___X_CMD___GET_BRANCH"
     )
 
     ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
