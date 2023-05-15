@@ -33,4 +33,4 @@ ___x_cmd_get_setupscript(){
     x boot init
 }
 
-___x_cmd_get_setupscript "${repo:x-cmd/x-cmd}"
+___x_cmd_get_setupscript "${REPO:x-cmd/x-cmd}"
