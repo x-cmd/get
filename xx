@@ -13,8 +13,8 @@ ___x_cmd_get_setupscript(){
             return 1
         }
         
-        git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git" || exit 1
-    )
+        git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git"
+    ) || return 1
 
     ___X_CMD_WEBSRC_REGION=cn
     ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
