@@ -6,4 +6,5 @@ x rclone copy ./ oss2:x-cmd-get/ \
     --include "/alpha" \
     --include "/beta" \
     --include "/latest" \
+    --include "/x.bat" \
     --s3-acl public-read
