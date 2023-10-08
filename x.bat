@@ -60,6 +60,7 @@ if EXIST "%gitbash%"        goto :start-git-bash
 echo ERROR: Fail to install git-for-windows. Press any key to exit.
 exit 1
 
+
 :start-git-bash
 echo INFO: start git-bash "%gitbash%"
 
