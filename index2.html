@@ -60,20 +60,19 @@ ___x_cmd_get_setup(){
                 printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
                 printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
-            printf "%s\n" "$___X_CMD_VERSION"
+            ___X_CMD_VERSION_DIRNAME="$___X_CMD_VERSION"
             ;;
         *)
             [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
                 log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
                 return 1;
             }
-            local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
-            printf "%s\n" ".$___X_CMD_VERSION_SUM8"
+            ___X_CMD_VERSION_DIRNAME=".$___X_CMD_VERSION_SUM8"
             ;;
     esac;
 }
 
-___x_cmd_get_main_subshell(){
+___x_cmd_get_main_loop(){
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
     ___x_cmd_get_download "$tmptgt" || return;
@@ -88,18 +87,20 @@ ___x_cmd_get_main(){
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
     local ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
 
-    local version_dirname;  version_dirname="$(___x_cmd_get_main_subshell)" || return 1;
+    local ___X_CMD_VERSION_DIRNAME=;
+
+    ___x_cmd_get_main_loop || return 1;
 
     local code='. "$___X_CMD_ROOT/v/$___X_CMD_GET_VERION_DIRNAME";';
     code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK"; x boot init;';
 
-    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$version_dirname" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
+    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$___X_CMD_VERSION_DIRNAME" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
     
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
-        . "$___X_CMD_ROOT/v/$version_dirname";
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION_DIRNAME";
     else
         log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_VERSION=$version_dirname "${SHELL:-/bin/sh}";
+        ___X_CMD_VERSION="$___X_CMD_VERSION_DIRNAME" "${SHELL:-/bin/sh}";
     fi
 }
 
