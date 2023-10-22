@@ -49,7 +49,7 @@ ___x_cmd_get_populate(){
     command mv "${tmptgt}" "$sum8dir";
 }
 
-___x_cmd_get_setup(){
+___x_cmd_get_link(){
     local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
     case "$___X_CMD_VERSION" in
         latest|alpha|beta|v*)
@@ -72,12 +72,20 @@ ___x_cmd_get_setup(){
     esac;
 }
 
-___x_cmd_get_main_loop(){
-    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
+___x_cmd_get_bootinit(){
+    local code='. "$___X_CMD_ROOT/v/$___X_CMD_GET_VERION_DIRNAME";';
+    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK"; x boot init;';
 
-    ___x_cmd_get_download "$tmptgt" || return;
-    ___x_cmd_get_populate "$tmptgt" || return;
-    ___x_cmd_get_setup;
+    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$___X_CMD_VERSION_DIRNAME" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+}
+
+___x_cmd_get_start(){
+    if [ -z "$___X_CMD_ROOT_MOD" ]; then
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION_DIRNAME";
+    else
+        log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___X_CMD_VERSION="$___X_CMD_VERSION_DIRNAME" "${SHELL:-/bin/sh}";
+    fi
 }
 
 ___x_cmd_get_main(){
@@ -89,19 +97,13 @@ ___x_cmd_get_main(){
 
     local ___X_CMD_VERSION_DIRNAME=;
 
-    ___x_cmd_get_main_loop || return 1;
+    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    local code='. "$___X_CMD_ROOT/v/$___X_CMD_GET_VERION_DIRNAME";';
-    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK"; x boot init;';
-
-    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$___X_CMD_VERSION_DIRNAME" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
-    
-    if [ -z "$___X_CMD_ROOT_MOD" ]; then
-        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION_DIRNAME";
-    else
-        log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_VERSION="$___X_CMD_VERSION_DIRNAME" "${SHELL:-/bin/sh}";
-    fi
+    ___x_cmd_get_download "$tmptgt" || return;
+    ___x_cmd_get_populate "$tmptgt" || return;
+    ___x_cmd_get_link               || return;
+    ___x_cmd_get_bootinit           || return;
+    ___x_cmd_get_start              || return;
 }
 
 ___x_cmd_get_main;
