@@ -56,7 +56,7 @@ ___x_cmd_get_link(){
             command mkdir -p "$vpath";
             (
                 printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}";
-                printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
+                printf "___X_CMD_VERSION=%s\n"              ".${___X_CMD_VERSION_SUM8}";
                 printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
             ;;
