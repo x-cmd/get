@@ -60,14 +60,14 @@ ___x_cmd_get_setup(){
                 printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
                 printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
-            ___X_CMD_VERSION_DIRNAME="$___X_CMD_VERSION"
+            ___X_CMD_VERSION_DIRNAME="$___X_CMD_VERSION";
             ;;
         *)
             [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
                 log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
                 return 1;
             }
-            ___X_CMD_VERSION_DIRNAME=".$___X_CMD_VERSION_SUM8"
+            ___X_CMD_VERSION_DIRNAME=".$___X_CMD_VERSION_SUM8";
             ;;
     esac;
 }
