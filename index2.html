@@ -61,50 +61,47 @@ ___x_cmd_get_setup(){
                 printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
                 printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
+            printf "%s\n" "$___X_CMD_VERSION"
             ;;
         *)
-            [ "$___X_CMD_VERSION" = "$version_sum" ] || {
+            [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
                 log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
                 return 1;
             }
+            local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
+            printf "%s\n" "_$___X_CMD_VERSION_SUM8"
             ;;
     esac;
-    printf "%s\n" "$vpath/X";
 }
 
 ___x_cmd_get_main_subshell(){
-    log "------------------";
-    ___X_CMD_ROOT="$HOME/.x-cmd.root";
-    ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
-    ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
-    ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
-
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    ___x_cmd_get_download "$tmptgt";
-
-    if tgt="$(___x_cmd_get_populate "$tmptgt")"; then
-        ___x_cmd_get_setup "$tgt";
-    else
-        log "Setup failure: fail to download and populate";
-    fi
+    ___x_cmd_get_download "$tmptgt" || return;
+    ___x_cmd_get_populate "$tmptgt" || return;
+    ___x_cmd_get_setup;
 }
 
 ___x_cmd_get_main(){
-    local xpath;
-    xpath="$(___x_cmd_get_main_subshell)" || return 1;
+    log "------------------";
+    local ___X_CMD_ROOT="$HOME/.x-cmd.root";
+    local ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+    local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
+    local ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
 
-    local code='. "$___X_CMD_GET_XPATH";';
-    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK";';
-    code="$code"'x boot init';
+    local version_dirname;
+    version_dirname="$(___x_cmd_get_main_subshell)" || return 1;
 
-    ___X_CMD_GET_XPATH="$xpath" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
+    local code='. "$___X_CMD_ROOT/v/$___X_CMD_GET_VERION_DIRNAME";';
+    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK"; x boot init;';
+
+    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$version_dirname" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
     
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
-        . "$xpath";
+        . "$___X_CMD_ROOT/v/$version_dirname";
     else
         log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} "${SHELL:-/bin/sh}";
+        ___X_CMD_VERSION=$version_dirname "${SHELL:-/bin/sh}";
     fi
 }
 
