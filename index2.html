@@ -1,91 +1,90 @@
 {
+
+___X_CMD_GET_WEBROOT="https://raw.githubusercontent.com/x-cmd/release/main/dist";
+
 log(){
     printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 };
 
 ___x_cmd_get_download(){
-    local tmptgt="$1"
+    local tmptgt="$1";
     
-    PKG=all;
-    URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
-    target="$PKG.tgz"
+    local url="$___X_CMD_GET_WEBROOT/${___X_CMD_VERSION}.tgz";
+    target="$tmptgt/test.tgz";
     [ ! -d "${tmptgt}" ] || {
-        log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt"
-        return 1
+        log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
+        return 1;
     }
 
     (
         command mkdir -p "${tmptgt}"; cd "${tmptgt}";
 
-        log "Download script archieve from $URL";
-        curl --fail "$URL" >"$target" 2>/dev/null || {
-            log "Fail to download from: $URL";
+        log "Download script archieve from $url";
+        curl --fail "$url" >"$target" 2>/dev/null || {
+            log "Fail to download from: $url";
             exit 1;
         };
 
-        log "Download SUCCESS: $target.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
-        tar vxf "$PKG.tgz" 2>>"$tmptgt/setup.log" 1>&2;
-        log "Deflation SUCCESS: $PKG.tgz";
+        log "Download SUCCESS: $target ( size: $(( ($(wc -m "$target" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
+        tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
+        log "Deflation SUCCESS: $target";
     )
 }
 
 ___x_cmd_get_populate(){
-    local tmptgt="$1"
+    local tmptgt="$1";
     [ ! -r ".x-cmd/metadata/version_sum" ] || . "$tmptgt/.x-cmd/metadata/version_sum"
     [ -n "$___X_CMD_VERSION_SUM" ] || {
-        log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum"
-        exit 1
+        log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum";
+        exit 1;
     }
 
-    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}"
+    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}";
 
-    ___X_CMD_VERSION_SUM8_DIR="$___X_CMD_ROOT/v/_$___X_CMD_VERSION_SUM8"
+    ___X_CMD_VERSION_SUM8_DIR="$___X_CMD_ROOT/v/_$___X_CMD_VERSION_SUM8";
     [ ! -e "$___X_CMD_VERSION_SUM8_DIR" ] || {
-        log "Folder already existed ==> $___X_CMD_VERSION_SUM8_DIR"
-        # TODO: Askiing whether to remove it
-        exit 0
+        log "Folder already existed ==> $___X_CMD_VERSION_SUM8_DIR";
+        exit 0; 
     }
 
-    command mv "${tmptgt}" "$___X_CMD_VERSION_SUM8_DIR"
-    # chmod -R 440 "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
+    command mv "${tmptgt}" "$___X_CMD_VERSION_SUM8_DIR";
 }
 
 ___x_cmd_get_setup(){
-    local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
+    local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
     case "$___X_CMD_VERSION" in
         latest|alpha|beta|v*)
-            command rm -rf "$vpath"
-            command mkdir -p "$vpath"
+            command rm -rf "$vpath";
+            command mkdir -p "$vpath";
             (
-                printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}"
-                printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}"
-                printf "___X_CMD_VERSION_SUM=%s\n"          "${version_sum}"
-                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${version_sum}"
+                printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}";
+                printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
+                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
             ;;
         *)
             [ "$___X_CMD_VERSION" = "$version_sum" ] || {
-                log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION"
-                return 1
+                log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
+                return 1;
             }
             ;;
-    esac
-    printf "%s\n" "$vpath/X"
+    esac;
+    printf "%s\n" "$vpath/X";
 }
 
 ___x_cmd_get_main_subshell(){
-    log "------------------"
-    ___X_CMD_ROOT="$HOME/.x-cmd.root"
+    log "------------------";
+    ___X_CMD_ROOT="$HOME/.x-cmd.root";
     ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
     ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
     ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
 
-    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME"
+    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    ___x_cmd_get_download "$tmptgt"
+    ___x_cmd_get_download "$tmptgt";
 
     if tgt="$(___x_cmd_get_populate "$tmptgt")"; then
-        ___x_cmd_get_setup "$tgt"
+        ___x_cmd_get_setup "$tgt";
     else
         log "Setup failure: fail to download and populate";
     fi
@@ -93,25 +92,21 @@ ___x_cmd_get_main_subshell(){
 
 ___x_cmd_get_main(){
     local xpath;
-    xpath=$(___x_cmd_get_main_subshell) || return 1
+    xpath="$(___x_cmd_get_main_subshell)" || return 1;
 
-    # A trick to disable boot init link for version <v0.1.13 
-    ___X_CMD_GET_XPATH="$xpath"     \
-    ___X_CMD_ROOT_V_VERSION_TRICK="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}"      \
-    "${SHELL:-/bin/sh}" 2>&1 | tee -a "$tgt/setup.log" >&2 <<A
-. "\$___X_CMD_GET_XPATH"
-___X_CMD_ROOT_V_VERSION="\$___X_CMD_ROOT_V_VERSION_TRICK"
-x boot init
-A
+    local code='. "$___X_CMD_GET_XPATH";';
+    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK";';
+    code="$code"'x boot init';
+
+    ___X_CMD_GET_XPATH="$xpath" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$tgt/setup.log" >&2 ;
     
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
-        . "$xpath"
+        . "$xpath";
     else
-        log "x-cmd detected in current shell env. Opening a new shell to avoid collision."
-        ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} "${SHELL:-/bin/sh}"
+        log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} "${SHELL:-/bin/sh}";
     fi
 }
 
-___x_cmd_get_main
-
+___x_cmd_get_main;
 }
