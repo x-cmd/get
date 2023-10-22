@@ -1,8 +1,8 @@
 {
 ___X_CMD_GET_WEBROOT="https://raw.githubusercontent.com/x-cmd/release/main/dist";
 
-log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+___x_cmd_get_log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.___x_cmd_get_log" >&2 ;
 };
 
 ___x_cmd_get_download(){
@@ -11,23 +11,23 @@ ___x_cmd_get_download(){
     local url="$___X_CMD_GET_WEBROOT/${___X_CMD_VERSION}.tgz";
     target="$tmptgt/download_tmp.tgz";
     [ ! -d "${tmptgt}" ] || {
-        log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
+        ___x_cmd_get_log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
         return 1;
     }
 
     (
         command mkdir -p "${tmptgt}"; cd "${tmptgt}";
 
-        log "Download script archieve from $url";
+        ___x_cmd_get_log "Download script archieve from $url";
         curl --fail "$url" >"$target" 2>/dev/null || {
-            log "Fail to download from: $url";
+            ___x_cmd_get_log "Fail to download from: $url";
             exit 1;
         };
 
-        log "Download SUCCESS: $target ( size: $(( ($(wc -m "$target" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
-        tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
+        ___x_cmd_get_log "Download SUCCESS: $target ( size: $(( ($(wc -m "$target" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
+        tar vxf "$target" 2>>"$tmptgt/setup.___x_cmd_get_log" 1>&2;
         command rm -f "$target"
-        log "Deflation SUCCESS: $target";
+        ___x_cmd_get_log "Deflation SUCCESS: $target";
     )
 }
 
@@ -35,14 +35,14 @@ ___x_cmd_get_populate(){
     local tmptgt="$1";  local sumfp="$tmptgt/.x-cmd/metadata/version_sum";
     [ ! -r "$sumfp" ] || . "$sumfp"
     [ -n "$___X_CMD_VERSION_SUM" ] || {
-        log "Fail to get version sum from: $sumfp";
+        ___x_cmd_get_log "Fail to get version sum from: $sumfp";
         exit 1;
     }
 
     ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}";
     local sum8dir="$___X_CMD_ROOT/.$___X_CMD_VERSION_SUM8";
     [ ! -e "$sum8dir" ] || {
-        log "Folder already existed ==> $sum8dir";
+        ___x_cmd_get_log "Folder already existed ==> $sum8dir";
         exit 0; 
     }
 
@@ -63,7 +63,7 @@ ___x_cmd_get_link(){
             ;;
         *)
             [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
-                log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
+                ___x_cmd_get_log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
                 return 1;
             }
             ___X_CMD_VERSION=".$___X_CMD_VERSION_SUM8";
@@ -74,14 +74,14 @@ ___x_cmd_get_link(){
 ___x_cmd_get_bootinit(){
     local code='. "$___X_CMD_ROOT/v/$___X_CMD_VERSION";';
     code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1"; x boot init;';
-    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.___x_cmd_get_log" >&2 ;
 }
 
 ___x_cmd_get_start(){
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION";
     else
-        log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
         ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi
 }
@@ -92,7 +92,7 @@ ___x_cmd_get_main(){
     local ___X_CMD_VERSION_SUM8=;
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
 
-    log "------------------ $___X_CMD_CURRENTTIME";
+    ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
     ___x_cmd_get_download "$tmptgt" || return;
