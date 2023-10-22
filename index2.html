@@ -1,0 +1,72 @@
+{
+log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2 ;
+};
+
+___X_CMD_ROOT="$HOME/.x-cmd.root"
+___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+
+___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")"
+___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
+
+___x_cmd_get_populate(){
+    (
+        PKG=all;
+        URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
+
+        target="$PKG.tgz"
+
+        local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME"
+
+        [ ! -d "${tmptgt}" ] || {
+            log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt"
+            return 1
+        }
+
+        command mkdir -p "${tmptgt}"; cd "${tmptgt}";
+
+        log "Download script archieve from $URL";
+        curl --fail "$URL" >"$target" 2>/dev/null || {
+            log "Fail to download from: $URL";
+            exit 1;
+        };
+
+        log "Download SUCCESS: $target.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
+        tar vxf "$PKG.tgz" 2>>"$tmptgt/setup.log" 1>&2;
+        log "Deflation SUCCESS: $PKG.tgz";
+
+        local ___X_CMD_VERSION_SUM=
+        [ ! -r ".x-cmd/metadata/version_sum" ] || . ".x-cmd/metadata/version_sum"
+
+        [ -n "$___X_CMD_VERSION_SUM" ] || {
+            log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum"
+            exit 1
+        }
+
+        local version_dir="$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
+        [ ! -e "$version_dir" ] || {
+            log "Folder already existed ==> $version_dir"
+            # TODO: Askiing whether to remove it
+            exit 0
+        }
+
+        cd ..
+        command mv "${___X_CMD_ROOT_V_VERSION}" "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
+        printf "%s\n" "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
+    )
+}
+
+if tgt="$(___x_cmd_get_populate)"; then
+    mkdir -p "$___X_CMD_ROOT_V_VERSION"
+    (
+        version_sum="${tgt##*/}"
+        printf "___X_CMD_VERSION_SUM=%s\n"          "${version_sum}"
+        printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${version_sum}"
+    ) >"$___X_CMD_ROOT_V_VERSION/X"
+
+    log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
+    . "$___X_CMD_ROOT_V_VERSION/X"
+    x boot init 2>&1 | tee -a "$tgt/setup.log" >&2;
+fi
+
+}
