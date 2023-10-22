@@ -31,15 +31,14 @@ ___x_cmd_get_download(){
 }
 
 ___x_cmd_get_populate(){
-    local tmptgt="$1";
-    [ ! -r ".x-cmd/metadata/version_sum" ] || . "$tmptgt/.x-cmd/metadata/version_sum"
+    local tmptgt="$1";  local sumfp="$tmptgt/.x-cmd/metadata/version_sum";
+    [ ! -r "$sumfp" ] || . "$sumfp"
     [ -n "$___X_CMD_VERSION_SUM" ] || {
-        log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum";
+        log "Fail to get version sum from: $sumfp";
         exit 1;
     }
 
     ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}";
-
     local sum8dir="$___X_CMD_ROOT/.$___X_CMD_VERSION_SUM8";
     [ ! -e "$sum8dir" ] || {
         log "Folder already existed ==> $sum8dir";
@@ -60,43 +59,39 @@ ___x_cmd_get_link(){
                 printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}";
                 printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X"
-            ___X_CMD_VERSION_DIRNAME="$___X_CMD_VERSION";
             ;;
         *)
             [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
                 log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
                 return 1;
             }
-            ___X_CMD_VERSION_DIRNAME=".$___X_CMD_VERSION_SUM8";
+            ___X_CMD_VERSION=".$___X_CMD_VERSION_SUM8";
             ;;
     esac;
 }
 
 ___x_cmd_get_bootinit(){
-    local code='. "$___X_CMD_ROOT/v/$___X_CMD_GET_VERION_DIRNAME";';
-    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK"; x boot init;';
-
-    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_GET_VERION_DIRNAME="$___X_CMD_VERSION_DIRNAME" ___X_CMD_ROOT_V_VERSION_TRICK_0_1_13="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    local code='. "$___X_CMD_ROOT/v/$___X_CMD_VERSION";';
+    code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1"; x boot init;';
+    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 }
 
 ___x_cmd_get_start(){
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
-        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION_DIRNAME";
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION";
     else
         log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_VERSION="$___X_CMD_VERSION_DIRNAME" "${SHELL:-/bin/sh}";
+        ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi
 }
 
 ___x_cmd_get_main(){
-    log "------------------";
     local ___X_CMD_ROOT="$HOME/.x-cmd.root";
     local ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+    local ___X_CMD_VERSION_SUM8=;
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
-    local ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
 
-    local ___X_CMD_VERSION_DIRNAME=;
-
+    log "------------------ $___X_CMD_CURRENTTIME";
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
     ___x_cmd_get_download "$tmptgt" || return;
