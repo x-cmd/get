@@ -9,7 +9,7 @@ ___x_cmd_get_download(){
     local tmptgt="$1";
     
     local url="$___X_CMD_GET_WEBROOT/${___X_CMD_VERSION}.tgz";
-    target="$tmptgt/test.tgz";
+    target="$tmptgt/download_tmp.tgz";
     [ ! -d "${tmptgt}" ] || {
         log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
         return 1;
@@ -26,6 +26,7 @@ ___x_cmd_get_download(){
 
         log "Download SUCCESS: $target ( size: $(( ($(wc -m "$target" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
         tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
+        command rm -f "$target"
         log "Deflation SUCCESS: $target";
     )
 }
