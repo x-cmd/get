@@ -60,6 +60,7 @@ if tgt="$(___x_cmd_get_populate)"; then
     mkdir -p "$___X_CMD_ROOT_V_VERSION"
     (
         version_sum="${tgt##*/}"
+        printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}"
         printf "___X_CMD_VERSION_SUM=%s\n"          "${version_sum}"
         printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${version_sum}"
     ) >"$___X_CMD_ROOT_V_VERSION/X"
