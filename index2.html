@@ -1,28 +1,20 @@
 {
 log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2 ;
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 };
 
-___X_CMD_ROOT="$HOME/.x-cmd.root"
-___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+___x_cmd_get_download(){
+    local tmptgt="$1"
+    
+    PKG=all;
+    URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
+    target="$PKG.tgz"
+    [ ! -d "${tmptgt}" ] || {
+        log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt"
+        return 1
+    }
 
-___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")"
-___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
-
-___x_cmd_get_populate(){
     (
-        PKG=all;
-        URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
-
-        target="$PKG.tgz"
-
-        local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME"
-
-        [ ! -d "${tmptgt}" ] || {
-            log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt"
-            return 1
-        }
-
         command mkdir -p "${tmptgt}"; cd "${tmptgt}";
 
         log "Download script archieve from $URL";
@@ -34,41 +26,92 @@ ___x_cmd_get_populate(){
         log "Download SUCCESS: $target.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
         tar vxf "$PKG.tgz" 2>>"$tmptgt/setup.log" 1>&2;
         log "Deflation SUCCESS: $PKG.tgz";
-
-        local ___X_CMD_VERSION_SUM=
-        [ ! -r ".x-cmd/metadata/version_sum" ] || . ".x-cmd/metadata/version_sum"
-
-        [ -n "$___X_CMD_VERSION_SUM" ] || {
-            log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum"
-            exit 1
-        }
-
-        local version_dir="$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
-        [ ! -e "$version_dir" ] || {
-            log "Folder already existed ==> $version_dir"
-            # TODO: Askiing whether to remove it
-            exit 0
-        }
-
-        cd ..
-        command mv "${___X_CMD_ROOT_V_VERSION}" "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
-        printf "%s\n" "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
     )
 }
 
-if tgt="$(___x_cmd_get_populate)"; then
-    mkdir -p "$___X_CMD_ROOT_V_VERSION"
-    (
-        version_sum="${tgt##*/}"
-        printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}"
-        printf "___X_CMD_VERSION=%s\n"              "${version_sum}"
-        printf "___X_CMD_VERSION_SUM=%s\n"          "${version_sum}"
-        printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${version_sum}"
-    ) >"$___X_CMD_ROOT_V_VERSION/X"
+___x_cmd_get_populate(){
+    local tmptgt="$1"
+    [ ! -r ".x-cmd/metadata/version_sum" ] || . "$tmptgt/.x-cmd/metadata/version_sum"
+    [ -n "$___X_CMD_VERSION_SUM" ] || {
+        log "Fail to get version sum from: $___X_CMD_ROOT_V_VERSION/.x-cmd/metadata/version_sum"
+        exit 1
+    }
 
-    log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
-    . "$___X_CMD_ROOT_V_VERSION/X"
-    x boot init 2>&1 | tee -a "$tgt/setup.log" >&2;
-fi
+    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}"
+
+    ___X_CMD_VERSION_SUM8_DIR="$___X_CMD_ROOT/v/_$___X_CMD_VERSION_SUM8"
+    [ ! -e "$___X_CMD_VERSION_SUM8_DIR" ] || {
+        log "Folder already existed ==> $___X_CMD_VERSION_SUM8_DIR"
+        # TODO: Askiing whether to remove it
+        exit 0
+    }
+
+    command mv "${tmptgt}" "$___X_CMD_VERSION_SUM8_DIR"
+    # chmod -R 440 "$___X_CMD_ROOT/v/$___X_CMD_VERSION_SUM"
+}
+
+___x_cmd_get_setup(){
+    local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
+    case "$___X_CMD_VERSION" in
+        latest|alpha|beta|v*)
+            command rm -rf "$vpath"
+            command mkdir -p "$vpath"
+            (
+                printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}"
+                printf "___X_CMD_VERSION=%s\n"              "_${___X_CMD_VERSION_SUM8}"
+                printf "___X_CMD_VERSION_SUM=%s\n"          "${version_sum}"
+                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     "${version_sum}"
+            ) >"$vpath/X"
+            ;;
+        *)
+            [ "$___X_CMD_VERSION" = "$version_sum" ] || {
+                log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION"
+                return 1
+            }
+            ;;
+    esac
+    printf "%s\n" "$vpath/X"
+}
+
+___x_cmd_get_main_subshell(){
+    log "------------------"
+    ___X_CMD_ROOT="$HOME/.x-cmd.root"
+    ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+    ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%S/%H:%M:%d")";
+    ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
+
+    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME"
+
+    ___x_cmd_get_download "$tmptgt"
+
+    if tgt="$(___x_cmd_get_populate "$tmptgt")"; then
+        ___x_cmd_get_setup "$tgt"
+    else
+        log "Setup failure: fail to download and populate";
+    fi
+}
+
+___x_cmd_get_main(){
+    local xpath;
+    xpath=$(___x_cmd_get_main_subshell) || return 1
+
+    # A trick to disable boot init link for version <v0.1.13 
+    ___X_CMD_GET_XPATH="$xpath"     \
+    ___X_CMD_ROOT_V_VERSION_TRICK="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}"      \
+    "${SHELL:-/bin/sh}" 2>&1 | tee -a "$tgt/setup.log" >&2 <<A
+. "\$___X_CMD_GET_XPATH"
+___X_CMD_ROOT_V_VERSION="\$___X_CMD_ROOT_V_VERSION_TRICK"
+x boot init
+A
+    
+    if [ -z "$___X_CMD_ROOT_MOD" ]; then
+        . "$xpath"
+    else
+        log "x-cmd detected in current shell env. Opening a new shell to avoid collision."
+        ___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest} "${SHELL:-/bin/sh}"
+    fi
+}
+
+___x_cmd_get_main
 
 }
