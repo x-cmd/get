@@ -80,10 +80,11 @@ ___x_cmd_get_link(){
 ___x_cmd_get_bootinit(){
     local code='. "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";';
     code="$code"'___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1"; x boot init;';
-    ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    ___X_CMD_ROOT_CODE= ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" "${SHELL:-/bin/sh}" -c "$code" 2>&1 | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 }
 
 ___x_cmd_get_start(){
+    ___X_CMD_ROOT_CODE=
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
     else
