@@ -29,7 +29,8 @@ else (
     log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
     . "$___X_CMD_ROOT_V_VERSION/X";
 };
-fi;
+fi && {
+    x boot init 2>&1 | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2;
+}
 
-x boot init 2>&1 | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2;
 }
