@@ -80,7 +80,7 @@ ___x_cmd_get_link(){
 };
 
 ___x_cmd_get_bootinit()(
-    ___X_CMD_WEBSRC_REGION=cn
+    ___X_CMD_WEBSRC_REGION=cn;
     ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}";
     ___X_CMD_ROOT_CODE=;
     . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
@@ -105,6 +105,7 @@ ___x_cmd_get_main(){
     local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
     local ___X_CMD_VERSION_SUM8=;
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%d_%H:%M:%S")";
+    command mkdir -p "$___X_CMD_ROOT";
 
     ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
