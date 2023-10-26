@@ -1,36 +1,121 @@
 {
-log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2 ;
+
+___x_cmd_get_log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 };
 
-___X_CMD_ROOT="$HOME/.x-cmd.root"
-___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
-___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
-
-if [ -f "$___X_CMD_ROOT_V_VERSION/X" ]; then
-    . "$___X_CMD_ROOT_V_VERSION/X";
-else (
-    PKG=all;
-    URL="https://gitee.com/x-cmd/release/raw/main/dist/${___X_CMD_VERSION}.tgz";
-
-    mkdir -p "${___X_CMD_ROOT_V_VERSION}"; cd "${___X_CMD_ROOT_V_VERSION}";
-
-    log "Download script archieve from $URL";
-    curl --fail "$URL" >"$PKG.tgz" 2>/dev/null || {
-        log "Fail to download from: $URL";
-        exit 1;
+___x_cmd_get_download(){
+    local tmptgt="$1";
+    
+    local url="https://gitee.com/x-cmd/release/raw/main";
+    case "$___X_CMD_VERSION" in
+        latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"         ;;
+        v*)                 url="$url/dist/${___X_CMD_VERSION}/full.tgz"    ;;
+        *)                  url="$url/sum/${___X_CMD_VERSION}.tgz"          ;;
+    esac;
+    
+    local target="$tmptgt/download_tmp.tgz";
+    [ ! -d "${tmptgt}" ] || {
+        ___x_cmd_get_log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
+        return 1;
     };
 
-    log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
-    tar vxf "$PKG.tgz" 2>>"$___X_CMD_ROOT_V_VERSION/setup.log" 1>&2;
-    log "Deflation SUCCESS: $PKG.tgz";
-) && {
-    ___X_CMD_WEBSRC_REGION=cn ;
-    log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
-    . "$___X_CMD_ROOT_V_VERSION/X";
-};
-fi && {
-    x boot init 2>&1 | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2;
-}
+    (
+        command mkdir -p "${tmptgt}"; cd "${tmptgt}";
 
+        ___x_cmd_get_log "Download script archieve from $url";
+        command curl --fail "$url" >"$target" 2>/dev/null || {
+            command rm -rf "$tmptgt";
+            ___x_cmd_get_log "Fail to download from: $url";
+            exit 1;
+        };
+
+        ___x_cmd_get_log "Download SUCCESS: $target ( size: $(command wc -m "$target" 2>/dev/null | command awk '{print ((int($1) + 1023 ) / 1024); }') KB )";
+        command tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
+        command rm -f "$target";
+        ___x_cmd_get_log "Deflation SUCCESS: $target";
+    );
+};
+
+___x_cmd_get_populate(){
+    local tmptgt="$1";  local sumfp="$tmptgt/.x-cmd/metadata/version_sum";
+    [ ! -r "$sumfp" ] || . "$sumfp";
+    [ -n "$___X_CMD_VERSION_SUM" ] || {
+        ___x_cmd_get_log "Fail to get version sum from: $sumfp";
+        return 1;
+    };
+
+    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}";
+    local sum8dir="$___X_CMD_ROOT/v/.$___X_CMD_VERSION_SUM8";
+    [ ! -e "$sum8dir" ] || {
+        ___x_cmd_get_log "Folder already existed ==> $sum8dir";
+        command rm -rf "${tmptgt}";
+        return 0; 
+    };
+
+    command rm -rf "$sum8dir";
+    command mv "${tmptgt}" "$sum8dir";
+};
+
+___x_cmd_get_link(){
+    local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
+    case "$___X_CMD_VERSION" in
+        latest|alpha|beta|v*)
+            command rm -rf "$vpath";
+            command mkdir -p "$vpath";
+            (
+                printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}";
+                printf "___X_CMD_VERSION=%s\n"              ".${___X_CMD_VERSION_SUM8}";
+                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     ".${___X_CMD_VERSION_SUM8}";
+            ) >"$vpath/X";
+            ;;
+        *)
+            [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
+                ___x_cmd_get_log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
+                return 1;
+            };
+            ___X_CMD_VERSION=".${___X_CMD_VERSION_SUM8}";
+            ;;
+    esac;
+};
+
+___x_cmd_get_bootinit()(
+    ___X_CMD_WEBSRC_REGION=cn;
+    ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}";
+    ___X_CMD_ROOT_CODE=;
+    . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
+
+    ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1";
+    [ -z "$___X_CMD_VERSION0" ] || ___X_CMD_VERSION="$___X_CMD_VERSION0";
+    x boot init;
+);
+
+___x_cmd_get_start(){
+    if [ -z "$___X_CMD_ROOT_MOD" ]; then
+        ___X_CMD_ROOT_CODE=;
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
+    else
+        ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
+    fi;
+};
+
+___x_cmd_get_main(){
+    local ___X_CMD_ROOT="$HOME/.x-cmd.root";
+    local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
+    local ___X_CMD_VERSION_SUM8=;
+    local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%d_%H:%M:%S")";
+    command mkdir -p "$___X_CMD_ROOT";
+
+    ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
+    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
+
+    ___x_cmd_get_download "$tmptgt" || return;
+    ___x_cmd_get_populate "$tmptgt" || return;
+    ___x_cmd_get_link               || return;
+    ___x_cmd_get_bootinit           || return;
+    ___x_cmd_get_start              || return;
+};
+
+___x_cmd_get_main;
 }

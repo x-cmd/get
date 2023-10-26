@@ -1,0 +1,36 @@
+{
+log(){
+    printf "[%s] %s\n" "$(date +"%Y-%m-%S/%H:%M:%d")" "$1" | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2 ;
+};
+
+___X_CMD_ROOT="$HOME/.x-cmd.root"
+___X_CMD_VERSION=${___X_CMD_TOINSTALL_VERSION:-latest};
+___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/${___X_CMD_VERSION}";
+
+if [ -f "$___X_CMD_ROOT_V_VERSION/X" ]; then
+    . "$___X_CMD_ROOT_V_VERSION/X";
+else (
+    PKG=all;
+    URL="https://gitee.com/x-cmd/release/raw/main/dist/${___X_CMD_VERSION}.tgz";
+
+    mkdir -p "${___X_CMD_ROOT_V_VERSION}"; cd "${___X_CMD_ROOT_V_VERSION}";
+
+    log "Download script archieve from $URL";
+    curl --fail "$URL" >"$PKG.tgz" 2>/dev/null || {
+        log "Fail to download from: $URL";
+        exit 1;
+    };
+
+    log "Download SUCCESS: $PKG.tgz ( size: $(( ($(wc -m "$PKG.tgz" 2>/dev/null | tr -dc '0-9') + 1023) / 1024 )) KB )";
+    tar vxf "$PKG.tgz" 2>>"$___X_CMD_ROOT_V_VERSION/setup.log" 1>&2;
+    log "Deflation SUCCESS: $PKG.tgz";
+) && {
+    ___X_CMD_WEBSRC_REGION=cn ;
+    log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
+    . "$___X_CMD_ROOT_V_VERSION/X";
+};
+fi && {
+    x boot init 2>&1 | tee -a "$___X_CMD_ROOT_V_VERSION/setup.log" >&2;
+}
+
+}
