@@ -1,7 +1,7 @@
 if command -v curl >/dev/null; then
-    ___X_CMD_TOINSTALL_VERSION=beta eval "$(curl       https://get.x-cmd.com)"
+    ___X_CMD_TOINSTALL_VERSION=beta eval "$(curl        https://get.x-cmd.com)";
 elif command -v wget >/dev/null; then
-    ___X_CMD_TOINSTALL_VERSION=beta eval "$(wget -O-   https://get.x-cmd.com)"
+    ___X_CMD_TOINSTALL_VERSION=beta eval "$(wget -O-    https://get.x-cmd.com)";
 else
-    printf "%s\n" "command not found ==> curl wget " >&2
-fi
+    printf "%s\n" "command not found ==> curl wget " >&2;
+fi;
