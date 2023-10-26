@@ -79,14 +79,18 @@ ___x_cmd_get_link(){
     esac;
 };
 
+# In the future: /bin/sh "$___X_CMD_ROOT/v/$___X_CMD_VERSION/mod/x-cmd/bin/xbin" boot init "$___X_CMD_ROOT" "$___X_CMD_VERSION"
 ___x_cmd_get_bootinit()(
     ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}";
     ___X_CMD_ROOT_CODE=;
+
+    ___X_CMD_ROOT_MOD=;
     . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
 
     ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1";
     [ -z "$___X_CMD_VERSION0" ] || ___X_CMD_VERSION="$___X_CMD_VERSION0";
-    x boot init;
+
+    x boot init "$___X_CMD_ROOT" "$___X_CMD_VERSION" ;
 );
 
 ___x_cmd_get_start(){
