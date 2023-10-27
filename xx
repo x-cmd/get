@@ -1,24 +1,35 @@
 
 ___x_cmd_get_setupscript(){
-    ___X_CMD_ROOT=$HOME/.x-cmd.root
-    mkdir -p "$___X_CMD_ROOT/v"
+    ___X_CMD_ROOT="$HOME/.x-cmd.root";
+    command mkdir -p "$___X_CMD_ROOT/v";
 
-    ___X_CMD_VERSION="${1:?Provide version}"
+    ___X_CMD_VERSION="${1:?Provide version}";
 
     (
-        cd "$___X_CMD_ROOT/v"
+        cd "$___X_CMD_ROOT/v";
 
         [ ! -d "$___X_CMD_VERSION" ] || {
-            echo "Already exists: $PWD/$___X_CMD_VERSION"
-            return 1
-        }
+            printf "%s\n" "Already exists: $PWD/$___X_CMD_VERSION" >&2;
+            return 1;
+        };
         
-        git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git" || exit 1
-    )
+        command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
+    ) || return 1;
 
-    ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT/v/$___X_CMD_VERSION"
-    . "$___X_CMD_ROOT_V_VERSION/X"
-    x boot init
-}
+    (
+        ___X_CMD_ROOT_CODE=;
+        ___X_CMD_ROOT_MOD=;
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
+        x boot init;
+    );
 
-___x_cmd_get_setupscript "${XX:-x2}"
+    if [ -z "$___X_CMD_ROOT_MOD" ]; then
+        ___X_CMD_ROOT_CODE=;
+        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
+    else
+        printf "%s\n" "- I|x: x-cmd detected in current shell env. Opening a new shell to avoid collision." >&2;
+        ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
+    fi;
+};
+
+___x_cmd_get_setupscript "${XX:-x2}";
