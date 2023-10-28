@@ -64,8 +64,8 @@ exit 1
 :start-git-bash
 echo INFO: start git-bash "%gitbash%"
 
-set x_str="if [ -f $HOME/.x-cmd.root/X ]; then . $HOME/.x-cmd.root/X; else eval \"$(curl https://get.x-cmd.com)\"; fi"
-findstr /c:%x_str% %USERPROFILE%\.bashrc >nul 2>&1
-if %errorlevel% neq 0       echo if [ -f $HOME/.x-cmd.root/X ]; then . $HOME/.x-cmd.root/X; else eval "$(curl https://get.x-cmd.com)"; fi >>%USERPROFILE%\.bashrc
+echo [ -f "$HOME/.x-cmd.root/X" ] ^|^| eval "$(curl https://get.x-cmd.com)" >%USERPROFILE%\.x-cmd.init.bash
+"%gitbash%" %USERPROFILE%\.x-cmd.init.bash
+del %USERPROFILE%\.x-cmd.init.bash
 
 "%gitbash%"
