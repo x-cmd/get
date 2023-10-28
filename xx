@@ -8,12 +8,19 @@ ___x_cmd_get_setupscript(){
     (
         cd "$___X_CMD_ROOT/v";
 
-        [ ! -d "$___X_CMD_VERSION" ] || {
-            printf "%s\n" "Already exists: $PWD/$___X_CMD_VERSION" >&2;
-            return 1;
-        };
-        
-        command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
+        if [ ! -d "$___X_CMD_VERSION" ]; then
+            command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
+        else
+            printf "%s\n" "- I|x: Already exists: $PWD/$___X_CMD_VERSION" >&2;
+            cd "$___X_CMD_VERSION";
+            if [ "$(command git status -s | command wc -l)" -ne 0 ]; then
+                command git status -s;
+                command git stash;
+                command git clean -fd;
+            fi;
+
+            command git pull origin "$(command git branch --show-current)";
+        fi;
     ) || return 1;
 
     (
