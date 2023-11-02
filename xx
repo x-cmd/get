@@ -27,6 +27,7 @@ ___x_cmd_get_setupscript(){
         ___X_CMD_WEBSRC_REGION=cn;
         ___X_CMD_ROOT_CODE=;
         ___X_CMD_ROOT_MOD=;
+        ___X_CMD_XRC_RELOAD=1;
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
         x boot init;
     );
