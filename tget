@@ -57,42 +57,51 @@ ___x_cmd_get_populate(){
     command mv "${tmptgt}" "$sum8dir";
 };
 
-___x_cmd_get_link(){
-    local vpath="$___X_CMD_ROOT/v/$___X_CMD_VERSION";
-    case "$___X_CMD_VERSION" in
-        latest|alpha|beta|v*)
-            command rm -rf "$vpath";
-            command mkdir -p "$vpath";
-            (
-                printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}";
-                printf "___X_CMD_VERSION=%s\n"              ".${___X_CMD_VERSION_SUM8}";
-                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     ".${___X_CMD_VERSION_SUM8}";
-            ) >"$vpath/X";
-            ;;
-        *)
-            [ "$___X_CMD_VERSION" = "$___X_CMD_VERSION_SUM" ] || {
-                ___x_cmd_get_log "Exit for unknown situation when ___X_CMD_VERSION is $___X_CMD_VERSION";
-                return 1;
-            };
-            ___X_CMD_VERSION=".${___X_CMD_VERSION_SUM8}";
-            ;;
-    esac;
+___x_cmd_get_xx(){
+    command mkdir -p "$___X_CMD_ROOT/v";
+    (
+        cd "$___X_CMD_ROOT/v";
+
+        if [ ! -d "$___X_CMD_VERSION" ]; then
+            ___x_cmd_get_log "Git clone: x-cmd/$___X_CMD_VERSION";
+            command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
+        else
+            ___x_cmd_get_log "Already exists: $PWD/$___X_CMD_VERSION";
+            cd "$___X_CMD_VERSION";
+            if [ "$(command git status -s | command wc -l)" -ne 0 ]; then
+                command git status -s;
+                command git stash;
+                command git clean -fd;
+            fi;
+
+            command git pull origin "$(command git branch --show-current)";
+        fi;
+    ) 
 };
 
 ___x_cmd_get_main(){
     local ___X_CMD_ROOT="$HOME/.x-cmd.root.test";
     local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
-    local ___X_CMD_VERSION_SUM8=;
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%d_%H:%M:%S")";
     command mkdir -p "$___X_CMD_ROOT";
 
     ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
-    local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    ___x_cmd_get_download "$tmptgt" || return;
-    ___x_cmd_get_populate "$tmptgt" || return;
-    ___x_cmd_get_link               || return;
-    # "${SHELL:-/bin/sh}" "$___X_CMD_ROOT/v/.${___X_CMD_VERSION_SUM8}/mod/x-cmd/lib/bin/xbin" root || return;
+    case "$___X_CMD_VERSION" in
+        x[0-9])
+            ___x_cmd_get_xx || return;
+            ___X_CMD_TGET_XBIN="$___X_CMD_ROOT/v/${___X_CMD_VERSION}/mod/x-cmd/lib/bin/xbin";
+            ;;
+        *)
+            local ___X_CMD_VERSION_SUM8=;
+            local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
+            ___x_cmd_get_download "$tmptgt" || return;
+            ___x_cmd_get_populate "$tmptgt" || return;
+            ___X_CMD_TGET_XBIN="$___X_CMD_ROOT/v/.${___X_CMD_VERSION_SUM8}/mod/x-cmd/lib/bin/xbin";
+            ;;
+    esac;
+
+    [ -f "$___X_CMD_TGET_XBIN" ];
 };
 
 ___x_cmd_get_main;
