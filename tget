@@ -7,7 +7,7 @@ ___x_cmd_get_log(){
 ___x_cmd_get_download(){
     local tmptgt="$1";
     
-    local url="https://raw.githubusercontent.com/x-cmd/release/main";
+    local url="https://gitee.com/x-cmd/release/raw/main";
     case "$___X_CMD_VERSION" in
         latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"         ;;
         v*)                 url="$url/dist/${___X_CMD_VERSION}/full.tgz"    ;;
@@ -101,7 +101,9 @@ ___x_cmd_get_main(){
             ;;
     esac;
 
-    [ -f "$___X_CMD_TGET_XBIN" ];
+    ___x_cmd_get_log "xbin path => $___X_CMD_TGET_XBIN";
+    [ -f "$___X_CMD_TGET_XBIN" ] || return;
+    ___x_cmd_get_log "Test case => \`\"\${SHELL:-/bin/sh}\" \"\$___X_CMD_TGET_XBIN\" root\`";
 };
 
 ___x_cmd_get_main;
