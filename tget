@@ -101,8 +101,8 @@ ___x_cmd_get_main(){
             ;;
     esac;
 
-    ___x_cmd_get_log "xbin path => $___X_CMD_TGET_XBIN";
     [ -f "$___X_CMD_TGET_XBIN" ] || return;
+    ___x_cmd_get_log "xbin path => $___X_CMD_TGET_XBIN";
     ___x_cmd_get_log "Test case => \`\"\${SHELL:-/bin/sh}\" \"\$___X_CMD_TGET_XBIN\" root\`";
 };
 
