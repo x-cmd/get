@@ -24,7 +24,11 @@ ___x_cmd_get_download(){
         command mkdir -p "${tmptgt}"; cd "${tmptgt}";
 
         ___x_cmd_get_log "Download script archieve from $url";
-        command curl --fail "$url" >"$target" 2>/dev/null || {
+        if command -v curl >/dev/null; then
+            command curl --fail "$url" >"$target" 2>/dev/null
+        else
+            command wget -O "$target" "$url" 2>/dev/null
+        fi || {
             command rm -rf "$tmptgt";
             ___x_cmd_get_log "Fail to download from: $url";
             exit 1;
