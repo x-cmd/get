@@ -81,7 +81,7 @@ ___x_cmd_get_xx(){
 
 ___x_cmd_get_main(){
     local ___X_CMD_ROOT="$HOME/.x-cmd.root.test";
-    local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
+    local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-x6}";
     local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%d_%H:%M:%S")";
     command mkdir -p "$___X_CMD_ROOT";
 
