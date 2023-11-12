@@ -25,9 +25,9 @@ ___x_cmd_get_download(){
 
         ___x_cmd_get_log "Download script archieve from $url";
         if command -v curl >/dev/null; then
-            command curl --fail "$url" >"$target" 2>/dev/null
+            command curl --fail "$url" >"$target" 2>/dev/null;
         else
-            command wget -O "$target" "$url" 2>/dev/null
+            command wget -O "$target" "$url" 2>/dev/null;
         fi || {
             command rm -rf "$tmptgt";
             ___x_cmd_get_log "Fail to download from: $url";
