@@ -9,3 +9,5 @@ x rclone copy ./ oss2:x-cmd-get/ \
     --include "/x.bat" \
     --include "/tget" \
     --s3-acl public-read
+   
+x aliyun cdn RefreshObjectCaches --ObjectType Directory --ObjectPath https://get.x-cmd.com/
