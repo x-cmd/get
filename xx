@@ -1,6 +1,6 @@
 
 ___x_cmd_get_setupscript(){
-    ___X_CMD_ROOT="$HOME/.x-cmd.root";
+    ___X_CMD_ROOT="${___X_CMD_ROOT:-"$HOME/.x-cmd.root"}";
     command mkdir -p "$___X_CMD_ROOT/v";
 
     ___X_CMD_VERSION="${1:?Provide version}";
@@ -36,7 +36,7 @@ ___x_cmd_get_setupscript(){
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
     else
         printf "%s\n" "- I|x: x-cmd detected in current shell env. Opening a new shell to avoid collision." >&2;
-        ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
+        ___X_CMD_ROOT_CODE= ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi;
 };
 
