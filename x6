@@ -1,4 +1,8 @@
 
-XX=x6 eval "$(curl https://get.x-cmd.com/xx)"
-
-
+if command -v curl >/dev/null; then
+    XX=x6 eval "$(curl https://get.x-cmd.com/xx)";
+elif command -v wget >/dev/null; then
+    XX=x6 eval "$(wget -O- https://get.x-cmd.com/xx)";
+else
+    printf "%s\n" "command not found ==> curl wget " >&2;
+fi;
