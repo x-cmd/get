@@ -1,5 +1,4 @@
 
-
 if command -v curl >/dev/null; then
     XX=x0 eval "$(curl https://get.x-cmd.com/xx)";
 elif command -v wget >/dev/null; then
