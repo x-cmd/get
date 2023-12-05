@@ -101,7 +101,7 @@ ___x_cmd_get_start(){
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
     else
         ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
+        ___X_CMD_ROOT_MOD= ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi;
 };
 
