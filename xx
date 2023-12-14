@@ -1,3 +1,16 @@
+if [ -n "$ZSH_VERSION" ]; then
+# `command cd` will not execute buildin command `cd` in zsh, refer: https://linux.die.net/man/1/zshbuiltins
+___x_cmd_inner_cd(){
+    builtin cd "$@" || return
+}
+
+else
+
+___x_cmd_inner_cd(){
+    command cd "$@" || return
+}
+
+fi
 
 ___x_cmd_get_setupscript(){
     ___X_CMD_ROOT="${___X_CMD_ROOT:-"$HOME/.x-cmd.root"}";
@@ -6,13 +19,13 @@ ___x_cmd_get_setupscript(){
     ___X_CMD_VERSION="${1:?Provide version}";
 
     (
-        cd "$___X_CMD_ROOT/v";
+        ___x_cmd_inner_cd "$___X_CMD_ROOT/v";
 
         if [ ! -d "$___X_CMD_VERSION" ]; then
             command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
         else
             printf "%s\n" "- I|x: Already exists: $PWD/$___X_CMD_VERSION" >&2;
-            cd "$___X_CMD_VERSION";
+            ___x_cmd_inner_cd "$___X_CMD_VERSION";
             if [ "$(command git status -s | command wc -l)" -ne 0 ]; then
                 command git status -s;
                 command git stash;
