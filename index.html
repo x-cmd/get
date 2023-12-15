@@ -15,7 +15,7 @@ ___x_cmd_inner_cd(){
 fi
 
 ___x_cmd_get_log(){
-    printf "[%s] %s\n" "$(date +"%Y-%m-%d/%H:%M:%S")" "$1" | tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
+    printf "[%s] %s\n" "$(command date +"%Y-%m-%d/%H:%M:%S")" "$1" | command tee -a "$___X_CMD_ROOT/setup.log" >&2 ;
 };
 
 ___x_cmd_get_download(){
@@ -123,7 +123,7 @@ ___x_cmd_get_main(){
     local ___X_CMD_ROOT="$HOME/.x-cmd.root";
     local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
     local ___X_CMD_VERSION_SUM8=;
-    local ___X_CMD_CURRENTTIME="$(date +"%Y-%m-%d_%H:%M:%S")";
+    local ___X_CMD_CURRENTTIME="$(command date +"%Y-%m-%d_%H:%M:%S")";
     command mkdir -p "$___X_CMD_ROOT";
 
     ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
