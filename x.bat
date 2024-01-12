@@ -4,6 +4,10 @@ REM Copyright 2022-? Li Junhao (l@x-cmd.com). Licensed under the GNU AFFERO GENE
 
 echo INFO: Check if Git-For-Windows is installed
 
+set gitbash=bash
+where.exe "%gitbash%" >nul 2>&1
+if %errorlevel% == 0        goto :start-git-bash
+
 set gitbash=git-bash
 where.exe "%gitbash%" >nul 2>&1
 if %errorlevel% == 0        goto :start-git-bash
