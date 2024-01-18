@@ -22,7 +22,7 @@ ___x_cmd_get_setupscript(){
         ___x_cmd_inner_cd "$___X_CMD_ROOT/v";
 
         if [ ! -d "$___X_CMD_VERSION" ]; then
-            command git clone "git@github.com:x-cmd/$___X_CMD_VERSION.git";
+            command git clone -c core.autocrlf=false "git@github.com:x-cmd/$___X_CMD_VERSION.git";
         else
             printf "%s\n" "- I|x: Already exists: $PWD/$___X_CMD_VERSION" >&2;
             ___x_cmd_inner_cd "$___X_CMD_VERSION";
