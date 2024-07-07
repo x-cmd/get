@@ -1,4 +1,5 @@
 
+___X_CMD_GET_GITPROVIDER="https://codeberg.org/"
 if command -v curl >/dev/null; then
     XX=x7 eval "$(curl https://get.x-cmd.com/xx)";
 elif command -v wget >/dev/null; then
