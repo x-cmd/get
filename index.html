@@ -113,7 +113,7 @@ ___x_cmd_get_start(){
     if [ -z "$___X_CMD_ROOT_MOD" ]; then
         ___X_CMD_ROOT_CODE=;
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
-    else
+    elif [ "${-#*i}" != "$-" ]; then
         ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
         ___X_CMD_ROOT_MOD= ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi;
