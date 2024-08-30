@@ -4,10 +4,6 @@ REM Copyright 2022-? Li Junhao (l@x-cmd.com). Licensed under the GNU AFFERO GENE
 
 echo INFO: Check if Git-For-Windows is installed
 
-set gitbash=bash
-where.exe "%gitbash%" >nul 2>&1
-if %errorlevel% == 0        goto :start-git-bash
-
 set gitbash=git-bash
 where.exe "%gitbash%" >nul 2>&1
 if %errorlevel% == 0        goto :start-git-bash
@@ -68,8 +64,12 @@ exit 1
 :start-git-bash
 echo INFO: start git-bash "%gitbash%"
 
-echo [ -f "$HOME/.x-cmd.root/X" ] ^|^| eval "$(curl https://get.x-cmd.com)" >%USERPROFILE%\.x-cmd.init.bash
-"%gitbash%" %USERPROFILE%\.x-cmd.init.bash
-del %USERPROFILE%\.x-cmd.init.bash
+if NOT EXIST "%USERPROFILE%\.x-cmd.root\X" (
+    echo INFO: x-cmd init
+    echo [ -f "$HOME/.x-cmd.root/X" ] ^|^| eval "$(curl https://get.x-cmd.com)" >%USERPROFILE%\.x-cmd.init.bash
+    "%gitbash%" %USERPROFILE%\.x-cmd.init.bash
+    del %USERPROFILE%\.x-cmd.init.bash
+)
+
 
 "%gitbash%"
