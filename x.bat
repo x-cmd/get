@@ -28,7 +28,7 @@ echo ---------------------------------------------------------------------------
 echo STEP 1: Download git-for-windows to %USERPROFILE%\.x-cmd.root\data\git-for-windows
 echo --------------------------------------------------------------------------------------------------------
 echo .
-curl -L -o git-for-windows.7z.exe https://github.com/x-cmd-build/git-for-windows/releases/download/v2.41.0/git-for-windows.7z.exe
+curl -L -o git-for-windows.7z.exe https://github.com/x-cmd-build/git-for-windows/releases/download/v2.47.0/git-for-windows.7z.exe
 if %errorlevel% equ 0  goto :install
 echo ERROR: Download failure. Press any key to exit.
 pause
