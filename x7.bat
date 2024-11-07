@@ -16,6 +16,10 @@ if EXIST "%gitbash%"        goto :start-git-bash
 set gitbash=%USERPROFILE%\AppData\Local\Programs\Git\bin\bash.exe
 if EXIST "%gitbash%"        goto :start-git-bash
 
+set gitbash=git-bash
+where.exe "%gitbash%" >nul 2>&1
+if %errorlevel% == 0        goto :start-git-bash
+
 if EXIST  %USERPROFILE%\.x-cmd.root\data\git-for-windows goto :init
 echo INFO: create directory to place git-for-windows -- %USERPROFILE%\.x-cmd.root\data\git-for-windows
 mkdir %USERPROFILE%\.x-cmd.root\data\git-for-windows
