@@ -20,7 +20,7 @@ ___x_cmd_get_log(){
 ___x_cmd_get_download(){
     local tmptgt="$1";
     
-    local url="https://raw.githubusercontent.com/x-cmd/release/main";
+    local url="https://oss.resource.x-cmd.com/x-cmd/release";
     case "$___X_CMD_VERSION" in
         latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"         ;;
         v*)                 url="$url/dist/${___X_CMD_VERSION}/full.tgz"    ;;
@@ -97,6 +97,7 @@ ___x_cmd_get_link(){
 };
 
 ___x_cmd_get_bootinit()(
+    ___X_CMD_WEBSRC_REGION=cn;
     ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}";
     ___X_CMD_ROOT_CODE=;
     ___X_CMD_ROOT_MOD=;

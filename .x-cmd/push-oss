@@ -1,0 +1,13 @@
+# shellcheck shell=dash #source
+x rclone -v copy ./ oss2:x-cmd-get/ \
+    --include "x?" \
+    --include "/index.html" \
+    --include "/hgit" \
+    --include "/alpha" \
+    --include "/beta" \
+    --include "/latest" \
+    --include "/x.bat" \
+    --include "/tget" \
+    --s3-acl public-read
+   
+x aliyun --profile akProfile cdn RefreshObjectCaches --ObjectType Directory --ObjectPath https://get.x-cmd.com/

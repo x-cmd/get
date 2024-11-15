@@ -11,7 +11,7 @@ if [ -f "$___X_CMD_ROOT_V_VERSION/X" ]; then
     . "$___X_CMD_ROOT_V_VERSION/X";
 else (
     PKG=all;
-    URL="https://raw.githubusercontent.com/x-cmd/release/main/dist/${___X_CMD_VERSION}.tgz";
+    URL="https://gitee.com/x-cmd/release/raw/main/dist/${___X_CMD_VERSION}.tgz";
 
     mkdir -p "${___X_CMD_ROOT_V_VERSION}"; cd "${___X_CMD_ROOT_V_VERSION}";
 
@@ -25,6 +25,7 @@ else (
     tar vxf "$PKG.tgz" 2>>"$___X_CMD_ROOT_V_VERSION/setup.log" 1>&2;
     log "Deflation SUCCESS: $PKG.tgz";
 ) && {
+    ___X_CMD_WEBSRC_REGION=cn ;
     log "Source: ${___X_CMD_ROOT_V_VERSION}/X";
     . "$___X_CMD_ROOT_V_VERSION/X";
 };
