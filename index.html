@@ -111,7 +111,9 @@ ___x_cmd_get_bootinit()(
 );
 
 ___x_cmd_get_start(){
-    if [ -z "$___X_CMD_ROOT_MOD" ]; then
+    if [ -n "$___X_CMD_XBINEXP_EXIT" ]; then
+        ___x_cmd_get_log "This installation/upgrade is performed by an external call, so the interactive shell for the new version will not automatically open.";
+    elif [ -z "$___X_CMD_ROOT_MOD" ]; then
         ___X_CMD_ROOT_CODE=;
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
     elif [ "${-#*i}" != "$-" ]; then
