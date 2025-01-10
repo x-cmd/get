@@ -98,17 +98,19 @@ ___x_cmd_get_link(){
 
 ___x_cmd_get_bootinit()(
     ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" \
-    ___X_CMD_ROOT_CODE=""       \
-    ___X_CMD_ROOT_MOD=""        \
-    ___X_CMD_XRC_RELOAD=1       \
-    ___X_CMD_ADVISE_DISABLE=1   \
+    ___X_CMD_ROOT="$___X_CMD_ROOT"          \
+    ___X_CMD_VERSION="$___X_CMD_VERSION"    \
+    ___X_CMD_ROOT_CODE=""                   \
+    ___X_CMD_ROOT_MOD=""                    \
+    ___X_CMD_XRC_RELOAD=1                   \
+    ___X_CMD_ADVISE_DISABLE=1               \
     sh -c '
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
 
         ___X_CMD_ROOT_V_VERSION="$___X_CMD_ROOT_V_VERSION_TRICK_0_1";
         [ -z "$___X_CMD_VERSION0" ] || ___X_CMD_VERSION="$___X_CMD_VERSION0";
         ___x_cmd boot init "$___X_CMD_ROOT" "$___X_CMD_VERSION";
-    '
+    ';
 );
 
 ___x_cmd_get_start(){
