@@ -102,7 +102,6 @@ ___x_cmd_get_bootinit()(
     ___X_CMD_VERSION="$___X_CMD_VERSION"    \
     ___X_CMD_ROOT_CODE=""                   \
     ___X_CMD_ROOT_MOD=""                    \
-    ___X_CMD_XRC_RELOAD=1                   \
     ___X_CMD_ADVISE_DISABLE=1               \
     sh -c '
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
