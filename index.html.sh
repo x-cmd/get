@@ -22,9 +22,11 @@ ___x_cmd_get_download(){
     
     local url="https://raw.githubusercontent.com/x-cmd/release/main";
     case "$___X_CMD_VERSION" in
-        latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"         ;;
-        v*)                 url="$url/dist/${___X_CMD_VERSION}/full.tgz"    ;;
-        *)                  url="$url/sum/${___X_CMD_VERSION}.tgz"          ;;
+        latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"             ;;
+        v0.1.*|v0.2.*|v0.3.*|v0.4.*|v0.5.0|v0.5.1)
+                            url="$url/dist/${___X_CMD_VERSION}/full.tgz"        ;;
+        v*)                 url="$url/dist/${___X_CMD_VERSION}/allinone.tgz"    ;;
+        *)                  url="$url/sum/${___X_CMD_VERSION}.tgz"              ;;
     esac;
     
     local target="$tmptgt/download_tmp.tgz";
