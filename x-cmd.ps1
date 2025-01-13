@@ -8,8 +8,6 @@ function ___x_cmd____rcpwsh_setup_pwsh(){
     & $xbatfile "$HOME\.x-cmd.root\bin\x" pwsh --setup
 }
 
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
 ___x_cmd____rcpwsh_setup_pwsh
 $___X_CMD_PCPWSH_RCFILE = "$HOME\.x-cmd.root\local\data\pwsh\_index.ps1"
 if (Test-Path $___X_CMD_PCPWSH_RCFILE) {
