@@ -13,6 +13,7 @@ $___X_CMD_PCPWSH_RCFILE = "$HOME\.x-cmd.root\local\data\pwsh\_index.ps1"
 if (Test-Path $___X_CMD_PCPWSH_RCFILE) {
     Set-ExecutionPolicy Bypass -Scope Process
     . $___X_CMD_PCPWSH_RCFILE
+    Write-Host "- I|x: Successfully loaded x-cmd"
 } else {
     Write-Host "- E|x: Not found pwsh rcfile -> $___X_CMD_PCPWSH_RCFILE"
 }
