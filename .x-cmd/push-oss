@@ -8,6 +8,7 @@ x rclone -v copy ./ oss2:x-cmd-get/ \
     --include "/latest" \
     --include "/x.bat" \
     --include "/x-cmd.bat" \
+    --include "/x-cmd.ps1" \
     --include "/tget" \
     --s3-acl public-read
    
