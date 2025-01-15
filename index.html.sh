@@ -51,7 +51,6 @@ ___x_cmd_get_download(){
 
         ___x_cmd_get_log "Download SUCCESS: $target ( size: $(command wc -c "$target" 2>/dev/null | command awk '{print ((int($1) + 1023 ) / 1024); }') KB )";
         command tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
-        ___x_cmd_get_log "Deflation SUCCESS: $target";
     );
 };
 
@@ -70,6 +69,7 @@ ___x_cmd_get_populate(){
     local archivefile="$archivedir/.${___X_CMD_VERSION_SUM8}.tgz";
     command mkdir -p "$archivedir";
     command mv -f "$target" "$archivefile";
+    ___x_cmd_get_log "Archival SUCCESS: $target";
 
     local sum8dir="$___X_CMD_ROOT/v/.${___X_CMD_VERSION_SUM8}";
     [ ! -e "$sum8dir" ] || {
