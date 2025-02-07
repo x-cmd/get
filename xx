@@ -45,7 +45,7 @@ ___x_cmd_get_setupscript(){
         sh -c '
             . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
             ___x_cmd boot init;
-        ';
+        ' || return 1;
     );
 
     if [ -n "$___X_CMD_XBINEXP_EXIT" ]; then
