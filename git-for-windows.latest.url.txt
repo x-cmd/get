@@ -1,0 +1,1 @@
+https://mirrors.tuna.tsinghua.edu.cn/github-release/git-for-windows/git/LatestRelease/PortableGit-2.48.1-64-bit.7z.exe

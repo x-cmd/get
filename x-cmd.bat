@@ -34,7 +34,14 @@ echo ---------------------------------------------------------------------------
 echo STEP 1: Download git-for-windows to %USERPROFILE%\.x-cmd.root\data\git-for-windows
 echo --------------------------------------------------------------------------------------------------------
 echo .
-curl -L -o git-for-windows.7z.exe https://mirrors.tuna.tsinghua.edu.cn/github-release/git-for-windows/git/LatestRelease/PortableGit-2.48.1-64-bit.7z.exe
+
+for /f "delims=" %%i in ('curl -s "https://get.x-cmd.com/git-for-windows.latest.url.txt"') do set "url=%%i"
+if not defined url (
+    echo ERROR: Failed to fetch URL for git-for-windows. Exiting.
+    pause
+    exit 1
+)
+curl -L -o git-for-windows.7z.exe %url%
 if %errorlevel% equ 0  goto :install
 echo ERROR: Download failure. Press any key to exit.
 pause
