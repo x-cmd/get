@@ -11,6 +11,7 @@ x rclone -v copy ./ oss2:x-cmd-get/ \
     --include "/x-cmd.ps1" \
     --include "/pre-get" \
     --include "/tget" \
+    --include "/git-for-windows.latest.url.txt" \
     --s3-acl public-read
    
 x aliyun --profile akProfile cdn RefreshObjectCaches --ObjectType Directory --ObjectPath https://get.x-cmd.com/
