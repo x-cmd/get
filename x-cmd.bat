@@ -34,7 +34,6 @@ echo ---------------------------------------------------------------------------
 echo STEP 1: Download git-for-windows to %USERPROFILE%\.x-cmd.root\data\git-for-windows
 echo --------------------------------------------------------------------------------------------------------
 echo .
-
 for /f "delims=" %%i in ('curl -s "https://get.x-cmd.com/git-for-windows.latest.url.txt"') do set "url=%%i"
 if not defined url (
     echo ERROR: Failed to fetch URL for git-for-windows. Exiting.
