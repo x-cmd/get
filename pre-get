@@ -50,6 +50,7 @@ ___x_cmd_get_download(){
         };
 
         ___x_cmd_get_log "Download SUCCESS: $target ( size: $(command wc -c "$target" 2>/dev/null | command awk '{print ((int($1) + 1023 ) / 1024); }') KB )";
+        command touch "$tmptgt/setup.log";
         command tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
     );
 };
