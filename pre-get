@@ -2,13 +2,13 @@
 
 if [ -n "$ZSH_VERSION" ]; then
 ___x_cmd_inner_cd(){
-    builtin cd "$@" || return;
+    builtin cd "$@" || return $?;
 };
 
 else
 
 ___x_cmd_inner_cd(){
-    command cd "$@" || return;
+    command cd "$@" || return $?;
 };
 
 fi;
@@ -146,16 +146,16 @@ ___x_cmd_get_install(){
     ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    ___x_cmd_get_download "$tmptgt" || return;
-    ___x_cmd_get_populate "$tmptgt" || return;
-    ___x_cmd_get_link               || return;
+    ___x_cmd_get_download "$tmptgt" || return $?;
+    ___x_cmd_get_populate "$tmptgt" || return $?;
+    ___x_cmd_get_link               || return $?;
     ___x_cmd_get_bootinit
 };
 
 ___x_cmd_get_main(){
     local x_cmd_root="$HOME/.x-cmd.root";
     local x_cmd_version="${___X_CMD_TOINSTALL_VERSION:-latest}";
-    ___x_cmd_get_install    "$x_cmd_root" "$x_cmd_version" || return;
+    ___x_cmd_get_install    "$x_cmd_root" "$x_cmd_version" || return $?;
     ___x_cmd_get_start      "$x_cmd_root" "$x_cmd_version"
 };
 
