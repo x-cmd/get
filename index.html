@@ -2,13 +2,13 @@
 
 if [ -n "$ZSH_VERSION" ]; then
 ___x_cmd_inner_cd(){
-    builtin cd "$@" || return;
+    builtin cd "$@" || return $?;
 };
 
 else
 
 ___x_cmd_inner_cd(){
-    command cd "$@" || return;
+    command cd "$@" || return $?;
 };
 
 fi;
@@ -123,21 +123,9 @@ ___x_cmd_get_bootinit()(
     ';
 );
 
-___x_cmd_get_start(){
-    if [ -n "$___X_CMD_XBINEXP_EXIT" ]; then
-        ___x_cmd_get_log "This installation/upgrade is performed by an external call, so the interactive shell for the new version will not automatically open.";
-    elif [ -z "$___X_CMD_ROOT_MOD" ]; then
-        ___X_CMD_ROOT_CODE=;
-        . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
-    elif [ "${-#*i}" != "$-" ]; then
-        ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
-        ___X_CMD_ROOT_MOD= ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
-    fi;
-};
-
-___x_cmd_get_main(){
-    local ___X_CMD_ROOT="$HOME/.x-cmd.root";
-    local ___X_CMD_VERSION="${___X_CMD_TOINSTALL_VERSION:-latest}";
+___x_cmd_get_install(){
+    local ___X_CMD_ROOT="$1";
+    local ___X_CMD_VERSION="$2";
     local ___X_CMD_VERSION_SUM8=;
     local ___X_CMD_CURRENTTIME="$(command date +"%Y-%m-%d_%H-%M-%S")";
     command mkdir -p "$___X_CMD_ROOT";
@@ -145,11 +133,31 @@ ___x_cmd_get_main(){
     ___x_cmd_get_log "------------------ $___X_CMD_CURRENTTIME";
     local tmptgt="$___X_CMD_ROOT/v/${___X_CMD_VERSION}.$$.$___X_CMD_CURRENTTIME";
 
-    ___x_cmd_get_download "$tmptgt" || return;
-    ___x_cmd_get_populate "$tmptgt" || return;
-    ___x_cmd_get_link               || return;
-    ___x_cmd_get_bootinit           || return;
-    ___x_cmd_get_start              || return;
+    ___x_cmd_get_download "$tmptgt" || return $?;
+    ___x_cmd_get_populate "$tmptgt" || return $?;
+    ___x_cmd_get_link               || return $?;
+    ___x_cmd_get_bootinit
+};
+
+___x_cmd_get_start(){
+    local x_cmd_root="$1";
+    local x_cmd_version="$2";
+    if [ -n "$___X_CMD_XBINEXP_EXIT" ]; then
+        ___x_cmd_get_log "This installation/upgrade is performed by an external call, so the interactive shell for the new version will not automatically open.";
+    elif [ -z "$___X_CMD_ROOT_MOD" ]; then
+        ___X_CMD_ROOT_CODE=;
+        . "$x_cmd_root/X";
+    elif [ "${-#*i}" != "$-" ]; then
+        ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___X_CMD_ROOT_MOD= ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$x_cmd_version" "${SHELL:-/bin/sh}";
+    fi;
+};
+
+___x_cmd_get_main(){
+    local x_cmd_root="$HOME/.x-cmd.root";
+    local x_cmd_version="${___X_CMD_TOINSTALL_VERSION:-latest}";
+    ___x_cmd_get_install    "$x_cmd_root" "$x_cmd_version" || return $?;
+    ___x_cmd_get_start      "$x_cmd_root" "$x_cmd_version"
 };
 
 ___x_cmd_get_main;
