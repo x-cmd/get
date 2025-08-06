@@ -20,7 +20,7 @@ ___x_cmd_get_log(){
 ___x_cmd_get_download(){
     local tmptgt="$1";
     
-    local url="https://oss.resource.x-cmd.com/x-cmd/release";
+    local url="https://x-cmd-resource.oss-cn-heyuan.aliyuncs.com/x-cmd/release";
     case "$___X_CMD_VERSION" in
         latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"             ;;
         v0.1.*|v0.2.*|v0.3.*|v0.4.*|v0.5.0|v0.5.1)
