@@ -5,7 +5,7 @@ function ___x_cmd____rcpwsh_setup_pwsh(){
         Write-Host "- I|x: Download the x-cmd x.bat script file from '$xbaturl' to '$xbatfile'"
         Invoke-WebRequest -Uri "$xbaturl" -OutFile "$xbatfile"
     }
-    & $xbatfile "$HOME\.x-cmd.root\bin\x" pwsh --setup
+    & $xbatfile "$HOME\.x-cmd.root\bin\x-cmd" pwsh --setup
 }
 
 ___x_cmd____rcpwsh_setup_pwsh
