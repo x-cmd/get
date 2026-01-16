@@ -8,7 +8,7 @@ ___x_cmd_inner_cd(){
 else
 
 ___x_cmd_inner_cd(){
-    command cd "$@" || return $?;
+    command cd "$@" || return $? ;
 };
 
 fi;
@@ -22,15 +22,15 @@ ___x_cmd_get_download(){
     
     local url="https://raw.githubusercontent.com/x-cmd/release/main";
     case "$___X_CMD_VERSION" in
-        latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}.tgz"             ;;
+        latest|alpha|beta)  url="$url/dist/${___X_CMD_VERSION}. tgz"             ;;
         v0.1.*|v0.2.*|v0.3.*|v0.4.*|v0.5.0|v0.5.1)
-                            url="$url/dist/${___X_CMD_VERSION}/full.tgz"        ;;
+                            url="$url/dist/${___X_CMD_VERSION}/full. tgz"        ;;
         v*)                 url="$url/dist/${___X_CMD_VERSION}/allinone.tgz"    ;;
-        *)                  url="$url/sum/${___X_CMD_VERSION}.tgz"              ;;
+        *)                  url="$url/sum/${___X_CMD_VERSION}. tgz"              ;;
     esac;
     
-    local target="$tmptgt/download_tmp.tgz";
-    [ ! -d "${tmptgt}" ] || {
+    local target="$tmptgt/download_tmp. tgz";
+    [ !  -d "${tmptgt}" ] || {
         ___x_cmd_get_log "Folder already existed ==> There must be other process is installing x-cmd ==> $tmptgt";
         return 1;
     };
@@ -45,35 +45,35 @@ ___x_cmd_get_download(){
             command wget -O "$target" "$url" 2>/dev/null;
         fi || {
             command rm -rf "$tmptgt";
-            ___x_cmd_get_log "Fail to download from: $url";
+            ___x_cmd_get_log "Fail to download from:  $url";
             exit 1;
         };
 
-        ___x_cmd_get_log "Download SUCCESS: $target ( size: $(command wc -c "$target" 2>/dev/null | command awk '{print ((int($1) + 1023 ) / 1024); }') KB )";
+        ___x_cmd_get_log "Download SUCCESS:  $target ( size: $(command wc -c "$target" 2>/dev/null | command awk '{print ((int($1) + 1023 ) / 1024); }') KB )";
         command touch "$tmptgt/setup.log";
         command tar vxf "$target" 2>>"$tmptgt/setup.log" 1>&2;
     );
 };
 
 ___x_cmd_get_populate(){
-    local tmptgt="$1";  local sumfp="$tmptgt/.x-cmd/metadata/version_sum";
-    [ ! -r "$sumfp" ] || . "$sumfp";
+    local tmptgt="$1";  local sumfp="$tmptgt/. x-cmd/metadata/version_sum";
+    [ ! -r "$sumfp" ] || .  "$sumfp";
     [ -n "$___X_CMD_VERSION_SUM" ] || {
         ___x_cmd_get_log "Fail to get version sum from: $sumfp";
         return 1;
     };
 
-    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#????????}"}";
+    ___X_CMD_VERSION_SUM8="${___X_CMD_VERSION_SUM%"${___X_CMD_VERSION_SUM#???????? }"}";
 
     local target="$tmptgt/download_tmp.tgz";
     local archivedir="$___X_CMD_ROOT/global/shared/version/archive";
-    local archivefile="$archivedir/.${___X_CMD_VERSION_SUM8}.tgz";
+    local archivefile="$archivedir/. ${___X_CMD_VERSION_SUM8}.tgz";
     command mkdir -p "$archivedir";
     command mv -f "$target" "$archivefile";
     ___x_cmd_get_log "Archival SUCCESS: $target";
 
-    local sum8dir="$___X_CMD_ROOT/v/.${___X_CMD_VERSION_SUM8}";
-    [ ! -e "$sum8dir" ] || {
+    local sum8dir="$___X_CMD_ROOT/v/. ${___X_CMD_VERSION_SUM8}";
+    [ !  -e "$sum8dir" ] || {
         ___x_cmd_get_log "Folder already existed ==> $sum8dir";
         command rm -rf "${tmptgt}";
         return 0; 
@@ -91,8 +91,8 @@ ___x_cmd_get_link(){
             command mkdir -p "$vpath";
             (
                 printf "___X_CMD_VERSION0=%s\n"             "${___X_CMD_VERSION}";
-                printf "___X_CMD_VERSION=%s\n"              ".${___X_CMD_VERSION_SUM8}";
-                printf ". \"\$___X_CMD_ROOT/v/%s/X\"\n"     ".${___X_CMD_VERSION_SUM8}";
+                printf "___X_CMD_VERSION=%s\n"              ". ${___X_CMD_VERSION_SUM8}";
+                printf ".  \"\$___X_CMD_ROOT/v/%s/X\"\n"     ". ${___X_CMD_VERSION_SUM8}";
             ) >"$vpath/X";
             ;;
         *)
@@ -105,7 +105,8 @@ ___x_cmd_get_link(){
     esac;
 };
 
-___x_cmd_get_bootinit()(
+___x_cmd_get_bootinit(){
+(
     ___X_CMD_ROOT_V_VERSION_TRICK_0_1="$___X_CMD_ROOT/v/${___X_CMD_VERSION_SUM}" \
     ___X_CMD_ROOT="$___X_CMD_ROOT"          \
     ___X_CMD_VERSION="$___X_CMD_VERSION"    \
@@ -120,7 +121,8 @@ ___x_cmd_get_bootinit()(
         [ -z "$___X_CMD_VERSION0" ] || ___X_CMD_VERSION="$___X_CMD_VERSION0";
         ___x_cmd boot init "$___X_CMD_ROOT" "$___X_CMD_VERSION";
     ';
-);
+)
+};
 
 ___x_cmd_get_install(){
     local ___X_CMD_ROOT="$1";
@@ -134,7 +136,7 @@ ___x_cmd_get_install(){
 
     ___x_cmd_get_download "$tmptgt" || return $?;
     ___x_cmd_get_populate "$tmptgt" || return $?;
-    ___x_cmd_get_link               || return $?;
+    ___x_cmd_get_link               || return $? ;
     ___x_cmd_get_bootinit
 };
 
@@ -142,7 +144,7 @@ ___x_cmd_get_start(){
     local x_cmd_root="$1";
     local x_cmd_version="$2";
     if [ -n "$___X_CMD_XBINEXP_EXIT" ]; then
-        ___x_cmd_get_log "This installation/upgrade is performed by an external call, so the interactive shell for the new version will not automatically open.";
+        ___x_cmd_get_log "This installation/upgrade is performed by an external call, so the interactive shell for the new version will not automatically open. ";
     elif [ -z "$___X_CMD_ROOT_MOD" ]; then
         ___X_CMD_ROOT_CODE=;
         . "$x_cmd_root/X";
