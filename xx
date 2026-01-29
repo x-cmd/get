@@ -56,6 +56,7 @@ ___x_cmd_get_setupscript(){
         . "$___X_CMD_ROOT/v/$___X_CMD_VERSION/X";
     elif [ "${-#*i}" != "$-" ]; then
         printf "%s\n" "- I|x: x-cmd detected in current shell env. Opening a new shell to avoid collision." >&2;
+        printf "%s\n" "- I|x: If the new shell environment hasn’t loaded x-cmd, run: \`. ~/.x-cmd.root/X\`" >&2;
         ___X_CMD_ROOT_CODE= ___X_CMD_ROOT="$___X_CMD_ROOT" ___X_CMD_VERSION="$___X_CMD_VERSION" "${SHELL:-/bin/sh}";
     fi;
 };

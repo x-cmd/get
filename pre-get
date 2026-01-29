@@ -148,6 +148,7 @@ ___x_cmd_get_start(){
         . "$x_cmd_root/X";
     elif [ "${-#*i}" != "$-" ]; then
         ___x_cmd_get_log "x-cmd detected in current shell env. Opening a new shell to avoid collision.";
+        ___x_cmd_get_log "If the new shell environment hasn’t loaded x-cmd, run: \`. ~/.x-cmd.root/X\`";
         ___X_CMD_ROOT_MOD= ___X_CMD_ROOT_CODE= ___X_CMD_VERSION="$x_cmd_version" "${SHELL:-/bin/sh}";
     fi;
 };
